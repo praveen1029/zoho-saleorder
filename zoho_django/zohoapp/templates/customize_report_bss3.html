@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+</head>
+
+<style>
+
+    .multiselect {
+        width: 200px;
+        position: relative;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .option {
+        border-bottom: 1px solid #ddd;
+        cursor: pointer;
+    }
+
+    .option:last-child {
+        border-bottom: none;
+    }
+
+    .form-group label {
+        color: beige;
+        margin-bottom: 5px;
+    }
+
+    .column_button{
+        height: 4vh;
+        width: 5vh;
+        float: right;
+        margin-right: 2vh;
+    }
+
+    #general{
+        background-color:#007bff;
+    }
+
+    .ui-dateRangePicker {
+        background: #333;
+        border: 1px solid #555;
+        color: #EEE;
+    }
+
+    .myDiv:target{
+        display:block !important;
+    }
+
+    .myd{
+         display:none;
+    } 
+
+    .searchdiv{
+        display: list-item;	
+    }
+
+    .colborder{
+        border: 2px solid white;
+        height: 65vh;
+        overflow: hidden;
+    }
+
+    .inputdiv{
+        background-color: white; 
+        color: #060606; 
+        width:39vh;
+        height: 5vh;
+        border-radius: 5px;
+        margin-bottom: 1vh;
+        padding-top: 1vh;
+        padding-left: 2vh;
+    }
+
+    .dropdown-content{
+        width:39vh;
+        border-radius: 10px;
+    }
+
+    #custom-dropdown-btn{
+        background-color: white;
+        width: 61%;
+        height: 5vh;
+        text-align: left;
+    }
+
+    .dropdown-content .option:hover{
+        background-color: #007bff;
+    }
+
+    #date-options{
+        background-color: white;
+        width: 61%;
+        margin-top: 1vh;
+        border-radius: 10px;
+        margin-left: 4vh;
+    }
+
+    #date-options a{
+        color: #060606;
+    }
+
+
+
+    .div-option:hover{
+        background-color: #007bff;
+    }
+
+    
+    .close-button{
+        font-size: 2vh;
+        margin-top: 1vh; 
+        font-weight: 100;
+    }
+
+    .close-button:hover{
+        color: blue;
+    }
+
+    .multi-line {
+        position: relative;
+        width: 50%;
+    }
+
+    /* Style for the custom dropdown button */
+    .multi-line button {
+        width: 100%;
+        height: 5vh;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: left;
+    }
+
+    /* Style for the dropdown content */
+    .multi-line .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 95%;
+        overflow-y: auto;
+    }
+
+    /* Style for the dropdown options */
+    .multi-line .dropdown-option {
+        cursor: pointer;
+    }
+
+    /* Show the dropdown content when the button is clicked */
+    .custom-dropdown.active .dropdown-content {
+        display: block;
+    }
+    #AddFilter:hover, #addmore_btn:hover{
+        background-color: transparent;
+    }
+
+     #remove_btn:hover,#filteracc:hover{
+        background-color: #f8f9fa;
+    }
+
+    #multi{
+        color: black;
+    }
+
+    #multi:hover{
+        background-color: #007bff;
+        color: white;
+    }
+
+</style>
+
+<div class="container-fluid ">
+    <div class="row">
+        <div class="col-md-11">
+            <h1 class="text-uppercase">Customize Report</h1>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'balance_sheet_sthree' %}" class="btn  btn-light close-button" >
+                X
+            </a>
+        </div>
+        </div><br><br>
+
+
+    <div class="row row-container">
+        <div class="col-md-3"><br>
+            <div class="nav-item " id="general">
+                <a class="nav-link cursor-pointer active" style="background-color: grey; color: white; font-size: 3vh;">General</a>
+            </div> 
+        </div>
+
+        <div class="col-md-9 myDiv" id="generaldiv">
+            <form>
+                <div class="custom-dropdown">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="dateRangePicker" style="font-size: medium;">Date Range</label>
+                        </div>
+                        <div class="col-md-9 d-flex">
+                            <i class="fa fa-calendar" aria-hidden="true"
+                                style="font-size: 4vh; color: white;"></i>&nbsp;
+                            <select  id="filterDropdown" onclick="filterDates()" class="form-control text-dark bg-white" style="width: 61%;">
+                                <option value="" hidden>Select</option>
+                                <option value="today">Today</option>
+                                <option value="thisWeek">This Week</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="thisQuarter">This Quarter</option>
+                                <option value="thisYear">This Year</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="previousweek">Previous Week</option>
+                                <option value="previousmonth">Previous Month</option>
+                                <option value="previousquarter">Previous Quarter</option>
+                                <option value="previousyear">Previous Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div id="dateInputs" style="display: none;margin-left: 15.5rem;" class="col-md-9">
+                            <div class="date-container" style="margin:auto;">
+                                <label for="startDate">Start Date:</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            <button onclick="printDates()" class="btn btn-secondary" id="applyBtn">Apply</button>
+                        </div>
+                    </div>
+
+                </div><br>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="ReportBasis" style="font-size: medium; margin-top: 1vh;" >Report Basis</label>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="ReportBasis" class="form-control text-dark bg-white">
+                                <option value="#" style="color: #060606;" selected hidden></option>
+                                <option value="Accrual" style="color: #060606;">Accrual</option>
+                                <option value="Cash" style="color: #060606;">Cash</option>
+                            </select>
+                        </div>
+                    </div>
+                </div><br>
+    
+                <div class="form-group">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="checkbox" style="width: 50px;">
+                                    <label for="FilterAccounts" style="margin-top: 3px; font-size: medium;">Show detailed view</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+    
+                
+                <div class="row">
+                    <div class="col-md-4 d-flex">
+                        <button class="btn btn-success" style="width: 100%; background-color: transparent; margin-right: 2vh;">Run Report</button>
+                        <a class="btn btn-danger" href="{% url 'balance_sheet_sthree' %}" style="width: 100%; background-color: transparent;">Cancel</a>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+
+<script>
+ function filterDates() {
+        const selectedOption = document.getElementById("filterDropdown").value;
+        const currentDate = new Date();
+        let startDate, endDate;
+
+        switch (selectedOption) {
+            case "today":
+                startDate = endDate = new Date();
+                break;
+            case "thisWeek":
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+                endDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 6);
+                break;
+            case "thisMonth":
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+                break;
+            case "thisQuarter":
+                const currentMonth = currentDate.getMonth();
+                const startMonth = Math.floor(currentMonth / 3) * 3; // Determine the start month of the quarter
+                startDate = new Date(currentDate.getFullYear(), startMonth, 1); // Set the start date to the first day of the start month
+                endDate = new Date(currentDate.getFullYear(), startMonth + 3, 0); // Set the end date to the last day of the end month
+                break;
+
+            case 'thisYear':
+                // Set date to January 1st of the current year
+                const firstDayOfYear = new Date(new Date().getFullYear(), 0, 1);
+                startDate = firstDayOfYear;
+
+                // Set date to December 31st of the current year
+                const lastDayOfYear = new Date(new Date().getFullYear(), 11, 31);
+                endDate = lastDayOfYear;
+                break;
+            case 'yesterday':
+                const yesterday = new Date();
+                // Set date to yesterday
+                yesterday.setDate(yesterday.getDate() - 1);
+                startDate = endDate = yesterday;
+                break;
+            case "previousweek":
+                const lastWeekStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
+                const lastWeekEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1);
+                startDate = lastWeekStartDate;
+                endDate = lastWeekEndDate;
+                break;
+            case 'previousquarter':
+                const prevQuarterStartMonth = Math.floor(currentDate.getMonth() / 3) * 3 - 3;
+                const prevQuarterStart = new Date(currentDate.getFullYear(), prevQuarterStartMonth, 1);
+
+                const currentQuarterStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - currentDate.getMonth() % 3, 1);
+                const prevQuarterEnd = new Date(currentQuarterStart.getTime() - 1);
+
+                startDate = prevQuarterStart;
+                endDate = prevQuarterEnd;
+                break;
+            case 'previousmonth':
+                const previousMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+                const previousMonthEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+
+                startDate = previousMonthStartDate;
+                endDate = previousMonthEndDate;
+                break;
+
+            case 'previousyear':
+                const prevYear = currentDate.getFullYear() - 1;
+
+                const prevYearStartDate = new Date(prevYear, 0, 1);
+                const prevYearEndDate = new Date(prevYear, 11, 31);
+
+                startDate = prevYearStartDate;
+                endDate = prevYearEndDate;
+
+        }
+
+        // Display the selected date range on the webpage
+        document.getElementById("selectedDate").textContent = `${startDate.toDateString()}  ${endDate.toDateString()}`;
+    }
+
+    const dateRange = document.getElementById("filterDropdown");
+    const dateInputs = document.getElementById("dateInputs");
+
+    dateRange.addEventListener("change", function () {
+        if (dateRange.value === "custom") {
+            dateInputs.style.display = "block";
+        } else {
+            dateInputs.style.display = "none";
+        }
+    });
+
+    function printDates() {
+        const startDate = document.getElementById("startDate").value;
+
+        const result = `From ${startDate} `;
+        document.getElementById("selectedDate").textContent = result;
+    }
+    
+</script>
+
+
+
+{% endblock %}

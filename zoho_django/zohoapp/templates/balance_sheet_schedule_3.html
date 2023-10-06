@@ -1,0 +1,583 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+
+    <style>
+        tbody {
+            -ms-overflow-style: none;
+            /* Internet Explorer 10+ */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        tbody::-webkit-scrollbar {
+            display: none;
+        }
+
+        th,
+        td {
+            text-align: left;
+            color: white;
+        }
+
+        table,
+        td {
+            border: none;
+        }
+
+        table a {
+            color: white
+        }
+
+        table a:hover {
+            color: rgb(184, 121, 4)
+        }
+
+        table tr:hover {
+            background-color: rgba(29, 31, 33, 255)
+        }
+
+        .allow-border {
+            border-bottom: 1pt dotted white;
+        }
+
+        .dropdown-item:hover {
+            background-color: white;
+        }
+
+        #custom-dropdown-btn {
+            background-color: white;
+            width: 96%;
+            height: 4vh;
+            text-align: left;
+        }
+
+        #date-options {
+            background-color: white;
+            width: 83%;
+            margin-top: 1vh;
+            margin-left: 4vh;
+            border-radius: 10px;
+        }
+
+        #date-options a {
+            color: #060606;
+        }
+
+        .div-option:hover {
+            background-color: #007bff;
+        }
+
+        #date-options a:hover {
+            background-color: white;
+        }
+
+        .dropdown-item:hover {
+            background-color: white;
+        }
+
+        tr.detail-row,
+        #furplus,
+        #funplus,
+        #totalfur,
+        #totalfun {
+            display: none;
+        }
+
+        .close-button {
+            font-size: 2vh;
+            font-weight: 100;
+        }
+
+        @media print {
+            body {
+                visibility: hidden;
+            }
+
+            #printdiv {
+                visibility: visible;
+                width: auto;
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        .sticky-header {
+            position: fixed;
+            top: 10;
+            background-color: #f2f2f2;
+            margin-top: -355px;
+            background-color: #212529;
+            padding-top: 60px;
+        }
+
+        table td {
+            width: 33%;
+        }
+    </style>
+</head>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div style="display: flex;">
+                <i class="fa fa-calendar" aria-hidden="true" style="font-size: 4vh; color: white;"></i>&nbsp;
+                <select class="bg-white text-dark" id="filterDropdown" onclick="filterDates()"
+                    style="font-size: 1vw; height: 30px;">
+                    <option value="" hidden>Select</option>
+                    <option value="today">Today</option>
+                    <option value="thisWeek">This Week</option>
+                    <option value="thisMonth">This Month</option>
+                    <option value="thisQuarter">This Quarter</option>
+                    <option value="thisYear">This Year</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="previousweek">Previous Week</option>
+                    <option value="previousmonth">Previous Month</option>
+                    <option value="previousquarter">Previous Quarter</option>
+                    <option value="previousyear">Previous Year</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div id="dateInputs" style="display: none;">
+                <div class="date-container">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                </div>
+                <button onclick="printDates()" class="btn btn-secondary" id="applyBtn">Apply</button>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <button class="btn btn-light"><a class="text-dark customize" href="{% url 'customize_report_bss3' %}"><i
+                        class="fa fa-cog">&nbsp;</i>Customize Report</a></button>
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class=" col-md-1 d-flex">
+            <button class="btn btn-light" type="button" style="height: 30px;" onclick="display()">
+                <i class="fa fa-print">&nbsp;Print</i>
+            </button>
+        </div>
+        <div class="col-md-1 d-flex">
+            <button class="btn btn-light" type="button" style="height: 30px;" onclick="exportToPDF()">
+                <i class="fa fa-file-pdf-o" aria-hidden="true">&nbsp;PDF</i>
+            </button>
+        </div>
+        <div class="col-md-2 d-flex">
+            <button class="btn btn-light dropdown-toggle" type="button" id="exportDropdown2" data-bs-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false" style="height: 30px;">
+                <i class='fas fa-file-export'></i> Export
+            </button>
+            <div class="dropdown-menu " aria-labelledby="exportDropdown2">
+                <a class="dropdown-item" href="#" onclick="exportToExcel()">XLS (Excel)</a>
+            </div>&nbsp;&nbsp;&nbsp;
+            <a href="{% url 'report_inventory_view' %}" class="btn btn-light close-button" style="height: 30px;">
+                X
+            </a>
+        </div>
+    </div><br><br><br>
+
+    <div class="row" id="pdfdiv" style="width:105%">
+        <div class="row bg-dark" style="border-radius: 3vh; width: 77vw;" id="printdiv">
+            <h3 style="text-align: center; margin-top: 2vh;">{{company.company_name}}</h3>
+            <h1 style="text-align: center;">Balance Sheet (schedule lll)</h1>
+            <h6 style="text-align: center;">Basis: Cash</h6>
+            <h6 style="text-align: center;">As of <span id="selectedDate"></span></h6> <br>
+            <div class="table-responsive">
+                <div class="container-fluid ">
+                    <table class="table">
+                        <thead id="stick">
+                            <tr>
+                                <th class="bg-dark"
+                                    style="border-bottom: 2px solid white; font-size: 3vh; font-weight: 500; width: 26vw;">
+                                    Particulars </th>
+                                <th class="bg-dark"
+                                    style="border-bottom: 2px solid white; font-size: 3vh; font-weight: 500; width: 20vw; text-align: center;">
+                                    Note No.
+                                </th>
+                                <th class="bg-dark" id="tbhd"
+                                    style=" border-bottom: 2px solid white; text-align: right; font-size: 3vh; font-weight: 500; width: 26vw;">
+
+                                </th>
+                                <th class="bg-dark" id="tbhd"
+                                    style=" border-bottom: 2px solid white; text-align: right; font-size: 3vh; font-weight: 500; width: 26vw;">
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span style="font-size: large;">EQUITY AND LIABILITIES</span></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1. Shareholders funds</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">a. Share Capital</td>
+                                <td></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">b. Reserves and Surplus</td>
+                                <td style="text-align: center;">0</td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">c. Money received against share warrants</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>2. Money received against share warrants</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>3. Non-current liabiilities</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;"></td>
+                                <td style="text-align: right;"></td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left: 30px;">a. Long Term Borrowings</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left: 30px;">b. Dffered Tax Borrowings</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">c. Other long term liabilities</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">d. LOng Term Provisions</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td>4. Current Liabilities</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;"></td>
+                                <td style="text-align: right;"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">a. Short-term borrowings</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">b. Trade Payables</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">c. Other Current Liabilities</td>
+                                <td style="text-align: center;">0</td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">d.Short Term Provisions</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="text-align: right;font-size: medium;">TOTAL EQUITY AND LIABILITIES</td>
+                                <td style="text-align: right;" class="allow-border">0.00</td>
+                                <td style="text-align: right;" class="allow-border">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: large;">ASSETS</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>1.Non-current assets</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;"></td>
+                                <td style="text-align: right;"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">a. Fixed Assets</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;"></td>
+                                <td style="text-align: right;"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 45px;"> i. Tangible Assets</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 45px;"> ii. InTangible Assets</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 45px;"> iii. Capital Work-in-progress</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 45px;"> iv. InTangible assets under development </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> b. Non-current investments </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> c. Deferred Tax Assets (Net) </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> d. Long term loans and advances </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> e. Other non-current assets </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td> 2. Current Assets </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;"></td>
+                                <td style="text-align: right;"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> a. Current Investments </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> b. Inventories </td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> c. Trade Receivables</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;"> d. Cash and cash equivalents</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">  e. Short term loans and advances	</td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 30px;">  f. Other current assets	</td>
+                                <td style="text-align: center;">0</td>
+                                <td style="text-align: right;">0.00</td>
+                                <td style="text-align: right;">0.00</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="text-align: right;font-size: medium;" >TOTAL ASSETS</td>
+                                <td style="text-align: right;" class="allow-border">0.00</td>
+                                <td style="text-align: right;" class="allow-border">0.00</td>
+                            </tr>
+                            
+                        </tbody><br>
+                    </table>
+                    <div><br>
+                        <p>
+                            <small>**Amount is displayed in your base currency</small>&nbsp;
+                            <span class="badge text-semibold badge-success d-inline">INR</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Function to save Excel using XLSX
+    function exportToExcel() {
+        var table = document.querySelector('table');
+        var ws = XLSX.utils.table_to_sheet(table);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'report.xlsx');
+    }
+
+    function exportToPDF() {
+        var content = document.getElementById('pdfdiv');
+        html2pdf()
+            .from(content)
+            .save('report.pdf')
+    }
+
+    function display() {
+        var printContents = document.getElementById("printdiv").innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        $('#exportDropdown1').dropdown()
+
+    }
+
+    function filterDates() {
+        const selectedOption = document.getElementById("filterDropdown").value;
+        const currentDate = new Date();
+        let startDate, endDate;
+
+        switch (selectedOption) {
+            case "today":
+                startDate = endDate = new Date();
+                break;
+            case "thisWeek":
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+                endDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 6);
+                break;
+            case "thisMonth":
+                startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+                break;
+            case "thisQuarter":
+                const currentMonth = currentDate.getMonth();
+                const startMonth = Math.floor(currentMonth / 3) * 3; // Determine the start month of the quarter
+                startDate = new Date(currentDate.getFullYear(), startMonth, 1); // Set the start date to the first day of the start month
+                endDate = new Date(currentDate.getFullYear(), startMonth + 3, 0); // Set the end date to the last day of the end month
+                break;
+
+            case 'thisYear':
+                // Set date to January 1st of the current year
+                const firstDayOfYear = new Date(new Date().getFullYear(), 0, 1);
+                startDate = firstDayOfYear;
+
+                // Set date to December 31st of the current year
+                const lastDayOfYear = new Date(new Date().getFullYear(), 11, 31);
+                endDate = lastDayOfYear;
+                break;
+            case 'yesterday':
+                const yesterday = new Date();
+                // Set date to yesterday
+                yesterday.setDate(yesterday.getDate() - 1);
+                startDate = endDate = yesterday;
+                break;
+            case "previousweek":
+                const lastWeekStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
+                const lastWeekEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 1);
+                startDate = lastWeekStartDate;
+                endDate = lastWeekEndDate;
+                break;
+            case 'previousquarter':
+                const prevQuarterStartMonth = Math.floor(currentDate.getMonth() / 3) * 3 - 3;
+                const prevQuarterStart = new Date(currentDate.getFullYear(), prevQuarterStartMonth, 1);
+
+                const currentQuarterStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - currentDate.getMonth() % 3, 1);
+                const prevQuarterEnd = new Date(currentQuarterStart.getTime() - 1);
+
+                startDate = prevQuarterStart;
+                endDate = prevQuarterEnd;
+                break;
+            case 'previousmonth':
+                const previousMonthStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+                const previousMonthEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+
+                startDate = previousMonthStartDate;
+                endDate = previousMonthEndDate;
+                break;
+
+            case 'previousyear':
+                const prevYear = currentDate.getFullYear() - 1;
+
+                const prevYearStartDate = new Date(prevYear, 0, 1);
+                const prevYearEndDate = new Date(prevYear, 11, 31);
+
+                startDate = prevYearStartDate;
+                endDate = prevYearEndDate;
+
+        }
+
+        // Display the selected date range on the webpage
+        document.getElementById("selectedDate").textContent = `${startDate.toDateString()}  ${endDate.toDateString()}`;
+    }
+
+    const dateRange = document.getElementById("filterDropdown");
+    const dateInputs = document.getElementById("dateInputs");
+    const applyBtn = document.getElementById("applyBtn")
+
+    dateRange.addEventListener("change", function () {
+        if (dateRange.value === "custom") {
+            dateInputs.style.display = "block";
+        } else {
+            dateInputs.style.display = "none";
+        }
+    });
+
+    applyBtn.addEventListener("click", function () {
+        if (dateInputs.style.display === "block") {
+            dateInputs.style.display = "none"
+        } else {
+            dateInputs.style.display = "block"
+        }
+    });
+
+    function printDates() {
+        const startDate = new Date(document.getElementById("startDate").value);
+        const formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        const result = formattedStartDate;
+        document.getElementById("selectedDate").textContent = result;
+        
+    }
+</script>
+
+{% endblock %}

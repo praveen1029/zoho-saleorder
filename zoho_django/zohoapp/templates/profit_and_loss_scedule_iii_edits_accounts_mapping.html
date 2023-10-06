@@ -1,0 +1,659 @@
+<!--
+{% block content %}
+{% load static %}
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Include Select2 CSS 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+
+
+<style>
+
+    .modal{
+        z-index: 9999;
+        overflow: scroll;
+          }
+  
+  
+  .form-group{
+    width: 40%;
+  }
+  
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      
+      @media screen and (max-width: 600px) {
+        .col-25, .col-75, input[type=submit] {
+          width: 100%;
+          margin-top: 0;
+        }
+        input[type=text], select, textarea {
+        width: 100%;
+  
+      }
+      }
+
+      label {
+        padding: 25px 25px 25px 0;
+        display: inline-block;
+      }
+
+
+     .multiselect {
+        position: relative;
+        display: inline-block;
+    }
+
+    .select-box {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .dropdown1 {
+        
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+    .tag {
+        display: inline-block;
+        margin-right: 5px;
+        background-color:#ccc;
+        color:black;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+    .tag-close {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+      /* Remove bullet points for list items */
+      #itemsList {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #itemsList li {
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+
+    .custom-button{
+        background-color: #007BFF;
+        color: aliceblue;
+    }
+    .custom-modal-lg {
+        max-width: 50%; /* Adjust the desired width here */
+       
+    }
+   /* Adjust the rows attribute to increase the height of the textarea */
+   #modalTextarea {
+    height: 300px; /* Adjust the desired height here */
+}
+   
+
+/* Styles for the multi-select dropdown */
+.custom-multiselect {
+    position: relative;
+    width: 25%;
+    display: inline-block;
+    
+}
+
+.custom-select-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.custom-tag {
+    display: inline-block;
+    background-color: #ccc;
+    color: #000;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-tag-close {
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+.custom-dropdown-content {
+    display: none;
+    background-color: #fff;
+    color: #000;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+
+.custom-dropdown-option {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.custom-dropdown-option.custom-selected {
+    display: none;
+}
+
+.custom-dropdown-option:hover {
+    background-color: #f2f2f2;
+}
+</style>
+
+
+<div class="container-fulid containerprof">
+
+  <div class="card radius-15 p-3">
+    <div class="card-body">
+        <div class="card-title">
+          <h2 class="mb-0 text-uppercase text-right">Edit Accounts mapping</h2>
+        </div>
+    </div>
+  </div>
+
+  <div class="card radius-15 p-5">
+    <form action="#" method="post" enctype="multipart/form-data"id="myForm">
+
+
+      {% csrf_token %}
+    
+
+    <!--start of first row  <div class="row">
+
+        <label class="col-md-3">Revenue from operations:</label>
+        <div class="col-md-3">
+            <div class="multiselect">
+                <div class="select-box" onclick="toggleDropdown()"><div id="tagsContainer"></div><br/><br/></div>
+                <div class="dropdown1" id="dropdown">
+                    <input style="width: 100%;" type="text" id="searchInput" onkeyup="filterItems()" placeholder="Search...">
+                    <ul id="itemsList">
+                        <!--<li onclick="toggleTag(this)">Apple</li>
+                        <li onclick="toggleTag(this)">Banana</li>
+                        <li onclick="toggleTag(this)">Cherry</li>
+                        <li onclick="toggleTag(this)">Orange</li>
+                        <li onclick="toggleTag(this)">Grapes</li>
+                        <li onclick="toggleTag(this)">Kiwi</li>
+                    </ul>
+                </div>
+            </div>
+    </div>  
+
+        <div class="col-md-3">
+            <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="Revenue from operations1" name="Revenue from operations" placeholder="Note#">
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" id="expandButton" data-toggle="modal" data-target="#myModal">Expand</button>
+                </div>
+                <textarea style="width: 100%;" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment" placeholder="Description"></textarea>
+            </div>
+        </div>
+
+         <!-- Modal 
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog custom-modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" >
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:black">Description for Revenue from operations</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea style="width: 100%;" class="form-control text-light bg-dark" id="modalTextarea"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+     <!-- JavaScript to update the modal textarea content 
+     <script>
+        document.getElementById('expandButton').addEventListener('click', function () {
+            var textareaContent = document.getElementById('gst_treatment').value;
+            document.getElementById('modalTextarea').value = textareaContent;
+        });
+    </script><!--end of first row
+
+   
+<br/><br/><br/>
+
+<!--start of second row
+    <div class="row">
+        <label class="col-md-3"> Other Income:</label>
+
+
+        <div class="custom-multiselect">
+        <div class="custom-select-box" onclick="toggleCustomDropdown(1)">
+            <div id="custom-tags-container-1"></div>
+        </div>
+        <div class="custom-dropdown-content" id="custom-dropdown-1">
+            <input style="width: 100%;" type="text" id="custom-search-1" placeholder="Search" onkeyup="filterCustomOptions(1)">
+            <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 1)">Option 1</div>
+            <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 1)">Option 2</div>
+            <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 1)">Option 3</div>
+            <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 1)">Option 4</div>
+            <!-- Add more options as needed 
+        </div>
+    </div>
+            
+
+    <div class="col-md-3">
+        <input type="text" class="form-control text-light bg-dark" id="Revenue from operations1" name="Revenue from operations" placeholder="Note #1">
+    </div>
+
+        <div class="col-md-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-secondary" type="button" id="expandButton" data-toggle="modal" data-target="#myModal">Expand</button>
+                    </div>
+                    <textarea style="width: 100%;" class="form-control text-light bg-dark" id="gst_treatment1" name="gst_treatment" placeholder="Description"></textarea>
+                </div>
+                </div>
+        
+    
+             <!-- Modal 
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" >
+                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">Description for Revenue from operations</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <textarea style="width: 100%;" class="form-control text-light bg-dark" id="modalTextarea"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!--end of second row
+
+        <div>
+            <label for="Expenses">Expenses:</label>
+        </div>
+
+<!--start of third row
+        <div class="row">
+            <label class="col-md-3">Cost of materials consumed:</label>
+            <div class="col-md-3">
+                <div class="custom-multiselect" style="width: 25%;">
+                    <div class="custom-select-box" onclick="toggleCustomDropdown(2)">
+                        <div id="custom-tags-container-2"></div>
+                    </div>
+                    <div class="custom-dropdown-content" id="custom-dropdown-2">
+                        <input style="width: 100%;" type="text" id="custom-search-2" placeholder="Search" onkeyup="filterCustomOptions(2)">
+                        <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 2)">Option 1</div>
+                        <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 2)">Option 2</div>
+                        <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 2)">Option 3</div>
+                        <div class="custom-dropdown-option" onclick="toggleCustomTag(this, 2)">Option 4</div>
+                        <!-- Add more options as needed 
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <input type="text" class="form-control text-light bg-dark" id="Revenue from operations2" name="Revenue from operations" placeholder="Note #2">
+            </div>
+
+
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+    
+
+          <div class="row">
+            <label class="col-md-3">Purchases of stock in trade:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Changes in Inventories of finished goods work-in-progress and Stock-in-trade:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Employee benefits expense:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Finance Costs:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Depreciation And Amortization Expense:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Other Expenses:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Exceptional Items:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Extraordinary Items:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+        <div>
+            <label for="Expenses">Expenses:</label>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3"> Current tax:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3"> Deferred tax:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Profit (Loss) from discontinuing operations:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-3">Tax expense of discontinuing operations:</label>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+            <div class="col-md-3">
+                <input style="width: 100%;" type="text" class="form-control text-light bg-dark" id="gst_treatment" name="gst_treatment">
+            </div>
+        </div>
+
+    
+        <div class="card radius-15 p-3 sticky-card">
+            <div class="card-body">
+                <div>
+                    <button class="custom-button">Save & Run</button>
+                    <button class="custom-button cancel" style="background-color: #ccc; color:black">Cancel</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <script>
+
+            let selectedItems = ["Discount", "General Income","Interest Income","Late fee Income","Other Charges","Sales","Shipping Charges"]; // Sample tags to display on page load
+            const itemsList = document.getElementById("itemsList");
+    
+            function toggleDropdown() {
+                const dropdown = document.getElementById("dropdown");
+                dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+            }
+    
+            function filterItems() {
+                const input = document.getElementById("searchInput");
+                const filter = input.value.toUpperCase();
+    
+                const items = itemsList.getElementsByTagName("li");
+    
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    const textValue = item.textContent || item.innerText;
+                    if (textValue.toUpperCase().indexOf(filter) > -1) {
+                        item.style.display = "";
+                    } else {
+                        item.style.display = "none";
+                    }
+                }
+            }
+    
+            function toggleTag(item) {
+                const tagName = item.textContent || item.innerText;
+                if (!selectedItems.includes(tagName)) {
+                    selectedItems.push(tagName);
+                    updateTagsContainer();
+                }
+            }
+    
+            function updateTagsContainer() {
+                const tagsContainer = document.getElementById("tagsContainer");
+                tagsContainer.innerHTML = "";
+                selectedItems.forEach(tag => {
+                    const tagElement = document.createElement("div");
+                    tagElement.classList.add("tag");
+                    tagElement.textContent = tag;
+    
+                    const closeIcon = document.createElement("span");
+                    closeIcon.classList.add("tag-close");
+                    closeIcon.textContent = "x";
+                    closeIcon.addEventListener("click", () => removeTag(tag));
+                    tagElement.appendChild(closeIcon);
+    
+                    tagsContainer.appendChild(tagElement);
+                });
+            }
+    
+            function removeTag(tag) {
+                selectedItems = selectedItems.filter(item => item !== tag);
+                updateTagsContainer();
+            }
+    
+            document.addEventListener("click", function(event) {
+                const dropdown = document.getElementById("dropdown");
+                const selectBox = document.querySelector(".select-box");
+                if (!dropdown.contains(event.target) && event.target !== selectBox) {
+                    dropdown.style.display = "none";
+                }
+            });
+    
+            // Call the updateTagsContainer function on page load to display selected tags
+            window.addEventListener("load", updateTagsContainer);
+    
+           
+        </script>
+
+        <script>
+            // Set the initial value when the page loads
+            window.addEventListener('load', function() {
+                var inputElement = document.getElementById('Revenue from operations1');
+                if (inputElement) {
+                    inputElement.value = '3';
+                }
+            });
+        </script>
+
+    <!-- Include jQuery and Select2 JS 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <!-- Initialize Select2 
+    <script>
+        $(document).ready(function() {
+            $('#gst_treatment').select2({
+                // Add any options or configurations you need here
+            });
+        });
+    </script>
+
+<!--second multiselect
+<script>
+function toggleCustomDropdown(number) {
+    const customDropdown = document.getElementById(`custom-dropdown-${number}`);
+    customDropdown.style.display = customDropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleCustomTag(option, number) {
+    const customTagsContainer = document.getElementById(`custom-tags-container-${number}`);
+    const customTagText = option.innerText;
+    const customTag = document.createElement('div');
+    customTag.className = 'custom-tag';
+    customTag.textContent = customTagText;
+
+    const customTagClose = document.createElement('span');
+    customTagClose.className = 'custom-tag-close';
+    customTagClose.innerHTML = '&times;';
+    customTagClose.onclick = function () {
+        customTagsContainer.removeChild(customTag);
+        option.classList.remove('custom-selected');
+        option.style.display = 'block';
+    };
+
+    customTag.appendChild(customTagClose);
+    customTagsContainer.appendChild(customTag);
+    option.classList.add('custom-selected');
+    option.style.display = 'none';
+}
+
+function filterCustomOptions(number) {
+    const customInput = document.getElementById(`custom-search-${number}`);
+    const customFilter = customInput.value.toUpperCase();
+    const customDropdownOptions = document.querySelectorAll(`#custom-dropdown-${number} .custom-dropdown-option`);
+
+    customDropdownOptions.forEach(option => {
+        const customText = option.textContent.toUpperCase();
+        if (customText.indexOf(customFilter) > -1 && !option.classList.contains('custom-selected')) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+</script>
+
+ <!-- JavaScript to update the modal textarea content 
+ <script>
+    document.getElementById('expandButton').addEventListener('click', function () {
+        var textareaContent = document.getElementById('gst_treatment').value;
+        document.getElementById('modalTextarea').value = textareaContent;
+    });
+</script>
+
+{%endblock%}-->

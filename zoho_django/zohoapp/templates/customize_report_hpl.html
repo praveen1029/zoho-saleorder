@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/css/pikaday.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.8.0/pikaday.min.js"></script>
+</head>
+<style>
+    .column_button {
+        height: 4vh;
+        width: 5vh;
+        float: right;
+        margin-right: 2vh;
+    }
+</style>
+
+<div class="container-fluid ">
+    <div class="row">
+        <div class="col-md-11">
+            <h1 class="text-uppercase">Customize Report</h1>
+        </div>
+        <div class="col-md-1">
+            <a href="{% url 'horizontal_profit_and_loss' %}" class="btn  btn-light close-button">
+                X
+            </a>
+        </div>
+    </div><br><br>
+
+
+    <div class="row row-container">
+        <div class="col-md-3"><br>
+            <div class="nav-item " id="general">
+                <a class="nav-link cursor-pointer active"
+                    style="background-color: grey; color: white; font-size: 3vh;">General</a>
+            </div>
+        </div>
+
+        <div class="col-md-9 myDiv" id="generaldiv">
+            <form>
+                <div class="custom-dropdown">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="dateRangePicker" style="font-size: medium;">Date Range</label>
+                        </div>
+                        <div class="col-md-9 d-flex">
+                            <i class="fa fa-calendar" aria-hidden="true"
+                                style="font-size: 4vh; color: white;"></i>&nbsp;
+                            <select id="filterDropdown" onclick="filterDates()" class="form-control text-dark bg-white"
+                                style="width: 61%;">
+                                <option value="" hidden>Select</option>
+                                <option value="today">Today</option>
+                                <option value="thisWeek">This Week</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="thisQuarter">This Quarter</option>
+                                <option value="thisYear">This Year</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="previousweek">Previous Week</option>
+                                <option value="previousmonth">Previous Month</option>
+                                <option value="previousquarter">Previous Quarter</option>
+                                <option value="previousyear">Previous Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div id="dateInputs" style="display: none;margin-left: 15.5rem;" class="col-md-9">
+                            <div class="date-container" style="margin:auto;">
+                                <label for="startDate">Start Date:</label>
+                                <input type="date" id="startDate">
+                            </div>
+                            
+
+                            <div class="date-container">
+                                <label for="endDate">End Date:</label>
+                                <input type="date" id="endDate" style="margin-left: 9px;">
+                            </div>
+                            <button onclick="printDates()" class="btn btn-secondary" id="applyBtn">Apply</button>
+                        </div>
+                    </div>
+
+                </div><br><br><br><br><br><br><br><br><br><br><br>
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-4 d-flex">
+                        <button class="btn btn-success"
+                            style="width: 100%; background-color: transparent; margin-right: 2vh;">Run
+                            Report</button>
+                        <a class="btn btn-danger" href="{% url 'horizontal_profit_and_loss' %}"
+                            style="width: 100%; background-color: transparent;">Cancel</a>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const dateRange = document.getElementById("filterDropdown");
+    const dateInputs = document.getElementById("dateInputs");
+    const applyBtn = document.getElementById("applyBtn")
+
+    dateRange.addEventListener("change", function () {
+        if (dateRange.value === "custom") {
+            dateInputs.style.display = "block";
+        } else {
+            dateInputs.style.display = "none";
+        }
+    });
+
+    applyBtn.addEventListener("click", function () {
+        if (dateInputs.style.display === "block") {
+            dateInputs.style.display = "none"
+        } else {
+            dateInputs.style.display = "block"
+        }
+    });
+
+    function printDates() {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        if (startDate && endDate) {
+            const result = `From ${startDate} To ${endDate}`;
+            document.getElementById("selectedDate").textContent = result;
+        } else {
+            document.getElementById("result").textContent = "Please select both start and end dates.";
+        }
+    }
+</script>
+
+{% endblock %}
