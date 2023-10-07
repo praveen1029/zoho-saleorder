@@ -441,6 +441,7 @@ class SalesOrder(models.Model):
     t_tax=models.FloatField(null=True,blank=True)
     subtotal=models.FloatField(null=True,blank=True)
     grandtotal=models.FloatField(null=True,blank=True)
+    adjust=models.FloatField(null=True,blank=True)
     cxnote=models.TextField(max_length=255,null=True,blank=True)
     file=models.ImageField(upload_to='documents',null=True,blank=True)
     terms_condition=models.TextField(max_length=255,null=True,blank=True)

@@ -101,6 +101,12 @@
     <div class="card-body">
         <div class="card-title">
           <h2 class="mb-0 text-uppercase text-right"> New Sales Order</h2>
+          {% for message in messages %}
+            <div class="alert alert-success">
+                <a class="close" href="#" data-dismiss="alert">x</a>
+                  {{ message }}
+            </div>
+        {% endfor %}
         </div>
     </div>
   </div>
@@ -114,14 +120,14 @@
         </div>
         <div class="col-md-6 d-flex">
           <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;">
-            <option value=""></option>
+            <option value="" hidden></option>
             
             {% for cust in c %}
             <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option> 
             {% endfor %}
          
           </select>
-          <a data-toggle="modal" data-target="#newcustomer" class="btn" style="background-color: white; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
+          <a data-toggle="modal" data-target="#newcustomer" class="btn" style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
         </div>
       </div>
       <div class="row mt-2">
@@ -130,7 +136,13 @@
         </div>
 
         <div class="col-md-6">
-          <input type="email" class="form-control bg-light text-dark"   id="cx_mail" name="cx_mail">
+          <input type="email" class="form-control bg-light text-dark"   id="cx_mail" name="cx_mail" readonly>
+        </div>
+      </div>
+      <div class="row mt-2" id="gstdiv" style="display:none;">
+        <div class="col-md-9 d-flex">
+          <label for="" style="width: 52%;">GST Number</label>
+          <input type="text" class="form-control bg-light text-dark"   id="cx_gst" name="cx_gst" readonly>
         </div>
       </div>
 
@@ -140,7 +152,7 @@
         </div>
 
         <div class="col-md-6">
-          <input type="text" class="form-control bg-light text-dark"   id="prof_name" name="sale_no" value="SO-{{salord}}">
+          <input type="text" class="form-control bg-light text-dark"   id="prof_name" name="sale_no" value="SO-{{reford}}">
           <label id="order_label" style="display: none;"></label>
         </div>
       </div>
@@ -202,13 +214,13 @@
         </div>
 
         <div class="col-md-6">
-          <input type="text" class="form-control bg-light text-dark"   id="ref" name="ord_no" >
+          <input type="text" class="form-control bg-light text-dark"   id="ref" name="ord_no" value="{{reford}}" readonly>
         </div>
       </div>
 
       <div class="row mt-2" >
           <div class="col-md-3">
-            <label for="date1">sales Order Date</label>
+            <label for="date1">Sales Order Date</label>
           </div>
           <div class="col-md-6">
             <input type="date" class="form-control bg-light text-dark" id="date1" name="sa_date">
@@ -216,10 +228,10 @@
       </div>
       <div class="row mt-2">
         <div class="col-md-3">
-          <label for="date2">Shipment Date</label>
+          <label for="date2">Expiry Date</label>
         </div>
         <div class="col-md-6">
-          <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date">
+          <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date" readonly>
         </div>
         
       </div>
@@ -232,15 +244,16 @@
           <div class="d-flex">
             <select class="form-control bg-light text-dark my-select" id="pay_term" name="term">
               
+              <option value="" selected hidden>Select Payment Term</option>
               {% for p in pay %}
               
-                <option selected value="{{p.id}}">{{p.Terms}}</option>
+                <option value="{{p.id}}">{{p.Terms}}</option>
               {% endfor %}
               
             </select>
 
+            <a data-toggle="modal" data-target="#newpayment" class="btn" style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
           </div> 
-          <a href="" data-toggle="modal" data-target="#newpayment"><i class="fa fa-gear"></i> Configure Payment Trems</a>
   
         </div>
       </div>  
@@ -254,11 +267,12 @@
 
   
       <div class="row mt-2">
-        <div class="col-md-12 table-responsive-md mt-3">
-          <table class="table table-bordered " id="item_table" onclick='toggleDateInput()'>
+        <div class="col-md-12 mt-3">
+          <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
             <thead>
               <tr>
-                <th>Item<br><a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
+                <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
+                <th class="text-right">HSN</th>
                 <th class="text-right">Quantity</th>
                 <th class="text-right">Rate</th>
                 <th class="text-right">Discount</th>
@@ -274,18 +288,20 @@
                         <select
                               class='form-control bg-light text-dark border-0 item_select itm'
                               name='item[]' id='item1'>
-                              <option value=" " selected disabled>Select Item</option>
+                              <option value=" " selected disabled hidden>Select Item</option>
                               {% for i in itm %}
-                                <option value="{{i.Name}}">{{ i.Name  }} </option>
+                                <option value="{{i.Name}}">{{ i.Name}} </option>
                               {% endfor %}
                           </select></div>
                   </td>
                   
-                
+                  <td style="width: 15%;" class='text-right'>
+                    <input type='number' id='hsn1' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+                  </td>
                    
-                  <td style="width: 13%;" class='text-right'><input type='number' id='qty1'
-                          class=' text-right qty form-control bg-light text-dark' name='quantity[]'
-                          value='0'>
+                  <td style="width: 20%;" class='text-right'>
+                    <input type='number' id='qty1' class=' text-right qty form-control bg-light text-dark' name='quantity[]' value='0' style="margin-top: 4vh;"><br>
+                    Available Stock : <span id="stock_data"></span>
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate1'
                           class=' text-right rate form-control bg-light text-dark' name='rate[]'
@@ -298,7 +314,7 @@
                   <td style="width: 15%;" class='text-right '> <select name='tax[]' id='tax1'
                           class='form-control bg-light text-dark  text-right border-0 tax' onclick="toggleDateInput()">
                           <optgroup class="text-center" label="GST">
-                            <option value="0" selected></option>
+                            <option value="0" selected hidden></option>
                             <option value="0">0% GST(0%)</option>
                             <option value="3">3.0% GST(3%)</option>
                             <option value="5">5.0% GST(5%)</option>
@@ -315,14 +331,14 @@
                             <option value="28">28.0% IGST(28%)</option>             
                             </optgroup>
                       </select></td>
-                  <td style="display: none;">
+                  <td  style="display: none;">
                       <input type="text" name='taxamount' id="taxamount1"
                           class=" taxamount text-dark" />
                   </td>
-                  <td style="width: 15%;" class='text-right'><input type='number' id='amount1'
+                  <td style="width: 20%;" class='text-right'><input type='number' id='amount1'
                           class=' text-right form-control amount bg-light text-dark' name='amount[]'
-                          value='0.00'></td>
-                  <td class='text-center'><button type='button' id='del_btn1'
+                          value='0.00' readonly></td>
+                  <td style="width: 20%;" class='text-center'><button type='button' id='del_btn1'
                           class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
                           style='width:30px'>X</button></td>
                           <td class='text-center'>
@@ -349,31 +365,31 @@
                     <td>Sub Total</td>
                     <td></td>
                     <td><input type="number" id="subtotal" name="subtotal" step="any" value="0.00"
-                            class="bg-transparent border-0 text-right subtotal text-white"></td>
+                            class="form-control bg-transparent border-0 text-right subtotal text-white" readonly></td>
                 </tr>
                 <tr style="display: none;" id="tr_igst">
                     <td>IGST</td>
                     <td></td>
                     <td><input type="number" id='igst' name="igst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right igst  text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right igst  text-white" readonly></td>
                 </tr>
                 <tr style="display: none;" id="tr_cgst">
                     <td>CGST</td>
                     <td></td>
                     <td><input type="number" id='cgst' name="cgst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right cgst text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right cgst text-white" readonly></td>
                 </tr>
                 <tr style="display: none;" id="tr_sgst">
                     <td>SGST</td>
                     <td></td>
                     <td><input type="number" id='sgst' name="sgst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right sgst  text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right sgst  text-white" readonly></td>
                 </tr>
                 <tr>
                     <td>Tax Amount</td>
                     <td></td>
                     <td><input type="number" id="total_taxamount" name="totaltax" step="any" value="0.00" 
-                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white"></td>
+                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white" readonly></td>
                 </tr>
                 <tr>
                     <td>Shipping Charges</td>
@@ -381,6 +397,13 @@
                     <td><input type="hidden" id="shipping_charge"  step="any" value="0.00" 
                         class="form-control bg-transparent border-0 text-right shipping_charge  "></td>
                         <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="0" name="shipping_charge"> </td>
+                </tr>
+                <tr>
+                    <td>Adjustment</td>
+                    
+                    <td><input type="hidden" id="adjustment"  step="any" value="0.00" 
+                        class="form-control bg-transparent border-0 text-right adjustment  "></td>
+                    <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0" readonly name="adjust"> </td>
                 </tr>
                 <tr>
                     <td></td>
@@ -391,7 +414,7 @@
                     <th>Total ( &#x20B9; )</th>
                     <th></th>
                     <th><input type="number" id="grandtotal" name="t_total" step="any" value="0.00" 
-                            class="form-control bg-transparent border-0 text-right grandtotal  text-white"></th>
+                            class="form-control bg-transparent border-0 text-right grandtotal  text-white" readonly></th>
                 </tr>
             </table>
         </div>
@@ -432,35 +455,33 @@
 
     <div class="modal fade" id="newpayment">
       <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color: #202325;">
           <h6 style="color: red;">Payment Terms</h6>
           <!-- Rest of your modal content here -->
           <form id="modalForm"  action="" onsubmit="return false">
             <div id="terms-container">
               <div class="form-row">
                 {% for p in pay %}
-                <div class="col-6">
-                    <input type="text" value="{{p.Terms}}" class="form-control text-black" placeholder="Terms">
+                <div class="col-6" style="background-color: #191c24;">
+                    <input type="text" value="{{p.Terms}}" class="form-control" placeholder="Terms" style="background-color: #191c24; color: white;">
                   </div>
                   <div class="col-6">
-                    <input type="text" value="{{p.Days}}" class="form-control text-black" placeholder="No of Days">
+                    <input type="text" value="{{p.Days}}" class="form-control" placeholder="No of Days" style="background-color: #191c24; color: white;">
                   </div>
                 {% endfor %}
     
                 <div class="col-6">
-                  <input type="text" name="terms" class="form-control text-black" placeholder="Terms">
+                  <input type="text" name="terms" class="form-control text-black" placeholder="Terms" style="background-color: #191c24;">
                 </div>
-                <div class="col-5">
-                  <input type="text" name="days" class="form-control text-black" placeholder="No of Days">
-                </div>
-                <div class="col-1 ">
-                  <button type="button" class="btn btn-success add-term-row">+</button>
+                <div class="col-6">
+                  <input type="text" name="days" class="form-control text-black" placeholder="No of Days" style="background-color: #191c24;">
                 </div>
               </div>
             </div>
             <div class="form-row mt-3">
               <div class="col-12 text-right">
-                <input type="submit" class="btn btn-success" value="submit" id="payment">
+                <button type="button" class="btn add-term-row" style="background-color: chocolate;">Add New</button>
+                <input type="submit" class="btn btn-success" value="Submit" id="payment">
               </div>
             </div>
          </form>
@@ -631,7 +652,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <select class="form-control bg-light text-dark" id="c_gsttype" name="c_gsttype" required>
-                      <option value="value" selected>Select a Gst Treatment</option>
+                      <option value="value" selected hidden>Select a Gst Treatment</option>
                       <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
                       <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">Registered Business-Composition Business that is registered under the Composition scheme in GST</option>
                       <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
@@ -648,7 +669,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <input type="text" class="form-control text-dark" id="c_gstin" name="c_gstin" placeholder="29APPCK7465F1Z1">
-                    <label id="gst_label"></label>
+                    <label id="gst_label" style="display: none;"></label>
                   </div>       
                 </div>
 
@@ -658,7 +679,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <input type="text" class="form-control text-dark" id="c_pan" name="c_pan" placeholder="APPCK7465F">
-                    <label id="pan_label"></label>
+                    <label id="pan_label" style="display: none;"></label>
                   </div>       
                 </div>
 
@@ -668,7 +689,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <select class="form-control bg-light text-dark" id="placesupply" name="placesupply">
-                      <option value="Nill"></option>
+                      <option value="Nill" hidden></option>
                       <option value="[AN] Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
                       <option value="[AD] Andhra Predhesh">[AD] Andhra Predhesh</option>
                       <option value="[AR] Arunachal Predesh">[AR] Arunachal Predesh</option>
@@ -712,10 +733,10 @@
                 </div>
 
                 <div class="row mt-2">
-                  <div class="col-md-4 ">
+                  <div class="col-md-3">
                     <label for="c_tax" style="color: rgb(190, 88, 88);">Tax Preference * </label>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <div class="d-flex">
                       <div class="radio_opt mx-5 mt-2">
                         <input type="radio" id="item-tax3" name="radioOption2" value="Taxable" >
@@ -733,9 +754,9 @@
                   <div class="col-md-3">
                     <label for="intra">Intra-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="intra" class="form-control bg-light text-dark" id="intra1">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="GST0[0%]">GST0[0%]</option>
                       <option value="GST5[5%]">GST5[5%]</option>
@@ -744,14 +765,14 @@
                       <option value="GST28[28%]">GST28[28%]</option>
                     </select>             
                   </div>
-
+                  <div class="col-md-3"></div>
                   
-                  <div class="col-md-2">
-                    <label for="inter">Inter-State TAX</label>
-                  </div>
                   <div class="col-md-3">
+                    <label for="inter">Inter-State TAX</label>
+                  </div><br>
+                  <div class="col-md-6">
                     <select name="inter" class="form-control bg-light text-dark" id="inter1">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="IGST0[0%]">IGST0[0%]</option>
                       <option value="IGST5[5%]">IGST5[5%]</option>
@@ -772,7 +793,7 @@
                   </div>
                   <div class="col-md-3 mt-2">
                     <select class="form-control bg-light text-dark"id="c_curn" name="c_curn" required>
-                      <option selected disabled value="">Choose..</option>
+                      <option selected disabled value="" hidden>Choose..</option>
                       <option value="INR">INR</option>
                     </select>
                   </div>       
@@ -815,8 +836,8 @@
                   </div>
                 </div>
                 <div class="row mt-2 m-0 p-0 mb-2">
-                  <div class="col-md-9"> </div>
-                  <div class="col-md-3 text-right  m-0 p-0">
+                  <div class="col-md-8"> </div>
+                  <div class="col-md-4" style="margin-left: -5vh;">
                     <input type="checkbox" onclick="address()" id="voka" name="vokay">
                     <label for="voka" style="color: #909091;">Same As Billing Address</label>
                   </div>
@@ -866,7 +887,7 @@
                   </div>
                   <div class="col-md-4">
                     <select type="text" class="form-control bg-light text-dark" id="cstate" name="vstate">
-                      <option value="" selected>Choose</option>
+                      <option value="" selected hidden>Choose</option>
                       <option value="None Of This">None Of This</option>
                       <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
                       </option>
@@ -916,7 +937,7 @@
                   </div>
                   <div class="col-md-4 ">
                     <select type="text" class="form-control bg-light text-dark" id="csstate" name="vsstate">
-                      <option value="" selected>Choose</option>
+                      <option value="" selected hidden>Choose</option>
                       <option value="None Of This">None Of This</option>
                       <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
                       </option>
@@ -1089,10 +1110,10 @@
               <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalItem">
 
                 <div class="row mt-2">
-                  <div class="col-md-4 mr-0">
-                    <label class="col-form-label col-sm-2 p-0">Type <i class="fa fa-question-circle"></i></label>
+                  <div class="col-md-3 mr-0">
+                    <label class="col-form-label p-0">Type</label>
                   </div>
-                  <div class="col-md-5 ml-0 d-flex">
+                  <div class="col-md-6 ml-0 d-flex">
                     <div class="radio_opt mx-5 ">
                       <input type="radio" id="item_type1" name="radioOption" value="Goods" >
                       <label for="option1">Goods</label>
@@ -1118,21 +1139,40 @@
                   <div class="col-md-6">
                     <div class="d-flex">
                       <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
-                        <option value="">Select Unit</option>
+                        <option value="" hidden>Select Unit</option>
                         {% for u in unit %}
                         <option value="{{u.id}}">{{u.unit}}</option>
                         {% endfor %}
                       </select>                
-                      <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newunit" data-toggle="modal">+</a>  
+                      <a href="#" class="btn" data-target="#newunit" data-toggle="modal" style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>  
                     </div>
+                  </div>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-3 ">
+                    <label for="">HSN</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="hsn" name="hsn" required>
+                    <label id="hsn_war" style="display: none;"></label>
+                  </div>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-3 ">
+                    <label for="">Stock</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="stock" name="stock" required>
                   </div>
                 </div>
  
                 <div class="row mt-2">
-                  <div class="col-md-4 ">
+                  <div class="col-md-3">
                     <label for="c_tax" style="color: rgb(190, 88, 88);">Tax Preference * </label>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <div class="d-flex">
                       <div class="radio_opt mx-5 mt-2">
                         <input type="radio" id="item-tax1" name="radioOption1" value="Taxable" >
@@ -1150,9 +1190,9 @@
                   <div class="col-md-3">
                     <label for="intra">Intra-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="intra" class="form-control bg-light text-dark" id="intra">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="GST0[0%]">GST0[0%]</option>
                       <option value="GST5[5%]">GST5[5%]</option>
@@ -1162,13 +1202,13 @@
                     </select>             
                   </div>
 
-                  
-                  <div class="col-md-2">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-3">
                     <label for="inter">Inter-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="inter" class="form-control bg-light text-dark" id="inter">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="IGST0[0%]">IGST0[0%]</option>
                       <option value="IGST5[5%]">IGST5[5%]</option>
@@ -1195,11 +1235,10 @@
                 </div>
                 
                 <div class="row mt-4">
-                  <div class="col-md-2">
-                    <label for="sell_price">Selling Price *</label>
-                  </div>
-                  <div class="col-md-4">
+
+                  <div class="col-md-6">
                     <div class="input-group mb-2">
+                    <label for="sell_price" style="margin-right:3vh;">Selling Price *</label>
                       <div class="input-group-prepend">
                         <div class="input-group-text">INR</div>
                       </div>
@@ -1226,7 +1265,7 @@
                   </div>
                   <div class="col-md-4">
                     <select name="sell_acc" id="sell_acc" class="form-control bg-light text-dark">
-                      <option value="">Select Account</option>
+                      <option value="" hidden>Select Account</option>
        
                         <option value="" disabled class="btn btn-dark text-white"><b>SALES</b></option>
                         {% for s in sales %}
@@ -1239,10 +1278,7 @@
                   </div>
                   <div class="col-md-4">
                     <select name="cost_acc" class="form-control bg-light text-dark" id="cost_acc">
-                      <option value="">Select Account</option>
-
-
-                      
+                      <option value="" hidden>Select Account</option>
                         <option value="" disabled class="btn btn-dark text-white"><b>PURCHASE</b></option>
                         {% for p in purchase %}
                             <option value="{{p.id}}">{{ p.Account_name }}</option>
@@ -1425,11 +1461,11 @@
     $(document).ready(function() {
       $("#prof_name").change(function() {
         var x=$('#prof_name').val();
-        salord = "{{salord}}"
-        if(salord != x.slice(3,)){
+        reford = "{{reford}}"
+        if(reford != x.slice(3,)){
           document.getElementById("order_label").style.display="block"
           document.getElementById("order_label").style.color="red"
-          document.getElementById("order_label").innerHTML="Changing Sale Order is not Recommended"
+          document.getElementById("order_label").innerHTML="Sale Order is not Continuous"
         }
       });
     });
@@ -1460,6 +1496,7 @@ addTermRowBtn.addEventListener('click', () => {
   termsField.placeholder = 'Terms';
   termsField.classList.add('form-control');
   termsField.classList.add('text-black');
+  termsField.style.backgroundColor = "#191c24";
   termsInput.appendChild(termsField);
   newRow.appendChild(termsInput);
 
@@ -1472,6 +1509,7 @@ addTermRowBtn.addEventListener('click', () => {
   daysField.placeholder = 'No of Days';
   daysField.classList.add('form-control');
   daysField.classList.add('text-black');
+  daysField.style.backgroundColor = "#191c24";
   daysInput.appendChild(daysField);
   newRow.appendChild(daysInput);
 
@@ -1545,12 +1583,13 @@ termsContainer.addEventListener('click', (event) => {
         var gst_label=document.getElementById("gst_label")
         var expr=/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
         if (!expr.test(x)) {
+            gst_label.style.display="block";
             gst_label.style.color="red";
             gst_label.innerHTML = "Invalid GST Number.";
         }
         else{
             gst_label.style.color="green";
-            gst_label.innerHTML = "valid GST Number.";
+            gst_label.innerHTML = "Valid GST Number.";
 
         }
       });
@@ -1562,12 +1601,13 @@ termsContainer.addEventListener('click', (event) => {
         var pan_label=document.getElementById("pan_label")
         var expr=    /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/
         if (!expr.test(x)) {
+            pan_label.style.display="block";
             pan_label.style.color="red";
             pan_label.innerHTML = "Invalid PAN Number.";
         }
         else{
             pan_label.style.color="green";
-            pan_label.innerHTML = "valid PAN Number.";
+            pan_label.innerHTML = "Valid PAN Number.";
 
         }
       });
@@ -1818,9 +1858,20 @@ $(document).ready(function() {
   });
 });
 
-
-
-
+$(document).ready(function() {
+      $("#hsn").change(function() {
+        var x=String($('#hsn').val());
+        if(x.length!= 6){
+          document.getElementById("hsn_war").style.display="block"
+          document.getElementById("hsn_war").style.color="red"
+          document.getElementById("hsn_war").innerHTML="HSN should be of length 6"
+        }
+        if(x.length == 6){
+          document.getElementById("hsn_war").style.color="green"
+          document.getElementById("hsn_war").innerHTML="HSN is valid"
+        }
+      });
+    });
 
 $(document).on("click","#itemSave",function(){
 
@@ -1841,6 +1892,7 @@ $(document).on("click","#itemSave",function(){
     intra = 0;
   }
 
+
   
   $.ajax({
     
@@ -1851,6 +1903,8 @@ $(document).on("click","#itemSave",function(){
         type : itemtype,
         name : $("#item_name").val(),
         unit : $("#item_units").val(),
+        hsn : $("#hsn").val(),
+        stock : $("#stock").val(),
         inter : inter,
         intra : intra,
         sell_price : $("#sell_price").val(),
@@ -1945,7 +1999,6 @@ function reloadAccount() {
 <script>
    $(document).on('change', '#customer_sel', function () {
     var customer = $('#customer_sel').val();
-    console.log(customer)
     $.ajax({
         type: "GET",
         url: "{% url 'customerdata' %}",
@@ -1953,15 +2006,63 @@ function reloadAccount() {
             id: customer
         },
         success: function (response) {
-            console.log(response)
-            data7 = response.email
-            console.log(data7)
-            document.getElementById('cx_mail').value = data7
-            
+          data7 = response.email
+          data_gst = response.gstno
+          place = response.place
+          document.getElementById('cx_mail').value = data7
+          if(data_gst == ""){
+            document.getElementById('gstdiv').style.display = "none"
+          }else{
+            document.getElementById('gstdiv').style.display = "block"
+            document.getElementById('cx_gst').value = data_gst
+          }
+
+          var selectElement = document.getElementById("srcofsupply");
+
+          // Loop through the options to find the one you want to select
+          for (var i = 0; i < selectElement.options.length; i++) {
+            if (selectElement.options[i].value === place) {
+              // Set the selected attribute of the desired option to true
+              selectElement.options[i].selected = true;
+              break; // Exit the loop once the option is selected
+            }
+          }
         }
     });
 });
 </script>
+
+<script>
+  $(document).on('change', '#pay_term', function () {
+   var term = $('#pay_term').val();
+   $.ajax({
+       type: "GET",
+       url: "{% url 'termdata' %}",
+       data: {
+           id: term
+       },
+       success: function (response) {
+        days = response.days
+        order_date =new Date( document.getElementById("date1").value)
+        if (!isNaN(order_date.getTime())) {
+          // Calculate the new date by adding 20 days
+          const endDate = new Date(order_date);
+          endDate.setDate(endDate.getDate() + days);
+
+          // Format the new date as YYYY-MM-DD
+          const formattedDate = endDate.toISOString().split("T")[0];
+
+          // Set the result in the second input
+          document.getElementById("date2").value = formattedDate;
+        } else {
+            alert("Please enter a valid date.");
+        }
+
+       }
+   });
+});
+</script>
+
 <script>
 var rowCount = 1;
 $(document).ready(function () {
@@ -2008,7 +2109,17 @@ function calculateGrandTotal() {
   var shippingCharges = parseFloat($('#shipping').val());
   grandTotal += shippingCharges;
 
-  $('#grandtotal').val(grandTotal.toFixed(2));
+  const roundedValue = Math.round(grandTotal / 10) * 10;
+
+            // Update the roundedNumber span with the rounded value
+
+            // Calculate and display the difference
+            const diff = roundedValue - grandTotal;
+
+
+
+  $('#adjust').val(diff.toFixed(2));
+  $('#grandtotal').val(roundedValue.toFixed(2));
   $('#total_taxamount').val(totalTaxAmount.toFixed(2));
 }
 
@@ -2027,7 +2138,7 @@ function calculateGrandTotal() {
         <td style="width: 10%;">
           <div>
             <select class='form-control bg-light text-dark  border-0 item_select itm' name='item[]' id='item${rowCount}'>
-              <option value=" " selected disabled>Select Item</option>
+              <option value=" " selected disabled hidden>Select Item</option>
               {% for i in itm %}
                 <option value="{{i.Name}}">{{ i.Name }}</option>
               {% endfor %}
@@ -2036,10 +2147,13 @@ function calculateGrandTotal() {
         </td>
 
       
-
+        <td style="width: 15%;" class='text-right'>
+          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+        </td>
         
-        <td style="width: 13%;" class='text-right'>
-          <input type='number' id='qty${rowCount}' class='text-right bg-light text-dark qty form-control' name='quantity[]' value='0'>
+        <td style="width: 20%;" class='text-right'>
+          <input type='number' id='qty${rowCount}' class='text-right bg-light text-dark qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;"><br>
+          Available Stock : <span id="stock_data${rowCount}" ></span>
         </td>
         
         <td style="width: 15%;" class='text-right'>
@@ -2053,7 +2167,7 @@ function calculateGrandTotal() {
         <td style="width: 15%;" class='text-right'>
           <select name='tax[]'  id='tax${rowCount}' class='form-control bg-light text-dark text-right border-0 tax' onclick=' toggleDateInput()'>
             <optgroup class="text-center" label="GST">
-                            <option value="0" selected></option>
+                            <option value="0" selected hidden></option>
                             <option value="0">0% GST(0%)</option>
                             <option value="3">3.0% GST(3%)</option>
                             <option value="5">5.0% GST(5%)</option>
@@ -2062,7 +2176,6 @@ function calculateGrandTotal() {
                             <option value="28">28.0% GST(28%)</option>
                           </optgroup>
                           <optgroup  class="text-center" label="IGST">
-                           
                             <option value="0">0% IGST(0%)</option>
                             <option value="3">3.0% IGST(3%)</option>
                             <option value="5">5.0% IGST(5%)</option>
@@ -2077,8 +2190,8 @@ function calculateGrandTotal() {
           <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control bg-light text-dark taxamount" />
         </td>
         
-        <td style="width: 15%;" class='text-right'>
-          <input type='number' id='amount${rowCount}' class='text-right bg-light text-dark form-control amount' name='amount[]' value='0.00'>
+        <td style="width: 20%;" class='text-right'>
+          <input type='number' id='amount${rowCount}' class='text-right bg-light text-dark form-control amount' name='amount[]' value='0.00' readonly>
         </td>
         
         <td class='text-center'>
@@ -2248,7 +2361,11 @@ function calculateTaxAmount() {
 
         document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
         var grandtotal = subtotal + total_taxamount + shipping;
-        document.getElementById("grandtotal").value = grandtotal.toFixed(2);
+        const roundedValue = Math.round(grandtotal / 10) * 10;
+            // Calculate and display the difference
+            const diff = roundedValue - grandtotal;
+        document.getElementById("adjust").value = diff.toFixed(2);
+        document.getElementById("grandtotal").value = roundedValue.toFixed(2);
     }
 
     // Call the function initially on page load
@@ -2345,8 +2462,6 @@ function toggleDateInput() {
       $(document).on('change', '#item1', function () {
           select = $('#item1').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2355,12 +2470,15 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
                   data4=response.place
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn1").value = hsn
+                  document.getElementById("stock_data").innerHTML = stock
                   document.getElementById('rate1').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2369,7 +2487,6 @@ function toggleDateInput() {
                   }
                   document.getElementById('tigst1').innerHTML = data2 + ' % IGST';
                   document.getElementById('tigst1').value = data2
-
               }
           });
 
@@ -2388,11 +2505,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn2").value = hsn
+                  document.getElementById("stock_data2").innerHTML = stock
                   document.getElementById('rate2').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2420,11 +2540,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn3").value = hsn
+                  document.getElementById("stock_data3").innerHTML = stock
                   document.getElementById('rate3').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2452,11 +2575,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn4").value = hsn
+                  document.getElementById("stock_data4").innerHTML = stock
                   document.getElementById('rate4').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2484,11 +2610,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn5").value = hsn
+                  document.getElementById("stock_data5").innerHTML = stock
                   document.getElementById('rate5').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2516,11 +2645,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn6").value = hsn
+                  document.getElementById("stock_data6").innerHTML = stock
                   document.getElementById('rate6').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2548,11 +2680,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn7").value = hsn
+                  document.getElementById("stock_data7").innerHTML = stock
                   document.getElementById('rate7').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2580,11 +2715,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn8").value = hsn
+                  document.getElementById("stock_data7").innerHTML = stock
                   document.getElementById('rate8').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2612,11 +2750,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn9").value = hsn
+                  document.getElementById("stock_data9").innerHTML = stock
                   document.getElementById('rate9').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2644,11 +2785,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn10").value = hsn
+                  document.getElementById("stock_data10").innerHTML = stock
                   document.getElementById('rate10').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2676,11 +2820,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn11").value = hsn
+                  document.getElementById("stock_data11").innerHTML = stock
                   document.getElementById('rate11').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2708,11 +2855,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn12").value = hsn
+                  document.getElementById("stock_data12").innerHTML = stock
                   document.getElementById('rate12').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2740,11 +2890,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn13").value = hsn
+                  document.getElementById("stock_data13").innerHTML = stock
                   document.getElementById('rate13').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2772,11 +2925,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn14").value = hsn
+                  document.getElementById("stock_data14").innerHTML = stock
                   document.getElementById('rate14').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2804,11 +2960,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn15").value = hsn
+                  document.getElementById("stock_data15").innerHTML = stock
                   document.getElementById('rate15').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2836,11 +2995,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn16").value = hsn
+                  document.getElementById("stock_data16").innerHTML = stock
                   document.getElementById('rate16').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2868,11 +3030,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn17").value = hsn
+                  document.getElementById("stock_data17").innerHTML = stock
                   document.getElementById('rate17').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2900,11 +3065,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn18").value = hsn
+                  document.getElementById("stock_data18").innerHTML = stock
                   document.getElementById('rate18').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2932,11 +3100,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn19").value = hsn
+                  document.getElementById("stock_data19").innerHTML = stock
                   document.getElementById('rate19').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2964,11 +3135,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn20").value = hsn
+                  document.getElementById("stock_data20").innerHTML = stock
                   document.getElementById('rate20').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2996,11 +3170,14 @@ function toggleDateInput() {
                   cust: customer
               },
               success: function (response) {
-                  console.log(response)
                   data = response.rate
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn21").value = hsn
+                  document.getElementById("stock_data21").innerHTML = stock
                   document.getElementById('rate21').value = data
 
                   if (data3 == '{{ company.state }}') {

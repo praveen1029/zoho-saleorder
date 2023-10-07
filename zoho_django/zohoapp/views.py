@@ -2257,7 +2257,6 @@ def edited(request,id):
 
 
 @login_required(login_url='login')
-
 def itemdata(request):
     cur_user = request.user.id
     user = User.objects.get(id=cur_user)
@@ -2265,8 +2264,6 @@ def itemdata(request):
     # print(company.state)
     id = request.GET.get('id')
     cust = request.GET.get('cust')
-   
-        
     item = AddItem.objects.get(Name=id)
     cus=customer.objects.get(id=cust)
     rate = item.s_price
@@ -2274,13 +2271,11 @@ def itemdata(request):
     gst = item.intrastate
     igst = item.interstate
     desc=item.s_desc
-    print(place)
     mail=cus.customerEmail
-    
+    stock=item.stock
+    hsn=item.hsn
     place_of_supply = customer.objects.get(id=cust).placeofsupply
-    print(place_of_supply)
-    return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst})
-    return redirect('/')
+    return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,'stock':stock,'hsn':hsn})
     
 
 def deleteestimate(request,est_id):
@@ -2407,11 +2402,8 @@ def add_account_est(request):
     
 def customerdata(request):
     customer_id = request.GET.get('id')
-    print(customer_id)
     cust = customer.objects.get(id=customer_id)
-    data7 = {'email': cust.customerEmail}
-    
-    print(data7)
+    data7 = {'email': cust.customerEmail,'gstno':cust.GSTIN,'place':cust.placeofsupply}
     return JsonResponse(data7)
 
 
@@ -3179,7 +3171,7 @@ def create_sales_order(request):
     pay=payment_terms.objects.all()
     itm=AddItem.objects.all()
     purchase=Purchase.objects.all()
-    salesorder = SalesOrder.objects.all()
+    last_record = SalesOrder.objects.last()
     
     context={
         "c":cust,
@@ -3189,7 +3181,7 @@ def create_sales_order(request):
         "unit":unit, 
         "sales":sales,
         "purchase":purchase,
-        "salord":len(salesorder)+1
+        "reford":(last_record.id)+1
     }
     return render(request,'create_sales_order.html',context)
 
@@ -3271,7 +3263,14 @@ def payment_term_for_sorder(request):
         ptr.save()
         return redirect("create_sales_order")
         
-        
+def termdata(request):
+    term_id = request.GET.get('id')
+    term = payment_terms.objects.get(id=term_id)
+    data = {'days': term.Days}
+    return JsonResponse(data)
+
+
+
 
 
 
@@ -3293,7 +3292,8 @@ def add_sales_order(request):
             sale_list_update = [item[0] for item in sale_list]
             
             if sales_no in sale_list_update:
-                return HttpResponse('We had some errors')
+                messages.error(request,'Sale Order number is already in use')
+                return redirect('create_sales_order')
 
             terms=request.POST['term']
             term=payment_terms.objects.get(id=terms)
@@ -3329,15 +3329,16 @@ def add_sales_order(request):
             desc=request.POST.getlist('desc[]')
             tax=request.POST.getlist('tax[]')
             total=request.POST.getlist('amount[]')
+            adjust=request.POST.getlist('adjust')
             term=payment_terms.objects.get(id=term.id)
             
             sales=SalesOrder(customer_id=custo,sales_no=sales_no,terms=term,reference=reference, sales_date=sa_date,ship_date=sh_date,
                         cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,
-                        grandtotal=t_total,status=status,terms_condition=tc,file=file,sos=sos,sh_charge=sh_charge)
+                        grandtotal=t_total,status=status,terms_condition=tc,file=file,sos=sos,sh_charge=sh_charge,adjust=adjust)
             sales.save()
             sale_id=SalesOrder.objects.get(id=sales.id)
           
-            if len(product)==len(quantity)==len(tax)==len(total)==len(rate):
+            if len(product)==len(quantity)==len(tax)==len(adjust)==len(rate):
             
                 mapped = zip(product,quantity,tax,total,rate,desc)
                 mapped = list(mapped)
@@ -6634,13 +6635,12 @@ def purchase_unit_dropdown(request):
 
 @login_required(login_url='login')
 def purchase_item(request):
-
-    company = company_details.objects.get(user = request.user)
-
     if request.method=='POST':
         type=request.POST.get('type')
         name=request.POST['name']
         ut=request.POST['unit']
+        hsn=request.POST['hsn']
+        stock=request.POST['stock']
         inter=request.POST['inter']
         intra=request.POST['intra']
         sell_price=request.POST.get('sell_price')
@@ -6656,17 +6656,10 @@ def purchase_item(request):
         history="Created by " + str(request.user)
         user = User.objects.get(id = request.user.id)
 
-        item=AddItem(type=type,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,p_price=cost_price,
+        item=AddItem(type=type,hsn=hsn,stock=stock,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,p_price=cost_price,
                     user=user,creat=history,interstate=inter,intrastate=intra)
 
         item.save()
-
-
-
-
-
-
-
         return HttpResponse({"message": "success"})
         
 @login_required(login_url='login')        
