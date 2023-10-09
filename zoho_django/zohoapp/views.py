@@ -2261,7 +2261,6 @@ def itemdata(request):
     cur_user = request.user.id
     user = User.objects.get(id=cur_user)
     company = company_details.objects.get(user = user)
-    # print(company.state)
     id = request.GET.get('id')
     cust = request.GET.get('cust')
     item = AddItem.objects.get(Name=id)
@@ -3172,6 +3171,15 @@ def create_sales_order(request):
     itm=AddItem.objects.all()
     purchase=Purchase.objects.all()
     last_record = SalesOrder.objects.last()
+    bank = Bankcreation.objects.all()
+
+    if last_record ==None:
+        reford = '01'
+    else:
+        if last_record.id+1 < 10:
+            reford = '0'+ str(last_record.id+1)
+        else:
+            reford = last_record.id+1
     
     context={
         "c":cust,
@@ -3181,7 +3189,8 @@ def create_sales_order(request):
         "unit":unit, 
         "sales":sales,
         "purchase":purchase,
-        "reford":(last_record.id)+1
+        "reford":reford,
+        "bank":bank
     }
     return render(request,'create_sales_order.html',context)
 
@@ -3268,8 +3277,48 @@ def termdata(request):
     term = payment_terms.objects.get(id=term_id)
     data = {'days': term.Days}
     return JsonResponse(data)
+        
+def bankdata(request):
+    bank_id = request.GET.get('id')
+    term = Bankcreation.objects.get(name=bank_id)
+    data = {'bank': term.ac_no}
+    return JsonResponse(data)
 
+def convert_to_invoice(request,pk):
+    sale = SalesOrder.objects.get(id=pk)
+    inv_id = invoice.objects.last()
+    user = User.objects.get(id = request.user.id)
+    custo = customer.objects.get(id=sale.customer.id)
+    print(inv_id)
+    if inv_id == None:
+        invoice_no = "INV-01"
+        order_no = 1
+    else:
+        if (inv_id.id<10):
+            invoice_no = "INV-0"+str(inv_id.id+1)
+            order_no = str(inv_id.id+1)
+        else:
+            invoice_no = "INV-"+str(inv_id.id+1)
+            order_no = str(inv_id.id+1)
 
+    terms = sale.terms.id
+    inv_date = sale.sales_date
+    due_date = sale.ship_date
+    cxnote = sale.cxnote
+    subtotal = sale.subtotal
+    igst = sale.igst
+    cgst = sale.cgst
+    sgst = sale.sgst
+    totaltax = sale.t_tax
+    t_total = sale.grandtotal
+    status = sale.status
+    tc = sale.terms_condition
+    file = sale.file
+    inv=invoice(user=user,customer=custo,invoice_no=invoice_no,terms=terms,order_no=order_no,inv_date=inv_date,due_date=due_date,cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,grandtotal=t_total,status=status,terms_condition=tc,file=file)
+    inv.save()
+    sale.complete_status = 1
+    sale.save()
+    return redirect('view_sales_order')
 
 
 
@@ -3311,6 +3360,11 @@ def add_sales_order(request):
             sgst=request.POST['sgst']
             totaltax=request.POST['totaltax']
             t_total=request.POST['t_total']
+            balance=request.POST['balance']
+            advance=request.POST['advance']
+            cheque_id=request.POST['cheque_id']
+            upi_id=request.POST['upi_id']
+            pay_method=request.POST['method']
             if request.FILES.get('file') is not None:
                 file=request.FILES['file']
             else:
@@ -3330,15 +3384,15 @@ def add_sales_order(request):
             tax=request.POST.getlist('tax[]')
             total=request.POST.getlist('amount[]')
             adjust=request.POST.getlist('adjust')
-            term=payment_terms.objects.get(id=term.id)
+            adjust = float(adjust[0])
             
-            sales=SalesOrder(customer_id=custo,sales_no=sales_no,terms=term,reference=reference, sales_date=sa_date,ship_date=sh_date,
-                        cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,
-                        grandtotal=t_total,status=status,terms_condition=tc,file=file,sos=sos,sh_charge=sh_charge,adjust=adjust)
+            sales=SalesOrder(customer_id=custo,sales_no=sales_no,terms=term,reference=reference, sales_date=sa_date,ship_date=sh_date,balance=balance,
+                        cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,cheque_id=cheque_id,upi_id=upi_id,pay_method=pay_method,
+                        grandtotal=t_total,status=status,terms_condition=tc,file=file,sos=sos,sh_charge=sh_charge,adjust=adjust,advance=advance)
             sales.save()
             sale_id=SalesOrder.objects.get(id=sales.id)
           
-            if len(product)==len(quantity)==len(tax)==len(adjust)==len(rate):
+            if len(product)==len(quantity)==len(tax)==len(total)==len(rate):
             
                 mapped = zip(product,quantity,tax,total,rate,desc)
                 mapped = list(mapped)
@@ -3357,13 +3411,18 @@ def sales_order_det(request,id):
     saleitem=sales_item.objects.filter(sale_id=id)
     sale_order=SalesOrder.objects.all()
     company=company_details.objects.get(user_id=request.user.id)
-    
+    bank=''
+    if sales.pay_method != 'cash':
+        if sales.pay_method != 'upi':
+            if sales.pay_method != 'cheque':
+                bank = Bankcreation.objects.get(name=sales.pay_method)
     
     context={
         'sale':sales,
         'saleitem':saleitem,
         'sale_order':sale_order,
         'company':company,
+        'bank':bank
         
         
                     }
@@ -3387,8 +3446,13 @@ def edit_sales_order(request,id):
     itm = AddItem.objects.all()
     salesitem = sales_item.objects.filter(sale_id=id)
     sales = SalesOrder.objects.get(id=id)
+    sales_id = SalesOrder.objects.get(id=id)
     pay=payment_terms.objects.all()
-    
+    bank = Bankcreation.objects.all()
+    unit=Unit.objects.all()
+    last_record = SalesOrder.objects.last()
+    sale=Sales.objects.all()
+    purchase=Purchase.objects.all()
 
     if request.method == 'POST':
         u=request.user.id
@@ -3398,7 +3462,22 @@ def edit_sales_order(request,id):
         sales.customer=cust
         term=request.POST['term']
         
+        sales_no=request.POST['sale_no']
+
+        if len(sales_no) == 4:
+            sales_no = sales_no[:3] + '0' +sales_no[-1]
+
+        sale_list = list(SalesOrder.objects.values_list('sales_no'))
+        sale_list_update = [item[0] for item in sale_list]
+
+        if sales_no in sale_list_update:
+            if sales_no != sales_id.sales_no:
+                messages.error(request,'Sale Order number is already in use')
+                return redirect('edit_sales_order',id)
         
+        sales.sales_no=request.POST['sale_no']
+
+        term=request.POST['term']
         sales.terms = payment_terms.objects.get(id=term)
         sales.sales_date = request.POST['sa_date']
         sales.shipdate=request.POST['sh_date']
@@ -3417,7 +3496,19 @@ def edit_sales_order(request,id):
 
             sales.terms_condition = request.POST.get('ter_cond')
         
-       
+        if 'Draft' in request.POST:
+            sales.status="DRAFT"
+        if "Save" in request.POST:
+            sales.status = "APPROVED"
+
+        sales.balance=request.POST['balance']
+        sales.advance=request.POST['advance']
+        sales.cheque_id=request.POST['cheque_id']
+        sales.upi_id=request.POST['upi_id']
+        sales.pay_method=request.POST['method']
+        adjust=request.POST.getlist('adjust')
+        adjust = float(adjust[0])
+        sales.adjust=adjust
         
         sales.save()
         
@@ -3450,7 +3541,13 @@ def edit_sales_order(request,id):
         "saleitm":salesitem,
         "sale":sales,
         "pay":pay,
-         "company":company
+        "company":company,
+        "bank":bank,
+        "unit":unit,
+        "reford":(last_record.id)+1,
+        "sales":sale,
+        "purchase":purchase
+
 
     }
     return render(request,'edit_sale_page.html',context)

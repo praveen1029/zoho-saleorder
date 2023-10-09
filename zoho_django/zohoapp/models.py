@@ -434,6 +434,9 @@ class SalesOrder(models.Model):
     sales_date=models.DateField(max_length=255,null=True,blank=True)
     ship_date=models.DateField(max_length=255,null=True,blank=True)
     sos=models.TextField(null=True,blank=True)
+    pay_method=models.CharField(null=True,blank=True,max_length=255)
+    cheque_id=models.CharField(null=True,blank=True,max_length=255)
+    upi_id=models.CharField(null=True,blank=True,max_length=255)
     sh_charge=models.CharField(null=True,blank=True,max_length=255)
     igst=models.TextField(max_length=255,null=True,blank=True)
     cgst=models.TextField(max_length=255,null=True,blank=True)
@@ -441,12 +444,15 @@ class SalesOrder(models.Model):
     t_tax=models.FloatField(null=True,blank=True)
     subtotal=models.FloatField(null=True,blank=True)
     grandtotal=models.FloatField(null=True,blank=True)
+    balance=models.FloatField(null=True,blank=True)
+    advance=models.FloatField(null=True,blank=True)
     adjust=models.FloatField(null=True,blank=True)
     cxnote=models.TextField(max_length=255,null=True,blank=True)
     file=models.ImageField(upload_to='documents',null=True,blank=True)
     terms_condition=models.TextField(max_length=255,null=True,blank=True)
     status=models.TextField(max_length=255,null=True,blank=True)
     terms=models.ForeignKey(payment_terms,on_delete=models.CASCADE,null=True,blank=True)
+    complete_status = models.IntegerField(default=0)
     def __str__(self) :
         return self.invoice_no
     

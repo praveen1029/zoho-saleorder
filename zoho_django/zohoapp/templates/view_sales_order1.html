@@ -3,43 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Round to Nearest 10 and Calculate Difference</title>
+    <title>Navigate to a New Page with PK</title>
 </head>
 <body>
-    <label for="inputNumber">Enter a number:</label>
-    <input type="number" id="inputNumber" placeholder="Enter a number">
-
-    <br><br>
-
-    <label for="roundedNumber">Rounded Number:</label>
-    <span id="roundedNumber"></span>
-
-    <br><br>
-
-    <label for="difference">Difference:</label>
-    <span id="difference"></span>
+    <!-- Button with a data attribute for the PK -->
+    <button data-pk="6" onclick="goToNewPage()">Go to New Page</button>
 
     <script>
-        // Get references to input and output elements
-        const inputNumber = document.getElementById("inputNumber");
-        const roundedNumber = document.getElementById("roundedNumber");
-        const difference = document.getElementById("difference");
+        function goToNewPage() {
+            // Get the PK value from the data attribute of the button
+            const pk = document.querySelector('button').getAttribute('data-pk');
 
-        // Add an event listener to the input field
-        inputNumber.addEventListener("input", function () {
-            // Get the input value
-            const inputValue = parseFloat(inputNumber.value);
+            // Set the relative URL of the new page with the pk as a query parameter
+            const newPageUrl = `sales_order_det/${pk}`; // Replace with the relative path to your new page
 
-            // Round to the nearest multiple of 10
-            const roundedValue = Math.round(inputValue / 10) * 10;
-
-            // Update the roundedNumber span with the rounded value
-            roundedNumber.textContent = roundedValue;
-
-            // Calculate and display the difference
-            const diff = roundedValue - inputValue;
-            difference.textContent = diff;
-        });
+            // Navigate to the new page
+            window.location.href = newPageUrl;
+        }
     </script>
 </body>
 </html>

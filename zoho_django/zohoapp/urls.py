@@ -120,6 +120,8 @@ urlpatterns = [
     path('add_customer',views.add_customer,name='add_customer'),
     
     path('termdata',views.termdata,name='termdata'),
+    path('bankdata',views.bankdata,name='bankdata'),
+    path('convert_to_invoice/<int:pk>',views.convert_to_invoice,name='convert_to_invoice'),
     path('view_sales_order',views.view_sales_order,name='view_sales_order'),
     path('view_sales_order1',views.view_sales_order1,name='view_sales_order1'),
     path('view_sales_order2',views.view_sales_order2,name='view_sales_order2'),

@@ -100,7 +100,13 @@
   <div class="card radius-15" style="width: 100%;">
     <div class="card-body">
         <div class="card-title">
-          <h2 class="mb-0 text-uppercase text-right"> New Sales Order</h2>
+          <h2 class="mb-0 text-uppercase text-right"> Edit Sales Order</h2>
+          {% for message in messages %}
+          <div class="alert alert-success">
+              <a class="close" href="#" data-dismiss="alert">x</a>
+                {{ message }}
+          </div>
+          {% endfor %}
         </div>
     </div>
   </div>
@@ -112,16 +118,18 @@
         <div class="col-md-3">
           <label >Customer Name *</label>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex">
           <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark">
             <option selected value="{{sale.customer.id}}">{{sale.customer.customerName}}</option>
             
             {% for cust in c %}
+            {% if cust.customerName != sale.customer.customerName  %}
             <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option>
+            {% endif %}
             {% endfor %}
          
           </select>
-          <a href="" data-toggle="modal" data-target="#newcustomer">+ Add New Customer</a>
+          <a data-toggle="modal" data-target="#newcustomer" class="btn" style="background-color: chocolate; color: black; height: 80%; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
         </div>
       </div>
       <div class="row mt-2">
@@ -130,7 +138,7 @@
         </div>
 
         <div class="col-md-6">
-          <input type="email" class="form-control bg-light text-dark"   id="cx_mail" name="cx_mail" value="{{sale.customer.customerEmail}}">
+          <input type="email" class="form-control bg-light text-dark"   id="cx_mail" name="cx_mail" value="{{sale.customer.customerEmail}}" readonly>
         </div>
       </div>
       <div class="row mt-2">
@@ -140,6 +148,7 @@
 
         <div class="col-md-6">
           <input type="text" class="form-control bg-light text-dark" value="{{sale.sales_no}}"  id="prof_name" name="sale_no">
+          <label id="order_label" style="display: none;"></label>
         </div>
       </div>
 
@@ -197,17 +206,17 @@
   
       <div class="row mt-2">
         <div class="col-md-3">
-          <label for="prof_name" >Reference</label>
+          <label for="" >Reference</label>
         </div>
 
         <div class="col-md-6">
-          <input type="text" class="form-control bg-light text-dark"   id="ref" name="ord_no" value="{{sale.reference}}">
+          <input type="text" class="form-control bg-light text-dark"   id="ref" name="ord_no" value="{{sale.reference}}" readonly>
         </div>
       </div>
 
       <div class="row mt-2" >
           <div class="col-md-3">
-            <label for="date1">sales Order Date</label>
+            <label for="date1">Sales Order Date</label>
           </div>
           <div class="col-md-6">
             <input type="date" class="form-control bg-light text-dark" id="date1" name="sa_date" value="{{sale.sales_date|date:'Y-m-d'}}">
@@ -215,10 +224,10 @@
       </div>
       <div class="row mt-2">
         <div class="col-md-3">
-          <label for="date2">Shipment Date</label>
+          <label for="date2">Expiry Date</label>
         </div>
         <div class="col-md-6">
-          <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date" value="{{sale.ship_date|date:'Y-m-d'}}">
+          <input type="date" class="form-control bg-light text-dark" id="date2" name="sh_date" value="{{sale.ship_date|date:'Y-m-d'}}" readonly>
         </div>
         
       </div>
@@ -230,20 +239,67 @@
         <div class="col-md-6">
           <div class="d-flex">
             <select class="form-control bg-light text-dark my-select" id="pay_term" name="term" >
-              <option selected value="{{sale.terms.Terms}}">{{p.Terms}}</option>
+              <option selected value="{{sale.terms.id}}">{{sale.terms.Terms}}</option>
               {% for p in pay %}
+              {% if p.Terms != sale.terms.Terms %}
               
-                <option selected value="{{p.id}}">{{p.Terms}}</option>
+                <option value="{{p.id}}">{{p.Terms}}</option>
+              {% endif %}
               {% endfor %}
               
             </select>
+            <a href="" data-toggle="modal" data-target="#newpayment" class="btn" style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
 
           </div> 
-          <a href="" data-toggle="modal" data-target="#newpayment"><i class="fa fa-gear"></i> Configure Payment Trems</a>
   
         </div>
       </div>  
 
+      <div class="row mt-2">
+        <div class="col-md-3">
+          <label for="date2">Payment Method</label>
+        </div>
+        <div class="col-md-6">
+          <div class="d-flex">
+            <select class="form-control bg-light text-dark my-select" id="pay_method" name="method">
+              <option value="{{sale.pay_method}}" selected hidden>{{sale.pay_method}}</option>
+              <option value="cash">Cash</option>
+              <option value="cheque">Cheque</option>
+              <option value="upi">UPI</option>
+              {% for item in bank %}
+              <option value="{{item.name}}">{{item.name}}</option>
+              {% endfor %}
+            </select>
+          </div> 
+        </div>
+      </div>  
+
+      <div class="row mt-2" id="chequediv" style="display: none;">
+        <div class="col-md-3">
+          <label for="date2">Cheque ID</label>
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control text-black" name="cheque_id" id="cheque_id" value="{{sale.cheque_id}}">
+        </div>
+      </div>  
+
+      <div class="row mt-2" id="upidiv" style="display: none;">
+        <div class="col-md-3">
+          <label for="date2">UPI ID</label>
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control text-black" name="upi_id" id="upi_id"value="{{sale.upi_id}}">
+        </div>
+      </div>  
+
+      <div class="row mt-2" id="bnkdiv" style="display: none;">
+        <div class="col-md-3">
+          <label for="date2">Bank Account</label>
+        </div>
+        <div class="col-md-6">
+          <input type="text" class="form-control text-black" name="bnk_id" id="bnk_id" readonly>
+        </div>
+      </div>
      
 
 
@@ -259,51 +315,56 @@
             <thead>
              
               <tr>
-                <th>Item<br><a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
+                <th>Item<a href="" data-toggle="modal" data-target="#newitem" class="text-capitalize">+ Item</a></th>
+                <th class="text-right">HSN</th>
                 <th class="text-right">Quantity</th>
                 <th class="text-right">Rate</th>
                 <th class="text-right">Discount</th>
                 <th class="text-right">Tax</th>
                 <th class="text-right">Amount</th>
-                <th colspan="2"></th>
+                <th ></th>
               </tr>
             </thead>
             <tbody>
               {% for i in saleitm %}
               <tr id="row{{forloop.counter}}">
-                  <td style="width: 10%;">
+                  <td>
                       <div ><select
                               class='form-control bg-light text-dark border-0 item_select itm'
                               name='item[]' id='item{{forloop.counter}}'>
-                              <option selected value="{{i.product}}" >{{i.product}}</option>
+                              <option selected value="{{i.product}}" hidden>{{i.product}}</option>
                               {% for j in itm %}
-                                <option value="{{i.Name}}">{{ j.Name  }} </option>
+                                <option value="{{j.Name}}">{{ j.Name  }} </option>
                               {% endfor %}
                           </select></div>
                   </td>
-                  
+                  <td class='text-right' style="width: 15%;">
+                    <input type='number' id='hsn1' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+                  </td>
                 
                    
-                  <td style="width: 13%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
+                  <td style="width: 17%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
                           class=' text-right qty form-control bg-light text-dark' name='quantity[]'
-                          value='{{i.quantity}}'>
+                          value='{{i.quantity}}' style="margin-top: 4vh;"><br>
+                          Available Stock : <span id="stock_data"></span>
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate{{forloop.counter}}'
                           class=' text-right rate form-control bg-light text-dark' name='rate[]'
-                          value='{{i.rate}}'>
+                          value='{{i.rate}}' readonly>
                   </td>
-                  <td style="width: 12%;" class='text-right text-dark'><input type='number' id='discount{{forloop.counter}}'
+                  <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount{{forloop.counter}}'
                           class=' text-right discount bg-light text-dark form-control' name='desc[]'
                           value='{{i.desc}}'>
                   </td>
-                  <td style="width: 15%;" class='text-right '> <select name='tax[]' id='tax{{forloop.counter}}'
+                  <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax{{forloop.counter}}'
                           class='form-control bg-light text-dark  text-right border-0 tax' onclick="toggleDateInput()">
                          
-                          {% if i.sale.sos == sale.customer.placeofsupply %}
-                          <option value="{{i.tax}} ">{{i.tax}}  GST</option>
+                          {% if i.sale.sos == '[KL] Kerala' %}
+                          <option value="{{i.tax}} " hidden>{{i.tax}}.0%  GST({{i.tax}}%)</option>
                             {% else %}
-                            <option value="{{i.tax}} ">{{i.tax}} IGST</option>
+                            <option value="{{i.tax}} " hidden>{{i.tax}}.0% IGST({{i.tax}}%)</option>
                             {% endif %}
+                            <optgroup  class="text-center" label="GST">
                             <option value="0">0% GST(0%)</option>
                             <option value="3">3.0% GST(3%)</option>
                             <option value="5">5.0% GST(5%)</option>
@@ -326,18 +387,17 @@
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='amount{{forloop.counter}}'
                           class=' text-right form-control amount bg-light text-dark' name='amount[]'
-                          value='{{i.total}}'></td>
+                          value='{{i.total}}' readonly></td>
                   <td class='text-center'><button type='button' id='del_btn1'
                           class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
-                          style='width:30px'>X</button></td>
-                          <td class='text-center'>
+                          style='width:30px'>X</button><br><br>
                             <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row=1 style='width:30px' ><i class="fa fa-clone"></i>
                             </button>
                           </td>
  </tr>
  {% endfor %}
       </tbody>
-    </table>
+    </table><br>
     <button type="button" class="btn btn-sm text-white" style="background-color: rgb(210, 132, 30);" id="add-row">Add another line</button>
   </div>
 </div>
@@ -346,7 +406,7 @@
         <div class="col-sm-5 d-flex flex-column mt-auto">
 
             <label for="">Customer Notes</label>
-            <textarea name="customer_note" id="" cols="8" rows="8"
+            <textarea name="customer_note" id="" cols="8" rows="13"
                 placeholder=" Will be Displayed on the Purchase Order">{{sale.cxnote}}</textarea>
         </div>
         <div class="col-sm-6 mt-4" >
@@ -355,13 +415,13 @@
                     <td>Sub Total</td>
                     <td></td>
                     <td><input type="number" id="subtotal" name="subtotal" step="any" value="0.00"
-                            class="bg-transparent border-0 text-right subtotal text-white"></td>
+                            class="bg-transparent border-0 text-right subtotal text-white" readonly></td>
                 </tr>
                 <tr style="display: none;" id="tr_igst">
                     <td>IGST</td>
                     <td></td>
                     <td><input type="number" id='igst' name="igst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right igst  text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right igst  text-white"readonly ></td>
                 </tr>
                 <tr style="display: none;" id="tr_cgst">
                     <td>CGST</td>
@@ -373,13 +433,13 @@
                     <td>SGST</td>
                     <td></td>
                     <td><input type="number" id='sgst' name="sgst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right sgst  text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right sgst  text-white" readonly></td>
                 </tr>
                 <tr>
                     <td>Tax Amount</td>
                     <td></td>
                     <td><input type="number" id="total_taxamount" name="totaltax" step="any" value="0.00" 
-                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white"></td>
+                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white" readonly></td>
                 </tr>
                 <tr>
                     <td>Shipping Charges</td>
@@ -388,6 +448,12 @@
                         class="form-control bg-transparent border-0 text-right shipping_charge  "></td>
                         <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="{{sale.sh_charge}}" name="shipping_charge" > </td>
                 </tr>
+                <td>Adjustment</td>
+                    
+                <td><input type="hidden" id="adjustment"  step="any" value="0.00" 
+                    class="form-control bg-transparent border-0 text-right adjustment  "></td>
+                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" readonly name="adjust"> </td>
+            </tr>
                 <tr>
                     <td></td>
                     <td></td>
@@ -397,19 +463,35 @@
                     <th>Total ( &#x20B9; )</th>
                     <th></th>
                     <th><input type="number" id="grandtotal" name="t_total" step="any" value="0.00" 
-                            class="form-control bg-transparent border-0 text-right grandtotal  text-white"></th>
+                            class="form-control bg-transparent border-0 text-right grandtotal  text-white" readonly></th>
                 </tr>
             </table>
+            <div class="col-sm-12 mt-4" >
+              <table class=" table  text-white" style="background-color: rgba(58, 57, 57, 0.8);">
+                  <tr>
+                      <td>Advance Paid</td>
+                      <td></td>
+                      <td><input type="number" id="advance" name="advance" step="any" value="0.00"
+                              class="form-control bg-transparent border-0 text-right advance text-white"></td>
+                  </tr>
+                  <tr>
+                      <td>Balance</td>
+                      <td></td>
+                      <td><input type="number" id='balance' name="balance" step="any" value="0.00"
+                              class="form-control bg-transparent border-0 text-right balance  text-white" readonly></td>
+                  </tr>
+              </table>
+          </div>
         </div>
     </div>
 
-    <div class="row py-5 border-bottom">
-        <div class="col-md-8 d-flex flex-column w-60 text-white">
+    <div class="row border-bottom">
+        <div class="col-md-8 d-flex flex-column text-white mb-5">
             <label for="">Terms & Conditions</label>
-            <textarea name="ter_cond" id="" cols="20" rows="5"
+            <textarea name="ter_cond" id="" cols="20" rows="7"
                 placeholder=" Enter the terms & conditions of your business to be displayed in your transaction."></textarea>
         </div>
-        <div class="col-md-4 py-5 text-center rounded" style="background-color: rgba(32, 35, 37);">
+        <div class="col-md-4 mt-5 text-center rounded" style="background-color: rgba(32, 35, 37); height: 26vh;">
             <label class="text-white" for="">Attach File(s) to Purchase</label><br>
 
             
@@ -422,8 +504,8 @@
       <div class="row mt-5 mb-3 m-5 ">
        
     
-     
-        <input style="width: 150px;margin-right: 2rem;" type="submit" class="btn btn-success mt-2" value="Save">
+        <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" type="submit" class="btn mt-2" value="Draft" name="Draft">
+        <input style="width: 150px;margin-right: 2rem;" type="submit" class="btn btn-success mt-2" value="Save" name="Save">
            <input style="width: 150px;margin-right: 2rem;" class="btn btn-danger mt-2" type="reset" value="Cancel">
      
         
@@ -437,34 +519,32 @@
 
     <div class="modal fade" id="newpayment">
       <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color: #202325;">
           <h6 style="color: red;">Payment Terms</h6>
           <!-- Rest of your modal content here -->
           <form id="modalForm"  action="" onsubmit="return false">
             <div id="terms-container">
               <div class="form-row">
                 {% for p in pay %}
-                <div class="col-6">
-                    <input type="text" value="{{p.Terms}}" class="form-control text-black" placeholder="Terms">
+                <div class="col-6" style="background-color: #191c24;">
+                    <input type="text" value="{{p.Terms}}" class="form-control" placeholder="Terms" style="background-color: #191c24; color: white;">
                   </div>
                   <div class="col-6">
-                    <input type="text" value="{{p.Days}}" class="form-control text-black" placeholder="No of Days">
+                    <input type="text" value="{{p.Days}}" class="form-control" placeholder="No of Days" style="background-color: #191c24; color: white;">
                   </div>
                 {% endfor %}
     
                 <div class="col-6">
-                  <input type="text" name="terms" class="form-control text-black" placeholder="Terms">
+                  <input type="text" name="terms" class="form-control" placeholder="Terms" style="background-color: #191c24;">
                 </div>
                 <div class="col-5">
-                  <input type="text" name="days" class="form-control text-black" placeholder="No of Days">
-                </div>
-                <div class="col-1 ">
-                  <button type="button" class="btn btn-success add-term-row">+</button>
+                  <input type="text" name="days" class="form-control" placeholder="No of Days" style="background-color: #191c24;">
                 </div>
               </div>
             </div>
             <div class="form-row mt-3">
               <div class="col-12 text-right">
+                <button type="button" class="btn add-term-row" style="background-color: chocolate;">Add New</button>
                 <input type="submit" class="btn btn-success" value="submit" id="payment">
               </div>
             </div>
@@ -636,7 +716,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <select class="form-control bg-light text-dark" id="c_gsttype" name="c_gsttype" required>
-                      <option value="value" selected>Select a Gst Treatment</option>
+                      <option value="value" selected hidden>Select a Gst Treatment</option>
                       <option value="Registered Business-Regular Business that is registered under GST">Registered Business-Regular Business that is registered under GST</option>
                       <option value="Registered Business-Composition Business that is registered under the Composition scheme in GST">Registered Business-Composition Business that is registered under the Composition scheme in GST</option>
                       <option value="Unregistered Business-not Registered under GST">Unregistered Business-not Registered under GST</option>
@@ -652,8 +732,8 @@
                     <label id="glbl" style="color:rgb(190, 88, 88);">GSTIN/UIN *</label>
                   </div>
                   <div class="col-md-6 mt-2">
-                    <input type="text" class="form-control" id="c_gstin" name="c_gstin" placeholder="29APPCK7465F1Z1">
-                    <label id="gst_label"></label>
+                    <input type="text" class="form-control text-black" id="c_gstin" name="c_gstin" placeholder="29APPCK7465F1Z1">
+                    <label id="gst_label" style="display: none;"></label>
                   </div>       
                 </div>
 
@@ -662,8 +742,8 @@
                     <label for="v_pan">PAN Number</label>
                   </div>
                   <div class="col-md-6 mt-2">
-                    <input type="text" class="form-control" id="c_pan" name="c_pan" placeholder="APPCK7465F">
-                    <label id="pan_label"></label>
+                    <input type="text" class="form-control text-black" id="c_pan" name="c_pan" placeholder="APPCK7465F">
+                    <label id="pan_label" style="display: none;"></label>
                   </div>       
                 </div>
 
@@ -673,7 +753,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <select class="form-control bg-light text-dark" id="placesupply" name="placesupply">
-                      <option value="Nill"></option>
+                      <option value="Nill" hidden></option>
                       <option value="[AN] Andaman and Nicobar Islads">[AN] Andaman and Nicobar Islads</option>
                       <option value="[AD] Andhra Predhesh">[AD] Andhra Predhesh</option>
                       <option value="[AR] Arunachal Predesh">[AR] Arunachal Predesh</option>
@@ -717,10 +797,10 @@
                 </div>
 
                 <div class="row mt-2">
-                  <div class="col-md-4 ">
+                  <div class="col-md-3">
                     <label for="c_tax" style="color: rgb(190, 88, 88);">Tax Preference * </label>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <div class="d-flex">
                       <div class="radio_opt mx-5 mt-2">
                         <input type="radio" id="item-tax3" name="radioOption2" value="Taxable" >
@@ -738,9 +818,9 @@
                   <div class="col-md-3">
                     <label for="intra">Intra-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="intra" class="form-control bg-light text-dark" id="intra1">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="GST0[0%]">GST0[0%]</option>
                       <option value="GST5[5%]">GST5[5%]</option>
@@ -750,13 +830,13 @@
                     </select>             
                   </div>
 
-                  
-                  <div class="col-md-2">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-3">
                     <label for="inter">Inter-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="inter" class="form-control bg-light text-dark" id="inter1">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="IGST0[0%]">IGST0[0%]</option>
                       <option value="IGST5[5%]">IGST5[5%]</option>
@@ -777,7 +857,7 @@
                   </div>
                   <div class="col-md-3 mt-2">
                     <select class="form-control bg-light text-dark"id="c_curn" name="c_curn" required>
-                      <option selected disabled value="">Choose..</option>
+                      <option selected disabled value="" hidden>Choose..</option>
                       <option value="INR">INR</option>
                     </select>
                   </div>       
@@ -820,8 +900,8 @@
                   </div>
                 </div>
                 <div class="row mt-2 m-0 p-0 mb-2">
-                  <div class="col-md-9"> </div>
-                  <div class="col-md-3 text-right  m-0 p-0">
+                  <div class="col-md-8"> </div>
+                  <div class="col-md-4" style="margin-left: -5vh;">
                     <input type="checkbox" onclick="address()" id="voka" name="vokay">
                     <label for="voka" style="color: #909091;">Same As Billing Address</label>
                   </div>
@@ -871,7 +951,7 @@
                   </div>
                   <div class="col-md-4">
                     <select type="text" class="form-control bg-light text-dark" id="cstate" name="vstate">
-                      <option value="" selected>Choose</option>
+                      <option value="" selected hidden>Choose</option>
                       <option value="None Of This">None Of This</option>
                       <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
                       </option>
@@ -921,7 +1001,7 @@
                   </div>
                   <div class="col-md-4 ">
                     <select type="text" class="form-control bg-light text-dark" id="csstate" name="vsstate">
-                      <option value="" selected>Choose</option>
+                      <option value="" selected hidden>Choose</option>
                       <option value="None Of This">None Of This</option>
                       <option value="Andaman and Nicobar Islads">Andaman and Nicobar Islads
                       </option>
@@ -1094,8 +1174,8 @@
               <form action="" method="post" class="needs-validation" novalidate autocomplete="off" id="modalItem">
 
                 <div class="row mt-2">
-                  <div class="col-md-4 mr-0">
-                    <label class="col-form-label col-sm-2 p-0">Type <i class="fa fa-question-circle"></i></label>
+                  <div class="col-md-3 mr-0">
+                    <label class="col-form-label p-0">Type</label>
                   </div>
                   <div class="col-md-5 ml-0 d-flex">
                     <div class="radio_opt mx-5 ">
@@ -1123,21 +1203,40 @@
                   <div class="col-md-6">
                     <div class="d-flex">
                       <select class="form-control bg-light text-dark" id="item_units" name="item_units" required>
-                        <option value="">Select Unit</option>
+                        <option value="" hidden>Select Unit</option>
                         {% for u in unit %}
                         <option value="{{u.id}}">{{u.unit}}</option>
                         {% endfor %}
                       </select>                
-                      <a href="#" class="btn btn-outline-secondary py-2 my-1" data-target="#newunit" data-toggle="modal">+</a>  
+                      <a href="#" class="btn" data-target="#newunit" data-toggle="modal" style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>  
                     </div>
+                  </div>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-3 ">
+                    <label for="">HSN</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="hsn" name="hsn" required>
+                    <label id="hsn_war" style="display: none;"></label>
+                  </div>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-3 ">
+                    <label for="">Stock</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="stock" name="stock" required>
                   </div>
                 </div>
  
                 <div class="row mt-2">
-                  <div class="col-md-4 ">
+                  <div class="col-md-3 ">
                     <label for="c_tax" style="color: rgb(190, 88, 88);">Tax Preference * </label>
                   </div>
-                  <div class="col-md-5">
+                  <div class="col-md-6">
                     <div class="d-flex">
                       <div class="radio_opt mx-5 mt-2">
                         <input type="radio" id="item-tax1" name="radioOption1" value="Taxable" >
@@ -1155,9 +1254,9 @@
                   <div class="col-md-3">
                     <label for="intra">Intra-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="intra" class="form-control bg-light text-dark" id="intra">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="GST0[0%]">GST0[0%]</option>
                       <option value="GST5[5%]">GST5[5%]</option>
@@ -1167,13 +1266,13 @@
                     </select>             
                   </div>
 
-                  
-                  <div class="col-md-2">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-3">
                     <label for="inter">Inter-State TAX</label>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <select name="inter" class="form-control bg-light text-dark" id="inter">
-                      <option value="">Select GST</option>
+                      <option value="" hidden>Select GST</option>
 
                       <option value="IGST0[0%]">IGST0[0%]</option>
                       <option value="IGST5[5%]">IGST5[5%]</option>
@@ -1200,11 +1299,9 @@
                 </div>
                 
                 <div class="row mt-4">
-                  <div class="col-md-2">
-                    <label for="sell_price">Selling Price *</label>
-                  </div>
-                  <div class="col-md-4">
+                  <div class="col-md-6">
                     <div class="input-group mb-2">
+                      <label for="sell_price" style="margin-right:3vh;">Selling Price *</label>
                       <div class="input-group-prepend">
                         <div class="input-group-text">INR</div>
                       </div>
@@ -1231,7 +1328,7 @@
                   </div>
                   <div class="col-md-4">
                     <select name="sell_acc" id="sell_acc" class="form-control bg-light text-dark">
-                      <option value="">Select Account</option>
+                      <option value="" hidden>Select Account</option>
        
                         <option value="" disabled class="btn btn-dark text-white"><b>SALES</b></option>
                         {% for s in sales %}
@@ -1244,7 +1341,7 @@
                   </div>
                   <div class="col-md-4">
                     <select name="cost_acc" class="form-control bg-light text-dark" id="cost_acc">
-                      <option value="">Select Account</option>
+                      <option value="" hidden>Select Account</option>
 
 
                       
@@ -1425,7 +1522,190 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
+<script>
+  $(document).ready(function() {
+    var x = $('#pay_method').val();
+    if(x==='cash'){
+        $('#chequediv').hide()
+        $('#bnkdiv').hide()
+        $('#upidiv').hide()
+        document.getElementById('cheque_id').value=null
+        document.getElementById('upi_id').value=null
+      }else if(x==='cheque'){
+        $('#chequediv').show()
+        $('#bnkdiv').hide()
+        $('#upidiv').hide()
+        document.getElementById('upi_id').value=null
+      }else if(x==='upi'){
+        $('#upidiv').show()
+        $('#bnkdiv').hide()
+        $('#chequediv').hide()
+        document.getElementById('cheque_id').value=null
+      }else{
+        $('#bnkdiv').show()
+        $('#chequediv').hide()
+        $('#upidiv').hide()
+        document.getElementById('cheque_id').value=null
+        document.getElementById('upi_id').value=null
 
+        $.ajax({
+            type: "GET",
+            url: "{% url 'bankdata' %}",
+            data: {
+                id: x,
+            },
+            success: function (response) {
+                data = response.bank
+                document.getElementById('cheque_id').value=null
+                document.getElementById('upi_id').value=null    
+                document.getElementById("bnk_id").value = data
+            }
+        });
+      }
+  })
+
+</script>
+
+<script>
+  $(document).ready(function() {
+    $("#advance").change(function() {
+      var x=$('#advance').val();
+        total = document.getElementById("grandtotal").value
+        document.getElementById("balance").value=total-x
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $("#pay_method").change(function() {
+      var x=$('#pay_method').val();
+      if(x==='cash'){
+        $('#chequediv').hide()
+        $('#bnkdiv').hide()
+        $('#upidiv').hide()
+        document.getElementById('cheque_id').value=null
+        document.getElementById('upi_id').value=null
+      }else if(x==='cheque'){
+        $('#chequediv').show()
+        $('#bnkdiv').hide()
+        $('#upidiv').hide()
+        document.getElementById('upi_id').value=null
+      }else if(x==='upi'){
+        $('#upidiv').show()
+        $('#bnkdiv').hide()
+        $('#chequediv').hide()
+        document.getElementById('cheque_id').value=null
+      }else{
+        $('#bnkdiv').show()
+        $('#chequediv').hide()
+        $('#upidiv').hide()
+        document.getElementById('cheque_id').value=null
+        document.getElementById('upi_id').value=null
+
+        $.ajax({
+            type: "GET",
+            url: "{% url 'bankdata' %}",
+            data: {
+                id: x,
+            },
+            success: function (response) {
+                data = response.bank
+                document.getElementById('cheque_id').value=null
+                document.getElementById('upi_id').value=null
+                document.getElementById("bnk_id").value = data
+            }
+        });
+      }
+    });
+  });
+</script>
+
+<script>
+
+  $(document).on('change', '#date1', function () {
+    var term = $('#pay_term').val();
+   $.ajax({
+       type: "GET",
+       url: "{% url 'termdata' %}",
+       data: {
+           id: term
+       },
+       success: function (response) {
+        days = response.days
+        order_date =new Date( document.getElementById("date1").value)
+        if (!isNaN(order_date.getTime())) {
+          // Calculate the new date by adding 20 days
+          const endDate = new Date(order_date);
+          endDate.setDate(endDate.getDate() + days);
+
+          // Format the new date as YYYY-MM-DD
+          const formattedDate = endDate.toISOString().split("T")[0];
+
+          // Set the result in the second input
+          document.getElementById("date2").value = formattedDate;
+        } else {
+            alert("Please enter a valid date.");
+        }
+
+       }
+   });
+  });
+</script>
+
+<script>
+  $(document).on('change', '#pay_term', function () {
+   var term = $('#pay_term').val();
+   $.ajax({
+       type: "GET",
+       url: "{% url 'termdata' %}",
+       data: {
+           id: term
+       },
+       success: function (response) {
+        days = response.days
+        order_date =new Date( document.getElementById("date1").value)
+        if (!isNaN(order_date.getTime())) {
+          // Calculate the new date by adding 20 days
+          const endDate = new Date(order_date);
+          endDate.setDate(endDate.getDate() + days);
+
+          // Format the new date as YYYY-MM-DD
+          const formattedDate = endDate.toISOString().split("T")[0];
+
+          // Set the result in the second input
+          document.getElementById("date2").value = formattedDate;
+        } else {
+            alert("Please enter a valid date.");
+        }
+
+       }
+   });
+});
+</script>
+
+<script>
+  $(document).ready(function() {
+    var y=$('#prof_name').val();
+    $("#prof_name").change(function() {
+      var x=$('#prof_name').val();
+      reford = "{{reford}}"
+      if(parseInt(reford) != parseInt(x.slice(3,))){
+        document.getElementById("order_label").style.display="block"
+        document.getElementById("order_label").style.color="red"
+        document.getElementById("order_label").innerHTML="Sale Order is not Continuous"
+      }
+      if (parseInt(reford) == parseInt(x.slice(3,))){
+        document.getElementById("order_label").style.color="green"
+        document.getElementById("order_label").innerHTML="Sale Order is Continuous"
+      }
+      if (y === x){
+        document.getElementById("order_label").style.color="green"
+        document.getElementById("order_label").innerHTML="Sale Order is Continuous"
+      }
+    });
+  });
+</script>
    
 <script>
      
@@ -1533,6 +1813,7 @@ termsContainer.addEventListener('click', (event) => {
         var gst_label=document.getElementById("gst_label")
         var expr=/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
         if (!expr.test(x)) {
+            gst_label.style.display="block";
             gst_label.style.color="red";
             gst_label.innerHTML = "Invalid GST Number.";
         }
@@ -1550,6 +1831,7 @@ termsContainer.addEventListener('click', (event) => {
         var pan_label=document.getElementById("pan_label")
         var expr=    /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/
         if (!expr.test(x)) {
+            pan_label.style.display="block";
             pan_label.style.color="red";
             pan_label.innerHTML = "Invalid PAN Number.";
         }
@@ -1826,7 +2108,20 @@ $(document).ready(function() {
 });
 
 
-
+$(document).ready(function() {
+      $("#hsn").change(function() {
+        var x=String($('#hsn').val());
+        if(x.length!= 6){
+          document.getElementById("hsn_war").style.display="block"
+          document.getElementById("hsn_war").style.color="red"
+          document.getElementById("hsn_war").innerHTML="HSN should be of length 6"
+        }
+        if(x.length == 6){
+          document.getElementById("hsn_war").style.color="green"
+          document.getElementById("hsn_war").innerHTML="HSN is valid"
+        }
+      });
+    });
 
 
 
@@ -1859,6 +2154,8 @@ $(document).on("click","#itemSave",function(){
         type : itemtype,
         name : $("#item_name").val(),
         unit : $("#item_units").val(),
+        hsn : $("#hsn").val(),
+        stock : $("#stock").val(),
         inter : inter,
         intra : intra,
         sell_price : $("#sell_price").val(),
@@ -2016,7 +2313,18 @@ function calculateGrandTotal() {
   var shippingCharges = parseFloat($('#shipping').val());
   grandTotal += shippingCharges;
 
-  $('#grandtotal').val(grandTotal.toFixed(2));
+  const roundedValue = Math.round(grandTotal / 10) * 10;
+
+            // Update the roundedNumber span with the rounded value
+
+            // Calculate and display the difference
+            const diff = roundedValue - grandTotal;
+
+
+
+  $('#adjust').val(diff.toFixed(2));
+  $('#grandtotal').val(roundedValue.toFixed(2));
+  $('#balance').val(roundedValue.toFixed(2));
   $('#total_taxamount').val(totalTaxAmount.toFixed(2));
 }
 
@@ -2032,7 +2340,7 @@ function calculateGrandTotal() {
     console.log()
     var newRow = `
       <tr id='row${rowCount}'>
-        <td style="width: 10%;">
+        <td>
           <div>
             <select class='form-control bg-light text-dark  border-0 item_select itm' name='item[]' id='item${rowCount}'>
               <option value=" " selected disabled>Select Item</option>
@@ -2044,9 +2352,11 @@ function calculateGrandTotal() {
         </td>
 
       
-
+        <td style="width: 15%;" class='text-right'>
+          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+        </td>
         
-        <td style="width: 13%;" class='text-right'>
+        <td style="width: 17%;" class='text-right'>
           <input type='number' id='qty${rowCount}' class='text-right bg-light text-dark qty form-control' name='quantity[]' value='0'>
         </td>
         
@@ -2054,11 +2364,11 @@ function calculateGrandTotal() {
           <input type='number' id='rate${rowCount}' class='text-right bg-light text-dark rate form-control' name='rate[]' value='0'>
         </td>
         
-        <td style="width: 12%;" class='text-right'>
+        <td style="width: 10%;" class='text-right'>
           <input type='number' id='discount${rowCount}' class='text-right bg-light text-dark discount form-control' name='des[]' value='0'>
         </td>
         
-        <td style="width: 15%;" class='text-right'>
+        <td style="width: 22%;" class='text-right'>
           <select name='tax[]'  id='tax${rowCount}' class='form-control bg-light text-dark text-right border-0 tax' onclick=' toggleDateInput()'>
             <optgroup class="text-center" label="GST">
                             <option value="0" selected></option>
@@ -2089,10 +2399,8 @@ function calculateGrandTotal() {
           <input type='number' id='amount${rowCount}' class='text-right bg-light text-dark form-control amount' name='amount[]' value='0.00'>
         </td>
         
-        <td class='text-center'>
-          <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button>
-        </td>
-        <td class='text-center'>
+          <td class='text-center'>
+            <button type='button' id='del_btn${rowCount}' class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row' style='width:30px'>X</button> <br><br>
         <button type='button' class='btn btn-transparent text-primary btn-sm btn-outline-primary rounded-circle clone-row' data-row='${rowCount}' style='width:30px'><i class="fa fa-clone"></i>
 </button>
       </td>
@@ -2256,7 +2564,12 @@ function calculateTaxAmount() {
 
         document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
         var grandtotal = subtotal + total_taxamount + shipping;
-        document.getElementById("grandtotal").value = grandtotal.toFixed(2);
+        const roundedValue = Math.round(grandtotal / 10) * 10;
+            // Calculate and display the difference
+            const diff = roundedValue - grandtotal;
+        document.getElementById("adjust").value = diff.toFixed(2);
+        document.getElementById("grandtotal").value = roundedValue.toFixed(2);
+        document.getElementById("balance").value = roundedValue.toFixed(2);
     }
 
     // Call the function initially on page load
@@ -2350,11 +2663,9 @@ function toggleDateInput() {
       console.log("ajax");
       // var place = document.getElementById('pos').value;
 
-      $(document).on('click', '#item1', function () {
+      $(document).on('change', '#item1', function () {
           select = $('#item1').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2369,6 +2680,10 @@ function toggleDateInput() {
                   data2 = response.igst
                   data3 = response.pos
                   data4=response.place
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn1").value = hsn
+                  document.getElementById("stock_data").innerHTML = stock
                   document.getElementById('rate1').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2383,7 +2698,7 @@ function toggleDateInput() {
 
       });
       // console.log('pos:'+place_of_supply);
-      $(document).on('click', '#item2', function () {
+      $(document).on('change', '#item2', function () {
           select = $('#item2').val();
           customer = $('#customer_sel').val();
           
@@ -2401,6 +2716,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn2").value = hsn
+                  document.getElementById("stock_data2").innerHTML = stock
                   document.getElementById('rate2').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2415,11 +2734,9 @@ function toggleDateInput() {
 
       });
 
-      $(document).on('click', '#item3', function () {
+      $(document).on('change', '#item3', function () {
           select = $('#item3').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2433,6 +2750,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn3").value = hsn
+                  document.getElementById("stock_data3").innerHTML = stock
                   document.getElementById('rate3').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2450,8 +2771,6 @@ function toggleDateInput() {
       $(document).on('change', '#item4', function () {
           select = $('#item4').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2465,6 +2784,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn4").value = hsn
+                  document.getElementById("stock_data4").innerHTML = stock
                   document.getElementById('rate4').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2482,8 +2805,6 @@ function toggleDateInput() {
       $(document).on('change', '#item5', function () {
           select = $('#item5').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2497,6 +2818,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn5").value = hsn
+                  document.getElementById("stock_data5").innerHTML = stock
                   document.getElementById('rate5').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2514,8 +2839,6 @@ function toggleDateInput() {
       $(document).on('change', '#item6', function () {
           select = $('#item6').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2529,6 +2852,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn6").value = hsn
+                  document.getElementById("stock_data6").innerHTML = stock
                   document.getElementById('rate6').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2546,8 +2873,6 @@ function toggleDateInput() {
       $(document).on('change', '#item7', function () {
           select = $('#item7').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2561,6 +2886,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn7").value = hsn
+                  document.getElementById("stock_data7").innerHTML = stock
                   document.getElementById('rate7').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2578,8 +2907,6 @@ function toggleDateInput() {
       $(document).on('change', '#item8', function () {
           select = $('#item8').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2593,6 +2920,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn8").value = hsn
+                  document.getElementById("stock_data8").innerHTML = stock
                   document.getElementById('rate8').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2610,8 +2941,6 @@ function toggleDateInput() {
       $(document).on('change', '#item9', function () {
           select = $('#item9').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2625,6 +2954,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn9").value = hsn
+                  document.getElementById("stock_data9").innerHTML = stock
                   document.getElementById('rate9').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2642,8 +2975,6 @@ function toggleDateInput() {
       $(document).on('change', '#item10', function () {
           select = $('#item10').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2657,6 +2988,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn10").value = hsn
+                  document.getElementById("stock_data10").innerHTML = stock
                   document.getElementById('rate10').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2674,8 +3009,6 @@ function toggleDateInput() {
       $(document).on('change', '#item11', function () {
           select = $('#item11').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2689,6 +3022,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn11").value = hsn
+                  document.getElementById("stock_data11").innerHTML = stock
                   document.getElementById('rate11').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2706,8 +3043,6 @@ function toggleDateInput() {
       $(document).on('change', '#item12', function () {
           select = $('#item12').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2721,6 +3056,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn12").value = hsn
+                  document.getElementById("stock_data12").innerHTML = stock
                   document.getElementById('rate12').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2738,8 +3077,6 @@ function toggleDateInput() {
       $(document).on('change', '#item13', function () {
           select = $('#item13').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2753,6 +3090,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn13").value = hsn
+                  document.getElementById("stock_data13").innerHTML = stock
                   document.getElementById('rate13').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2770,8 +3111,6 @@ function toggleDateInput() {
       $(document).on('change', '#item14', function () {
           select = $('#item14').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2785,6 +3124,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn14").value = hsn
+                  document.getElementById("stock_data14").innerHTML = stock
                   document.getElementById('rate14').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2802,8 +3145,6 @@ function toggleDateInput() {
       $(document).on('change', '#item15', function () {
           select = $('#item15').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2817,6 +3158,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn15").value = hsn
+                  document.getElementById("stock_data15").innerHTML = stock
                   document.getElementById('rate15').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2834,8 +3179,6 @@ function toggleDateInput() {
       $(document).on('change', '#item16', function () {
           select = $('#item16').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2849,6 +3192,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn16").value = hsn
+                  document.getElementById("stock_data16").innerHTML = stock
                   document.getElementById('rate16').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2866,8 +3213,6 @@ function toggleDateInput() {
       $(document).on('change', '#item17', function () {
           select = $('#item17').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2881,6 +3226,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn17").value = hsn
+                  document.getElementById("stock_data17").innerHTML = stock
                   document.getElementById('rate17').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2898,8 +3247,6 @@ function toggleDateInput() {
       $(document).on('change', '#item18', function () {
           select = $('#item18').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2913,6 +3260,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn18").value = hsn
+                  document.getElementById("stock_data18").innerHTML = stock
                   document.getElementById('rate18').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2930,8 +3281,6 @@ function toggleDateInput() {
       $(document).on('change', '#item19', function () {
           select = $('#item19').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2945,6 +3294,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn19").value = hsn
+                  document.getElementById("stock_data19").innerHTML = stock
                   document.getElementById('rate19').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2962,8 +3315,6 @@ function toggleDateInput() {
       $(document).on('change', '#item20', function () {
           select = $('#item20').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -2977,6 +3328,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn20").value = hsn
+                  document.getElementById("stock_data20").innerHTML = stock
                   document.getElementById('rate20').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -2994,8 +3349,6 @@ function toggleDateInput() {
       $(document).on('change', '#item21', function () {
           select = $('#item21').val();
           customer = $('#customer_sel').val();
-          console.log(select);
-          console.log(customer);
           $.ajax({
               type: "GET",
               url: "{% url 'itemdata' %}",
@@ -3009,6 +3362,10 @@ function toggleDateInput() {
                   data1 = response.gst
                   data2 = response.igst
                   data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn21").value = hsn
+                  document.getElementById("stock_data21").innerHTML = stock
                   document.getElementById('rate21').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -3025,5 +3382,657 @@ function toggleDateInput() {
 
 
   });
+</script>
+
+<script>
+  $(document).ready(function () {
+
+          select1 = $('#item1').val();
+          customer1 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select1,
+                  cust: customer1
+              },
+              success: function (response) {
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn1").value = hsn
+                  document.getElementById("stock_data").innerHTML = stock
+              }
+          });
+
+
+          select2 = $('#item2').val();
+          customer2 = $('#customer_sel').val();
+          
+
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select2,
+                  cust: customer2
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn2").value = hsn
+                  document.getElementById("stock_data2").innerHTML = stock
+                  document.getElementById('rate2').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst2').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst2').value = data1
+                  }
+                  document.getElementById('tigst2').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst2').value = data2
+
+              }
+          });
+
+
+          select3 = $('#item3').val();
+          customer3 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select3,
+                  cust: customer3
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn3").value = hsn
+                  document.getElementById("stock_data3").innerHTML = stock
+                  document.getElementById('rate3').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst3').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst3').value = data1
+                  }
+                  document.getElementById('tigst3').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst3').value = data2
+
+              }
+          });
+
+
+          select4 = $('#item4').val();
+          customer4 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select4,
+                  cust: customer4
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn4").value = hsn
+                  document.getElementById("stock_data4").innerHTML = stock
+                  document.getElementById('rate4').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst4').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst4').value = data1
+                  }
+                  document.getElementById('tigst4').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst4').value = data2
+
+              }
+          });
+
+
+          select5 = $('#item5').val();
+          customer5 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select5,
+                  cust: customer5
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn5").value = hsn
+                  document.getElementById("stock_data5").innerHTML = stock
+                  document.getElementById('rate5').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst5').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst5').value = data1
+                  }
+                  document.getElementById('tigst5').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst5').value = data2
+
+              }
+          });
+
+
+          select6 = $('#item6').val();
+          customer6 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select6,
+                  cust: customer6
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn6").value = hsn
+                  document.getElementById("stock_data6").innerHTML = stock
+                  document.getElementById('rate6').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst6').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst6').value = data1
+                  }
+                  document.getElementById('tigst6').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst6').value = data2
+
+              }
+          });
+
+
+          select7 = $('#item7').val();
+          customer7 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select7,
+                  cust: customer7
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn7").value = hsn
+                  document.getElementById("stock_data7").innerHTML = stock
+                  document.getElementById('rate7').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst7').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst7').value = data1
+                  }
+                  document.getElementById('tigst7').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst7').value = data2
+
+              }
+          });
+
+          select8 = $('#item8').val();
+          customer8 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select8,
+                  cust: customer8
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn8").value = hsn
+                  document.getElementById("stock_data8").innerHTML = stock
+                  document.getElementById('rate8').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst8').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst8').value = data1
+                  }
+                  document.getElementById('tigst8').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst8').value = data2
+
+              }
+          });
+
+
+          select9 = $('#item9').val();
+          customer9 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select9,
+                  cust: customer9
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn9").value = hsn
+                  document.getElementById("stock_data9").innerHTML = stock
+                  document.getElementById('rate9').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst9').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst9').value = data1
+                  }
+                  document.getElementById('tigst9').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst9').value = data2
+
+              }
+          });
+
+
+          select10 = $('#item10').val();
+          customer10 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select10,
+                  cust: customer10
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn10").value = hsn
+                  document.getElementById("stock_data10").innerHTML = stock
+                  document.getElementById('rate10').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst10').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst10').value = data1
+                  }
+                  document.getElementById('tigst10').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst10').value = data2
+
+              }
+          });
+
+
+          select11 = $('#item11').val();
+          customer11 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select11,
+                  cust: customer11
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn11").value = hsn
+                  document.getElementById("stock_data11").innerHTML = stock
+                  document.getElementById('rate11').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst11').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst11').value = data1
+                  }
+                  document.getElementById('tigst11').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst11').value = data2
+
+              }
+          });
+
+
+          select12 = $('#item12').val();
+          customer12 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select12,
+                  cust: customer12
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn12").value = hsn
+                  document.getElementById("stock_data12").innerHTML = stock
+                  document.getElementById('rate12').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst12').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst12').value = data1
+                  }
+                  document.getElementById('tigst12').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst12').value = data2
+
+              }
+          });
+
+
+          select13 = $('#item13').val();
+          customer13 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select13,
+                  cust: customer13
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn13").value = hsn
+                  document.getElementById("stock_data13").innerHTML = stock
+                  document.getElementById('rate13').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst13').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst13').value = data1
+                  }
+                  document.getElementById('tigst13').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst13').value = data2
+
+              }
+          });
+
+
+          select14 = $('#item14').val();
+          customer14 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select14,
+                  cust: customer14
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn14").value = hsn
+                  document.getElementById("stock_data14").innerHTML = stock
+                  document.getElementById('rate14').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst14').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst14').value = data1
+                  }
+                  document.getElementById('tigst14').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst14').value = data2
+
+              }
+          });
+
+
+          select15 = $('#item15').val();
+          customer15 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select15,
+                  cust: customer15
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn15").value = hsn
+                  document.getElementById("stock_data15").innerHTML = stock
+                  document.getElementById('rate15').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst15').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst15').value = data1
+                  }
+                  document.getElementById('tigst15').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst15').value = data2
+
+              }
+          });
+
+
+          select16 = $('#item16').val();
+          customer16 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select16,
+                  cust: customer16
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn16").value = hsn
+                  document.getElementById("stock_data16").innerHTML = stock
+                  document.getElementById('rate16').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst16').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst16').value = data1
+                  }
+                  document.getElementById('tigst16').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst16').value = data2
+
+              }
+          });
+
+
+          select17 = $('#item17').val();
+          customer17 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select17,
+                  cust: customer17
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn17").value = hsn
+                  document.getElementById("stock_data17").innerHTML = stock
+                  document.getElementById('rate17').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst17').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst17').value = data1
+                  }
+                  document.getElementById('tigst17').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst17').value = data2
+
+              }
+          });
+
+
+          select18 = $('#item18').val();
+          customer18 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select18,
+                  cust: customer18
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn18").value = hsn
+                  document.getElementById("stock_data18").innerHTML = stock
+                  document.getElementById('rate18').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst18').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst18').value = data1
+                  }
+                  document.getElementById('tigst18').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst18').value = data2
+
+              }
+          });
+
+
+          select19 = $('#item19').val();
+          customer19 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select19,
+                  cust: customer19
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn19").value = hsn
+                  document.getElementById("stock_data19").innerHTML = stock
+                  document.getElementById('rate19').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst19').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst19').value = data1
+                  }
+                  document.getElementById('tigst19').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst19').value = data2
+
+              }
+          });
+
+
+          select20 = $('#item20').val();
+          customer20 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select20,
+                  cust: customer20
+              },
+              success: function (response) {
+                  console.log(response)
+                  data = response.rate
+                  data1 = response.gst
+                  data2 = response.igst
+                  data3 = response.pos
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn20").value = hsn
+                  document.getElementById("stock_data20").innerHTML = stock
+                  document.getElementById('rate20').value = data
+
+                  if (data3 == '{{ company.state }}') {
+                      document.getElementById('tgst20').innerHTML = data1 + ' % GST';
+                      document.getElementById('tgst20').value = data1
+                  }
+                  document.getElementById('tigst20').innerHTML = data2 + ' % IGST';
+                  document.getElementById('tigst20').value = data2
+
+              }
+          });
+
+
+          select21 = $('#item21').val();
+          customer21 = $('#customer_sel').val();
+          $.ajax({
+              type: "GET",
+              url: "{% url 'itemdata' %}",
+              data: {
+                  id: select21,
+                  cust: customer21
+              },
+              success: function (response) {
+                  stock=response.stock
+                  hsn=response.hsn
+                  document.getElementById("hsn21").value = hsn
+                  document.getElementById("stock_data21").innerHTML = stock
+              }
+          });
+
+      });
+
+
 </script>
 {% endblock %}

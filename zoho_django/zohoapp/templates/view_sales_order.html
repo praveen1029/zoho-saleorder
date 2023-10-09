@@ -70,6 +70,7 @@
                         <th>AMOUNT</th>
                         <th>STATUS</th>
                         <th>BALANCE</th>
+                        <th>ACTION</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -83,9 +84,14 @@
                         <td>{{i.sales_no}}</td>
                         <td>{{i.customer.customerName}}</td>
                         <td>{{i.customer.customerEmail}}</td>
-                        <td></td>
-                        <td>{{i.status}}</td>
                         <td>{{i.grandtotal}}</td>
+                        <td>{{i.status}}</td>
+                        <td>{{i.balance}}</td>
+                        {% if i.complete_status == 0 %}
+                        <td><a href="{% url 'convert_to_invoice' i.id %}" style="color: chocolate;">Convert to invoice</a></td>
+                        {% else %}
+                        <td style="color: green;">Completed</td>
+                        {% endif %}
         
                        
                       </tr>

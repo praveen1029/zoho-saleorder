@@ -1,9 +1,126 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
+<style>            
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    padding: 1px;
+    margin: 0;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+  }
+  
+  .logo img {
+    max-height: 100px;
+  }
+  
+  .company-info h2 {
+    margin: 0;
+    font-size: 2em;
+  }
+  
+  .company-info p {
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .i.invoice-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .invoice-box h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-details p, .client-details p {
+    margin: 5px 0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #th {
+    background-color: #f2f2f2;
+    color: black;
+  }
+  
+  .invoice-total {
+    margin-top: 20px;
+    text-align: right;
+  }
+  
+  .invoice-total p {
+    margin: 5px 0;
+  }
+  
+  footer {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    text-align: center;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+  }
+  
+  footer p {
+    margin: 5px 0;
+  }
+ 
+  .dropdown-item:hover{
+       color: chocolate;
+     }
+  
+     ::-webkit-scrollbar{
+    display: none;
+  }
+
+  .saleordertable {
+            border-collapse: collapse; /* Collapse table borders */
+            border: none; /* Remove table border */
+        }
+
+        .saleordertable  td {
+            border: none; /* Remove cell borders */
+            padding: 8px; /* Add padding for cell content */
+            text-align: left; /* Optional: Adjust text alignment */
+        }
+
+        tr.clickable {
+            cursor: pointer;
+        }
+                  </style>
     
 <section >
-  <div class="row fixed-top  " style="top: 7rem; margin-left: 12rem;;position: fixed;">
+  <div class="row fixed-top  " style="top: 7rem; margin-left: 15rem;position: fixed; ">
    
   <div style="overflow-y: scroll; height: 600px;">
     <div class="col-md-12"  style="width: 100%;">
@@ -11,20 +128,40 @@
         
         <div class="col-md-3" style="border-right: 1px solid white;height: 100vh;">
           <div class="row">
-            <div class="col-md-4 "><a class="text-white" style="font-size: 1.5rem;">SalesOrder</a></div>
-            <div class="col-md-8 form-inline justify-content-end" ><a style="color: #ccc;width: 4rem;height: 2rem;margin-left: 5rem;" class="btn btn-success " href="{% url 'create_sales_order' %}"><i class="fa-solid fa-plus "></i>New</a>
-             
+            <a class="text-white" style="font-size: 1.5rem;">Sales Order</a>
+            <div class="col-md-12">
+            <input type="text" id="search" class="form-control bg-light text-dark mt-2 " placeholder="Search.." autocomplete="off">
+          </div>
+          <div class="col-md-2">
+            <div class="dropdown">
+              <a class="btn text-center px-4 pt-1 mt-1 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" style="width: 4rem;height: 2rem;">
+                <i  class="fas fa-sort m-1"></i>
+              </a>
+              <div class="dropdown-menu m-1">
+                <a class="dropdown-item" href="{% url 'sales_order_det' sale.id %}">All</a>
+                <a class="dropdown-item" onclick="sortTable()">Customer Name</a>
+                <a class="dropdown-item" onclick="sortTablebal()">Balance</a>
+              </div>
             </div>
+          </div>
+          <div class="col-md-6"></div>
+          <div class="col-md-4">              
+            <a style="width: 4rem;height: 2rem; width: fit-content;" class="btn btn btn-outline-warning text-right px-3 py-2 mt-1" href="{% url 'create_sales_order' %}"><i class="fa fa-plus "></i>New</a>
+          </div>
           </div>   
-          <table class="table  text-white">
+          <table class="table  text-white" id="myTable">
             
             <tbody>
               {% for i in sale_order %}
      
-              <tr>
+              <tr class="clickable" id="{{i.id}}">
      
-                <td class="justify-content-between align-items-center"><a class="text-white " href="{% url 'sales_order_det' i.id %}">{{i.sales_no}}</a><br><br>
-                      <label>{{i.customer.customerName}} </label><label class="text-end d-block">₹{{i.grandtotal}}</label>
+                <td class="justify-content-between align-items-center ">
+                  {{i.sales_no}}<br><br>
+                      <label>{{i.customer.customerName}} </label>
+                </td>
+                <td><br><br>
+                    <label class="text-end d-block">₹{{i.grandtotal}}</label>
                     
                 </td>
               </tr>
@@ -35,143 +172,438 @@
           </table>
        
         </div> 
-        
-        <div class="col-md-9 ml-1  mb-5 ">
-          <div class="row" >
-            <div class="col-md-12" ><a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a></div>
-            
-            <div class="p-2  bg-light  justify-content-right" style="width: 100%;">
-             <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark " style="margin-left: 70%;"><button class="btn btn-outline-dark" style="width: 5%;" title="Edit"><i class="fas fa-edit"></i></button>
-              </a>
-             
-             
- 
-                 <a class="text-dark"   href=""  data-toggle="dropdown"  >
-                  <button class="btn btn-outline-dark " style="width:5%" title="Share"><i class="fas fa-share"></i></button>
+
+        <div class="col-md-9 ml-1  mb-5 " id="overviewdiv">
+          <div class="row">
+              <div class="col-md-7" >
+                <a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a>
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6" >
+              <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i> Overview</a>
+              <a class="btn" id="transactionbtn" onclick="totemplate()" style="background-color: white; color: black;"><i class="fas fa-file-alt"></i>  Template</a>
+            </div>
+              <div class="col-md-6" style="text-align: right;">
+                <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
+                  <button class="btn btn-outline-warning"  title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark"   href=""  data-toggle="dropdown"  >
+                  <button class="btn btn-outline-warning "  title="Share"><i class="fas fa-share"></i></button>
                </a>
                <div class="dropdown-menu " >
                  <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
                  <a class="dropdown-item" href="#">WhatsApp</a>
-                 
-                
+               </div>
+               <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
+                <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
+              </a>
+              <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
+                <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+              </a>
 
-                 
-               </div> 
-                <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" ><button class="btn btn-outline-dark" style="width: 5%;" title="Delete"><i class="fas fa-trash-alt"></i></button>
+              <a class=" text-dark" href="" onclick="printSelectedArea()"  >
+                <button class="btn btn-outline-warning"  title="Print/Pdf"><i class="fas fa-print"></i>
+                </button> 
                </a>
-                
-               <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" ><button class="btn btn-outline-dark" style="width: 5%;" title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
-               </a>
+              </div>
+          </div><br>
+          <div class="row">
+            <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); overflow-y: scroll;height: 600px;width: 100%;">
+              <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="row">
+                      <div class="col-md-6 bg-light" style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
+                          <div class="overview text-dark">
+                              <h2 class="text-dark p-2" style="text-transform: uppercase;">Sales Order</h2>
+                              
+                              <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                  <tr>
+                                    <td>Sale Order No</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_no}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Reference</td>
+                                    <td>:</td>
+                                    <td>{{sale.reference}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Name</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Mail</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerEmail}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Source of Supply</td>
+                                    <td>:</td>
+                                    <td>{{sale.sos}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Sale Order Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Expiry Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.ship_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Term</td>
+                                    <td>:</td>
+                                    <td>{{sale.terms.Terms}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Method</td>
+                                    <td>:</td>
+                                    <td>{{sale.pay_method}}</td>
+                                  </tr>
+                                  {% if sale.pay_method == 'upi' %}
+                                  <tr>
+                                    <td>UPI ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.upi_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method == 'cheque' %}
+                                  <tr>
+                                    <td>Cheque ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.cheque_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method != 'cash' %}
+                                  <tr>
+                                    <td>Bank Account</td>
+                                    <td>:</td>
+                                    <td>{{bank.ac_no}}</td>
+                                  </tr>
+                                  {% endif %}
+
+
+
+                                  {% for i in saleitem %}
+                                  <tr>
+                                    <td>Product Name</td>
+                                    <td>:</td>
+                                    <td>{{i.product}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Product Quantity</td>
+                                    <td>:</td>
+                                    <td>{{i.quantity}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Product Rate</td>
+                                    <td>:</td>
+                                    <td>{{i.rate}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Product Tax</td>
+                                    <td>:</td>
+                                    <td>{{i.tax}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Product Total</td>
+                                    <td>:</td>
+                                    <td>{{i.total}}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table> 
+                          </div>
+                      </div>
+                      <div class="col-md-6" style="height: 100%;">
+                          <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
+                          <div class="card" style="background-color: rgb(100, 98, 98); padding:1rem;">
+                              <div class="row my-2">
+                                  <div class="card-title h4 mt-4">Customer Infomartion
+                                      <hr>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for=""> Customer Type :</label></div>
+                                  <div class="col-7">
+                                      <p class="bold">None</p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-6"><label for="">Opening Balance :</label></div>
+                                  <div class="col-6">
+                                      <p class="bold">555497</p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">Phone Number :</label></div>
+                                  <div class="col-7">
+                                      <p class="bold">9098988787</p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">Mobile Number :</label></div>
+                                  <div class="col-7">
+                                      <p class="bold">9098987678</p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">Currency:</label></div>
+                                  <div class="col-7">
+                                      <p class="bold">Indian Rupee</p>
+                                  </div>
+                              </div>
+                              <div class="card-title h4 mt-4">More Info
+                                  <hr>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">GST Treatment:</label></div>
+                                  <div class="col-7">
+                                      <p class="bold">Registered Business-Composition Business that is registered under the Composition scheme in GST</p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">GST Number:</label></div>
+                                  <div class="col-7">
+                                      <p class="bold"></p>
+                                  </div>
+                              </div>
+                              <div class="row mt-2">
+                                  <div class="col-5"><label for="">Pan Number:</label></div>
+                                  <div class="col-7">
+                                      <p class="bold"></p>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+              </div>
+             
+        
+<!-- .........................TRANSACTIONS CUSTOMERS ............................................ -->
+
+<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="profile-tab">
+<div class="slip m-3 p-5  bg-light" id="whatToPrint" style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
+<!-- <fieldset8 id="" style="background-color: burlywood" > -->
+<div class="row text-dark ">
+<div class="col-md-8">
+<h3 class="text-uppercase py-2">Mr Vijay vinod
+</h3>
+<p>Phone : 9098987678</p>
+<p>Email : vijay123@gmail.com</p>
+<!-- <p>No Credit Limit Set</p> -->
+<br>
+</div>
+<div class="col-md-4">
+<br><br>
+<p style="text-align: right;">Address : </p>
+<p style="text-align: right;">GSTIN : </p>
+</div>
+<hr>
+</div> 
+
+<div>
+<!-- <h6 class="text-dark text-uppercase py-2">TRANSACTIONS</h6> -->
+<table class="transaction_table table text-dark border mb-4">
+  <tbody><tr>
+      <th>
+          <div class="row">
+              <!-- <div class="col-md-6">TYPE</div> -->
+              <button class="btn " type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                  TRANSACTIONS
+              </button>
+          </div>
+
+      </th>
+      <th>
+          
+          
+          <div class="row">
+              <!-- <div class="col-md-6">TYPE</div> -->
+              <div class="dropdown">
+                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                      TYPE
+                  </button>
+                  <div class="dropdown-menu">
+                      <a class="dropdown-item" href="">A-Z</a>
+                      <a class="dropdown-item" href="">Z-A</a>
+                  </div>
+              </div>
+          </div>
+
+
+      </th>
+
+      <th>
+          <div class="row">
+              <!-- <div class="col-md-6">TYPE</div> -->
+              <div class="dropdown">
+                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                      NUMBER
+                  </button>
+                  <div class="dropdown-menu">
+                      <a class="dropdown-item" href="">A-Z</a>
+                      <a class="dropdown-item" href="">Z-A</a>
+                  </div>
+              </div>
+          </div>
+      </th>
+      <th>
+          <div class="row">
+              <div class="dropdown">
+                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                      DATE
+                  </button>
+                  <div class="dropdown-menu">
+                      <a class="dropdown-item" href="">A-Z</a>
+                      <a class="dropdown-item" href="">Z-A</a>
+                  </div>
+              </div>
+          </div> 
+      </th>
+      <th>
+          <div class="row">
+              <div class="dropdown">
+                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                      TOTAL
+                  </button>
+                  <div class="dropdown-menu">
+                      <a class="dropdown-item" href="">A-Z</a>
+                      <a class="dropdown-item" href="">Z-A</a>
+                  </div>
+              </div>
+          </div> 
+      </th>
+      <th>
+          <div class="row">
+              <div class="dropdown">
+                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
+                      BALANCE
+                  </button>
+                  <div class="dropdown-menu">
+                      <a class="dropdown-item" href="">A-Z</a>
+                      <a class="dropdown-item" href="">Z-A</a>
+                  </div>
+              </div>
+          </div> 
+      </th>
+  </tr>
+
+  <tr>
+  <td>1</td>
+  <td>Estimates</td>
+
+  
+
+</tr>
+<tr>
+  <td>2</td>
+  <td>Retainer Invoice</td>
+  
+</tr>
+<tr>
+  <td>3</td>
+  <td>Sales Order</td>
+  
+</tr> 
+<tr>
+  <td>4</td>
+  <td>Delivery Challans</td>
+  
+</tr>
+<tr>
+  <td>5</td>
+  <td>Invoice</td>
+  
+</tr>
+<tr>
+  <td>6</td>
+  <td>CreditNotes</td>
+  
+</tr>
+<tr>
+  <td>7</td>
+  <td>Recurring Invoice</td>
+  
+</tr> 
+<tr>
+  <td>8</td>
+  <td>Purchase Order</td>
+  
+</tr>
+<tr>
+  <td>9</td>
+  <td>Purchase Bills</td>
+  
+</tr>    
+<tr>
+  <td>10</td>
+  <td>Recurring Bills</td>
+  
+</tr>     
+ 
+</tbody></table>
+</div>
+</div>
+</div>
+         
+<!-- </fieldset8> -->
+
+
+
+
+
+             
+          </div>
+          </div>
+          
+        </div>
+        
+        <div class="col-md-9 mb-5 " id="templatediv" style="display: none;">
+          <div class="row" >
+            <div class="col-md-7" >
+              <a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6" >
+              <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: white; color: black;"><i class="fas fa-eye"></i> Overview</a>
+              <a class="btn" style="background-color: chocolate; margin-left: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
+            </div>
+            <div class="col-md-6" style="text-align: right;">
+              <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
+                <button class="btn btn-outline-warning"  title="Edit"><i class="fas fa-edit"></i></button>
+              </a>
+              <a class="text-dark"   href=""  data-toggle="dropdown"  >
+                <button class="btn btn-outline-warning "  title="Share"><i class="fas fa-share"></i></button>
+             </a>
+             <div class="dropdown-menu " >
+               <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
+               <a class="dropdown-item" href="#">WhatsApp</a>
+             </div>
+
+             <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
+              <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
+            </a>
+            <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
+              <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+            </a>
+            <a class=" text-dark" href="" onclick="printSelectedArea()"  >
+              <button class="btn btn-outline-warning"  title="Print/Pdf"><i class="fas fa-print"></i>
+              </button> 
+             </a>
+            </div>
+          </div>
+
           
              
-            <div class="dropdown" style="display: inline;">
-               
-              <a class=" text-dark" href="" onclick="printSelectedArea()"  >
-               <button class="btn btn-outline-dark" style="width: 5%;" title="Print/Pdf"><i class="fas fa-print"></i>
-               </button> 
-              </a>
-          </div>
- <div style="position: fixed;">
- </div>
+
+
              <div style="overflow-y: scroll;height: 600px;width: 100%;">
          
                <section id="selected-area" style="background-color: rgb(255, 221, 176);"class=" p-2 m-2 mb-5">
-                 <style>
-                   
- body {
-   font-family: Arial, sans-serif;
-   background-color: #f2f2f2;
-   padding: 1px;
-   margin: 0;
- }
- 
- header {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   padding: 20px;
-   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-   margin-bottom: 20px;
- }
- 
- .logo img {
-   max-height: 100px;
- }
- 
- .company-info h2 {
-   margin: 0;
-   font-size: 2em;
- }
- 
- .company-info p {
-   margin: 0;
-   line-height: 1.5;
- }
- 
- .i.invoice-box {
-   background-color: #fff;
-   padding: 20px;
-   border-radius: 10px;
-   box-shadow: 0 0 10px rgba(0,0,0,0.2);
- }
- 
- .invoice-box h1 {
-   font-size: 2em;
-   margin-bottom: 20px;
- }
- 
- .invoice-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   margin-bottom: 20px;
- }
- 
- .invoice-details p, .client-details p {
-   margin: 5px 0;
- }
- 
- table {
-   width: 100%;
-   border-collapse: collapse;
- }
- 
- th, td {
-   padding: 10px;
-   text-align: left;
-   border-bottom: 1px solid #ddd;
- }
- 
- #th {
-   background-color: #f2f2f2;
-   color: black;
- }
- 
- .invoice-total {
-   margin-top: 20px;
-   text-align: right;
- }
- 
- .invoice-total p {
-   margin: 5px 0;
- }
- 
- footer {
-   background-color: #fff;
-   padding: 20px;
-   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-   text-align: center;
-   font-size: 0.8em;
-   color: #888;
-   margin-top: 20px;
- }
- 
- footer p {
-   margin: 5px 0;
- }
- 
- 
-                 </style>
                    <header style="	background-color: #8b3131;border-radius: 1rem;">
                        <div class="logo ">
                            <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}" alt="Company Logo">
@@ -291,5 +723,106 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 </section>
+
+<script>
+
+const rows = document.querySelectorAll('.clickable');
+
+rows.forEach(row => {
+    row.addEventListener('click', () => {
+      var currentURL = window.location.href
+      const rowId = row.id;
+      var newURL = currentURL.replace(/\d+$/, rowId);
+      window.location.href = newURL;
+    });
+});
+
+
+
+
+
+</script>
+
+<script>
+  function totemplate(){
+    document.getElementById('templatediv').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+  }
+
+  function tooverview(){
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'block'
+  }
+</script>
+
+<script>
+  var $rows = $('#myTable tbody tr');
+  $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      
+      $rows.hide().filter(function() {
+          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+          return ~text.indexOf(val);
+      }).show();
+  });
+
+  </script>
+
+<script>
+  // Function to sort the table by the selected column
+  function sortTable() {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
+
+      while (switching) {
+          switching = false;
+          rows = table.rows;
+
+          for (i = 0; i < rows.length - 1; i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("label")[0];
+              y = rows[i + 1].getElementsByTagName("label")[0];
+
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                  shouldSwitch = true;
+                  break;
+              }
+          }
+
+          if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+          }
+      }
+  }
+  function sortTablebal() {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
+
+      while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 0; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = parseFloat(rows[i].getElementsByTagName("td")[1].textContent.replace('₹', '').trim());
+            y = parseFloat(rows[i + 1].getElementsByTagName("td")[1].textContent.replace('₹', '').trim());
+
+            if (x > y) {
+                shouldSwitch = true;
+                break;
+            }
+        }
+
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+  }
+
+</script>
 
 {% endblock %}
