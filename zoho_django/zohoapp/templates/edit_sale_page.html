@@ -452,7 +452,7 @@
                     
                 <td><input type="hidden" id="adjustment"  step="any" value="0.00" 
                     class="form-control bg-transparent border-0 text-right adjustment  "></td>
-                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" readonly name="adjust"> </td>
+                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" name="adjust"> </td>
             </tr>
                 <tr>
                     <td></td>
@@ -478,7 +478,9 @@
                       <td>Balance</td>
                       <td></td>
                       <td><input type="number" id='balance' name="balance" step="any" value="0.00"
-                              class="form-control bg-transparent border-0 text-right balance  text-white" readonly></td>
+                              class="form-control bg-transparent border-0 text-right balance  text-white" readonly>
+                            <div style="color: red; display: none;" id="advancediv">Advance is greater than Total</div>
+                            </td>
                   </tr>
               </table>
           </div>
@@ -1568,10 +1570,26 @@
 
 <script>
   $(document).ready(function() {
+    $("#adjust").change(function() {
+      var x=$('#adjust').val();
+        total = document.getElementById("grandtotal").value
+        document.getElementById("grandtotal").value=total-x
+        document.getElementById("balance").value=total-x
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
     $("#advance").change(function() {
       var x=$('#advance').val();
         total = document.getElementById("grandtotal").value
-        document.getElementById("balance").value=total-x
+        if(parseFloat(x)>parseFloat(total)){
+            document.getElementById("advancediv").style.display = "block"
+          }else{
+            document.getElementById("advancediv").style.display = "none"
+            document.getElementById("balance").value=total-x
+          }
     });
   });
 </script>
@@ -2313,18 +2331,11 @@ function calculateGrandTotal() {
   var shippingCharges = parseFloat($('#shipping').val());
   grandTotal += shippingCharges;
 
-  const roundedValue = Math.round(grandTotal / 10) * 10;
-
-            // Update the roundedNumber span with the rounded value
-
-            // Calculate and display the difference
-            const diff = roundedValue - grandTotal;
 
 
 
-  $('#adjust').val(diff.toFixed(2));
-  $('#grandtotal').val(roundedValue.toFixed(2));
-  $('#balance').val(roundedValue.toFixed(2));
+  $('#grandtotal').val(grandTotal.toFixed(2));
+  $('#balance').val(grandTotal.toFixed(2));
   $('#total_taxamount').val(totalTaxAmount.toFixed(2));
 }
 
@@ -2564,12 +2575,8 @@ function calculateTaxAmount() {
 
         document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
         var grandtotal = subtotal + total_taxamount + shipping;
-        const roundedValue = Math.round(grandtotal / 10) * 10;
-            // Calculate and display the difference
-            const diff = roundedValue - grandtotal;
-        document.getElementById("adjust").value = diff.toFixed(2);
-        document.getElementById("grandtotal").value = roundedValue.toFixed(2);
-        document.getElementById("balance").value = roundedValue.toFixed(2);
+        document.getElementById("grandtotal").value = grandtotal.toFixed(2);
+        document.getElementById("balance").value = grandtotal.toFixed(2);
     }
 
     // Call the function initially on page load

@@ -2274,7 +2274,8 @@ def itemdata(request):
     stock=item.stock
     hsn=item.hsn
     place_of_supply = customer.objects.get(id=cust).placeofsupply
-    return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,'stock':stock,'hsn':hsn})
+    return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
+                         'stock':stock,'hsn':hsn})
     
 
 def deleteestimate(request,est_id):
@@ -3154,10 +3155,13 @@ def view_sales_order1(request):
    
 @login_required(login_url='login')
 def view_sales_order2(request):
-    sales=SalesOrder.objects.all()
-    user = request.user
-    company = company_details.objects.get(user=user)
-    return render(request,'view_sales_order2.html',{"sale":sales,"company":company})      
+    company = company_details.objects.get(user = request.user)
+    data = SalesOrder.objects.all()
+    name_list =[]
+    for item in data :
+        if item.customer.customerName[3:] not in name_list:
+            name_list.append(item.customer.customerName[3:])
+    return render(request, 'view_sales_order2.html', {'data':data, 'company': company,'name_list':name_list})
 
     
 @login_required(login_url='login')
@@ -3289,7 +3293,7 @@ def convert_to_invoice(request,pk):
     inv_id = invoice.objects.last()
     user = User.objects.get(id = request.user.id)
     custo = customer.objects.get(id=sale.customer.id)
-    print(inv_id)
+
     if inv_id == None:
         invoice_no = "INV-01"
         order_no = 1
@@ -3314,14 +3318,22 @@ def convert_to_invoice(request,pk):
     status = sale.status
     tc = sale.terms_condition
     file = sale.file
-    inv=invoice(user=user,customer=custo,invoice_no=invoice_no,terms=terms,order_no=order_no,inv_date=inv_date,due_date=due_date,cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,grandtotal=t_total,status=status,terms_condition=tc,file=file)
+
+    inv=invoice(user=user,customer=custo,invoice_no=invoice_no,terms=terms,order_no=order_no,inv_date=inv_date,due_date=due_date,
+                cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,grandtotal=t_total,status=status,
+                terms_condition=tc,file=file)
     inv.save()
+
     sale.complete_status = 1
     sale.save()
+
     return redirect('view_sales_order')
 
-
-
+def convert_view(request,pk):
+    sale=SalesOrder.objects.get(id=pk)
+    sale.status = "draft"
+    sale.save()
+    return redirect('sales_order_det',pk)
 
 
     
@@ -3350,9 +3362,7 @@ def add_sales_order(request):
             sa_date=request.POST['sa_date']
             sh_date=request.POST['sh_date']
             sos=request.POST['srcofsupply']
-
             sh_charge=request.POST['shipping_charge']
-            
             cxnote=request.POST['customer_note']
             subtotal=request.POST['subtotal']
             igst=request.POST['igst']
@@ -3365,17 +3375,13 @@ def add_sales_order(request):
             cheque_id=request.POST['cheque_id']
             upi_id=request.POST['upi_id']
             pay_method=request.POST['method']
+
             if request.FILES.get('file') is not None:
                 file=request.FILES['file']
             else:
                 file="/static/images/alt.jpg"
-            tc=request.POST['ter_cond']
 
-            if 'Draft' in request.POST:
-                status="DRAFT"
-            if "Save" in request.POST:
-                status = "APPROVED"
-        
+            tc=request.POST['ter_cond']
             product=request.POST.getlist('item[]')
             hsn=request.POST.getlist('hsn[]')
             quantity=request.POST.getlist('quantity[]')
@@ -3385,24 +3391,26 @@ def add_sales_order(request):
             total=request.POST.getlist('amount[]')
             adjust=request.POST.getlist('adjust')
             adjust = float(adjust[0])
+
+            if 'Draft' in request.POST:
+                status="draft"
+            if "Save" in request.POST:
+                status = "approved"
             
-            sales=SalesOrder(customer_id=custo,sales_no=sales_no,terms=term,reference=reference, sales_date=sa_date,ship_date=sh_date,balance=balance,
-                        cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,cheque_id=cheque_id,upi_id=upi_id,pay_method=pay_method,
-                        grandtotal=t_total,status=status,terms_condition=tc,file=file,sos=sos,sh_charge=sh_charge,adjust=adjust,advance=advance)
+            sales=SalesOrder(customer_id=custo,sales_no=sales_no,terms=term,reference=reference, sales_date=sa_date,ship_date=sh_date,
+                             balance=balance,cxnote=cxnote,subtotal=subtotal,igst=igst,cgst=cgst,sgst=sgst,t_tax=totaltax,
+                             cheque_id=cheque_id,upi_id=upi_id,pay_method=pay_method,grandtotal=t_total,status=status,terms_condition=tc,
+                             file=file,sos=sos,sh_charge=sh_charge,adjust=adjust,advance=advance)
             sales.save()
             sale_id=SalesOrder.objects.get(id=sales.id)
           
             if len(product)==len(quantity)==len(tax)==len(total)==len(rate):
-            
                 mapped = zip(product,quantity,tax,total,rate,desc)
                 mapped = list(mapped)
-                
                 for element in mapped:
-
-                    created =sales_item(sale=sale_id,product=element[0],
-                                        quantity=element[1],tax=element[2],total=element[3],rate=element[4],desc=element[5])
+                    created =sales_item(sale=sale_id,product=element[0],quantity=element[1],tax=element[2],total=element[3],
+                                        rate=element[4],desc=element[5])
                     created.save()
-                
             return redirect('view_sales_order')          
     
 @login_required(login_url='login')
@@ -3411,21 +3419,14 @@ def sales_order_det(request,id):
     saleitem=sales_item.objects.filter(sale_id=id)
     sale_order=SalesOrder.objects.all()
     company=company_details.objects.get(user_id=request.user.id)
+
     bank=''
     if sales.pay_method != 'cash':
         if sales.pay_method != 'upi':
             if sales.pay_method != 'cheque':
                 bank = Bankcreation.objects.get(name=sales.pay_method)
     
-    context={
-        'sale':sales,
-        'saleitem':saleitem,
-        'sale_order':sale_order,
-        'company':company,
-        'bank':bank
-        
-        
-                    }
+    context={'sale':sales,'saleitem':saleitem,'sale_order':sale_order,'company':company,'bank':bank}
     
     return render(request,'sales_order_det.html',context)
 
@@ -3497,9 +3498,9 @@ def edit_sales_order(request,id):
             sales.terms_condition = request.POST.get('ter_cond')
         
         if 'Draft' in request.POST:
-            sales.status="DRAFT"
+            sales.status="draft"
         if "Save" in request.POST:
-            sales.status = "APPROVED"
+            sales.status = "approved"
 
         sales.balance=request.POST['balance']
         sales.advance=request.POST['advance']
@@ -10680,14 +10681,14 @@ def view_sales_order_all(request):
     sales=SalesOrder.objects.all()
     return render(request,'view_sales_order.html',{"sale":sales})   
     
-login_required(login_url='login')
+@login_required(login_url='login')
 def view_sales_order_Draft(request):
-    sales=SalesOrder.objects.filter(status="DRAFT")
+    sales=SalesOrder.objects.filter(status="draft")
     return render(request,'view_sales_order.html',{"sale":sales}) 
     
-login_required(login_url='login')
+@login_required(login_url='login')
 def view_sales_order_approved(request):
-    sales=SalesOrder.objects.filter(status="APPROVED")
+    sales=SalesOrder.objects.filter(status="approved")
     return render(request,'view_sales_order.html',{"sale":sales}) 
 
 @login_required(login_url='login')

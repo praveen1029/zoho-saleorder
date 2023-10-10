@@ -113,10 +113,39 @@
             padding: 8px; /* Add padding for cell content */
             text-align: left; /* Optional: Adjust text alignment */
         }
+  #producttable {
+            border-collapse: collapse; /* Collapse table borders */
+            border: none; /* Remove table border */
+            color: white;
+        }
+
+        #producttable  td {
+            border: none; /* Remove cell borders */
+            padding: 8px; /* Add padding for cell content */
+            text-align: left; /* Optional: Adjust text alignment */
+        }
 
         tr.clickable {
             cursor: pointer;
         }
+
+
+        @media print{
+        body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin-left: 2vh;
+        } 
+    }
                   </style>
     
 <section >
@@ -182,7 +211,10 @@
           <div class="row">
             <div class="col-md-6" >
               <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i> Overview</a>
-              <a class="btn" id="transactionbtn" onclick="totemplate()" style="background-color: white; color: black;"><i class="fas fa-file-alt"></i>  Template</a>
+              <a class="btn" id="transactionbtn" onclick="totemplate()" style="background-color: white; color: black; margin-right: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
+              {% if sale.status == "draft" %}
+              <a href="{% url 'convert_view' sale.id %}" class="btn btn-outline-warning" style="margin-right: 2vh;"><i class="fa fa-exchange" aria-hidden="true"></i>Convert</a>
+              {% endif %}
             </div>
               <div class="col-md-6" style="text-align: right;">
                 <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
@@ -198,23 +230,23 @@
                <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
                 <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
               </a>
-              <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
-                <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+              <a class="  text-dark" >
+                <button class="btn btn-outline-warning"  title="Pdf" onclick="exportToPDF()"><i class="fas fa-file-pdf-o"></i></button>
               </a>
 
-              <a class=" text-dark" href="" onclick="printSelectedArea()"  >
-                <button class="btn btn-outline-warning"  title="Print/Pdf"><i class="fas fa-print"></i>
+              <a class=" text-dark" href="" onclick="printSelectedArea(1)"  >
+                <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
                 </button> 
                </a>
               </div>
           </div><br>
           <div class="row">
-            <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); overflow-y: scroll;height: 600px;width: 100%;">
+            <div class="tab-content pt-2 m-2 mb-5" style="background-color: rgba(252, 236, 217, 0.8); overflow-y: scroll;height: 600px;width: 100%;">
               <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
                   <div class="row">
-                      <div class="col-md-6 bg-light" style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
-                          <div class="overview text-dark">
-                              <h2 class="text-dark p-2" style="text-transform: uppercase;">Sales Order</h2>
+                      <div class="col-md-6" style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0;" >
+                          <div class="overview text-dark" style="background-color: #ffddb0;" >
+                              <h2 class="text-dark" style="text-transform: uppercase;">Sales Order</h2>
                               
                               <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
                                 <tbody>
@@ -282,277 +314,112 @@
                                     <td>{{bank.ac_no}}</td>
                                   </tr>
                                   {% endif %}
-
-
-
-                                  {% for i in saleitem %}
                                   <tr>
-                                    <td>Product Name</td>
+                                    <td>Subtotal</td>
                                     <td>:</td>
-                                    <td>{{i.product}}</td>
+                                    <td>{{sale.subtotal}}</td>
+                                  </tr>
+                                  {% if sale.igst != '0.00' %}
+                                  <tr>
+                                    <td>IGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.igst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.cgst != '0.00' %}
+                                  <tr>
+                                    <td>CGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.cgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.sgst != '0.00' %}
+                                  <tr>
+                                    <td>SGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.sgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Tax Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.t_tax}}</td>
                                   </tr>
                                   <tr>
-                                    <td>Product Quantity</td>
+                                    <td>Shipping Charge</td>
                                     <td>:</td>
-                                    <td>{{i.quantity}}</td>
+                                    <td>{{sale.sh_charge}}</td>
                                   </tr>
                                   <tr>
-                                    <td>Product Rate</td>
+                                    <td>Adjustment</td>
                                     <td>:</td>
-                                    <td>{{i.rate}}</td>
+                                    <td>{{sale.adjust}}</td>
                                   </tr>
                                   <tr>
-                                    <td>Product Tax</td>
+                                    <td>Total Amount</td>
                                     <td>:</td>
-                                    <td>{{i.tax}}</td>
+                                    <td>{{sale.grandtotal}}</td>
+                                  </tr>
+                                  {% if sale.advance != 0.0 %}
+                                  <tr>
+                                    <td>Advance</td>
+                                    <td>:</td>
+                                    <td>{{sale.advance}}</td>
                                   </tr>
                                   <tr>
-                                    <td>Product Total</td>
+                                    <td>Balance Amount</td>
                                     <td>:</td>
-                                    <td>{{i.total}}</td>
+                                    <td>{{sale.balance}}</td>
                                   </tr>
-                                  {% endfor %}
+                                  {% endif %}
                                 </tbody>
                               </table> 
                           </div>
                       </div>
                       <div class="col-md-6" style="height: 100%;">
                           <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
-                          <div class="card" style="background-color: rgb(100, 98, 98); padding:1rem;">
-                              <div class="row my-2">
-                                  <div class="card-title h4 mt-4">Customer Infomartion
-                                      <hr>
+                          <div class="card" style="background-color:#8b3131; padding:1rem;">
+                              <div class="row">
+                                  <div class="card-title h2">PRODUCT INFORMATION
                                   </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for=""> Customer Type :</label></div>
-                                  <div class="col-7">
-                                      <p class="bold">None</p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-6"><label for="">Opening Balance :</label></div>
-                                  <div class="col-6">
-                                      <p class="bold">555497</p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">Phone Number :</label></div>
-                                  <div class="col-7">
-                                      <p class="bold">9098988787</p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">Mobile Number :</label></div>
-                                  <div class="col-7">
-                                      <p class="bold">9098987678</p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">Currency:</label></div>
-                                  <div class="col-7">
-                                      <p class="bold">Indian Rupee</p>
-                                  </div>
-                              </div>
-                              <div class="card-title h4 mt-4">More Info
-                                  <hr>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">GST Treatment:</label></div>
-                                  <div class="col-7">
-                                      <p class="bold">Registered Business-Composition Business that is registered under the Composition scheme in GST</p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">GST Number:</label></div>
-                                  <div class="col-7">
-                                      <p class="bold"></p>
-                                  </div>
-                              </div>
-                              <div class="row mt-2">
-                                  <div class="col-5"><label for="">Pan Number:</label></div>
-                                  <div class="col-7">
-                                      <p class="bold"></p>
-                                  </div>
+                                      <table class="table table-responsive" id="producttable">
+                                        <tbody>
+                                          {% for i in saleitem %}
+                                          <tr>
+                                            <td>Product Name</td>
+                                            <td>:</td>
+                                            <td>{{i.product}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Quantity</td>
+                                            <td>:</td>
+                                            <td>{{i.quantity}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Rate</td>
+                                            <td>:</td>
+                                            <td>{{i.rate}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Tax</td>
+                                            <td>:</td>
+                                            <td>{{i.tax}}</td>
+                                          </tr>
+                                          <tr style="border-bottom: solid; border-bottom-width: thin; ">
+                                            <td>Product Total</td>
+                                            <td>:</td>
+                                            <td>{{i.total}}
+                                            </td>
+                                          </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                      </table>
                               </div>
                           </div>
                       </div>
                   </div>
                   
               </div>
-             
-        
-<!-- .........................TRANSACTIONS CUSTOMERS ............................................ -->
-
-<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="profile-tab">
-<div class="slip m-3 p-5  bg-light" id="whatToPrint" style="box-shadow: 5px 5px 10px rgb(45, 45, 45);">
-<!-- <fieldset8 id="" style="background-color: burlywood" > -->
-<div class="row text-dark ">
-<div class="col-md-8">
-<h3 class="text-uppercase py-2">Mr Vijay vinod
-</h3>
-<p>Phone : 9098987678</p>
-<p>Email : vijay123@gmail.com</p>
-<!-- <p>No Credit Limit Set</p> -->
-<br>
-</div>
-<div class="col-md-4">
-<br><br>
-<p style="text-align: right;">Address : </p>
-<p style="text-align: right;">GSTIN : </p>
-</div>
-<hr>
-</div> 
-
-<div>
-<!-- <h6 class="text-dark text-uppercase py-2">TRANSACTIONS</h6> -->
-<table class="transaction_table table text-dark border mb-4">
-  <tbody><tr>
-      <th>
-          <div class="row">
-              <!-- <div class="col-md-6">TYPE</div> -->
-              <button class="btn " type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                  TRANSACTIONS
-              </button>
-          </div>
-
-      </th>
-      <th>
-          
-          
-          <div class="row">
-              <!-- <div class="col-md-6">TYPE</div> -->
-              <div class="dropdown">
-                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                      TYPE
-                  </button>
-                  <div class="dropdown-menu">
-                      <a class="dropdown-item" href="">A-Z</a>
-                      <a class="dropdown-item" href="">Z-A</a>
-                  </div>
-              </div>
-          </div>
-
-
-      </th>
-
-      <th>
-          <div class="row">
-              <!-- <div class="col-md-6">TYPE</div> -->
-              <div class="dropdown">
-                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                      NUMBER
-                  </button>
-                  <div class="dropdown-menu">
-                      <a class="dropdown-item" href="">A-Z</a>
-                      <a class="dropdown-item" href="">Z-A</a>
-                  </div>
-              </div>
-          </div>
-      </th>
-      <th>
-          <div class="row">
-              <div class="dropdown">
-                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                      DATE
-                  </button>
-                  <div class="dropdown-menu">
-                      <a class="dropdown-item" href="">A-Z</a>
-                      <a class="dropdown-item" href="">Z-A</a>
-                  </div>
-              </div>
-          </div> 
-      </th>
-      <th>
-          <div class="row">
-              <div class="dropdown">
-                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                      TOTAL
-                  </button>
-                  <div class="dropdown-menu">
-                      <a class="dropdown-item" href="">A-Z</a>
-                      <a class="dropdown-item" href="">Z-A</a>
-                  </div>
-              </div>
-          </div> 
-      </th>
-      <th>
-          <div class="row">
-              <div class="dropdown">
-                  <button class="btn  dropdown-toggle" type="button" style="color: #000;" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
-                      BALANCE
-                  </button>
-                  <div class="dropdown-menu">
-                      <a class="dropdown-item" href="">A-Z</a>
-                      <a class="dropdown-item" href="">Z-A</a>
-                  </div>
-              </div>
-          </div> 
-      </th>
-  </tr>
-
-  <tr>
-  <td>1</td>
-  <td>Estimates</td>
-
-  
-
-</tr>
-<tr>
-  <td>2</td>
-  <td>Retainer Invoice</td>
-  
-</tr>
-<tr>
-  <td>3</td>
-  <td>Sales Order</td>
-  
-</tr> 
-<tr>
-  <td>4</td>
-  <td>Delivery Challans</td>
-  
-</tr>
-<tr>
-  <td>5</td>
-  <td>Invoice</td>
-  
-</tr>
-<tr>
-  <td>6</td>
-  <td>CreditNotes</td>
-  
-</tr>
-<tr>
-  <td>7</td>
-  <td>Recurring Invoice</td>
-  
-</tr> 
-<tr>
-  <td>8</td>
-  <td>Purchase Order</td>
-  
-</tr>
-<tr>
-  <td>9</td>
-  <td>Purchase Bills</td>
-  
-</tr>    
-<tr>
-  <td>10</td>
-  <td>Recurring Bills</td>
-  
-</tr>     
- 
-</tbody></table>
-</div>
-</div>
-</div>
-         
-<!-- </fieldset8> -->
-
-
-
 
 
              
@@ -561,7 +428,7 @@
           
         </div>
         
-        <div class="col-md-9 mb-5 " id="templatediv" style="display: none;">
+        <div class="col-md-9 mb-5" id="templatediv" style="display: none;">
           <div class="row" >
             <div class="col-md-7" >
               <a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a>
@@ -571,6 +438,9 @@
             <div class="col-md-6" >
               <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: white; color: black;"><i class="fas fa-eye"></i> Overview</a>
               <a class="btn" style="background-color: chocolate; margin-left: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
+              {% if sale.status == "DRAFT" %}
+              <a href="{% url 'convert_view' sale.id %}" class="btn btn-outline-warning" style="margin-left: 2vh;"><i class="fa fa-exchange" aria-hidden="true"></i>Convert</a>
+              {% endif %}
             </div>
             <div class="col-md-6" style="text-align: right;">
               <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
@@ -590,8 +460,8 @@
             <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
               <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
             </a>
-            <a class=" text-dark" href="" onclick="printSelectedArea()"  >
-              <button class="btn btn-outline-warning"  title="Print/Pdf"><i class="fas fa-print"></i>
+            <a class=" text-dark"  onclick="printSelectedArea(2)"  >
+              <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
               </button> 
              </a>
             </div>
@@ -601,14 +471,14 @@
              
 
 
-             <div style="overflow-y: scroll;height: 600px;width: 100%;">
+             <div class="mt-4" style="overflow-y: scroll;height: 600px;width: 100%; margin-left: -1vh">
          
-               <section id="selected-area" style="background-color: rgb(255, 221, 176);"class=" p-2 m-2 mb-5">
+               <section id="selected-area" style="background-color: rgb(255, 221, 176);"class=" p-2 m-2">
                    <header style="	background-color: #8b3131;border-radius: 1rem;">
                        <div class="logo ">
                            <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}" alt="Company Logo">
                        </div>
-                       <div style="background: #8b3131;color: black;" class="company-info">
+                       <div style="background: #8b3131;color: white;" class="company-info">
                            <h2 class="text-white">{{company.company_name}}</h2>
                            <p class="text-white"> {{company.address}}<br>{{comp.city}}<br>Ph: {{company.contact_number}}<br>Email: {{company.company_email}}</p>
                        </div>
@@ -632,7 +502,6 @@
                                <tr>
                                  
                                  <th id="th">Product</th>
-                         
                                    <th id="th">Quantity</th>
                                    <th id="th">Price</th>
                                    <th id="th">Tax %</th>
@@ -664,6 +533,10 @@
                            <p class="text-dark">Tax Amount: <span class="ml-4"></span> <b>{{sale.t_tax}}</b></p>
                            <p class="text-dark">Shipping Charge: <span class="ml-4"></span> <b>{{sale.sh_charge}}</b></p>
                            <p class="text-dark">Total: <span class="ml-4"></span> <b>{{sale.grandtotal}}</b></p>
+                           {% if sale.advance != 0.0 %}
+                           <p class="text-dark">Advance: <span class="ml-4"></span> <b>{{sale.advance}}</b></p>
+                           <p class="text-dark">Balance: <span class="ml-4"></span> <b>{{sale.balance}}</b></p>
+                           {% endif %}
                        </div>
                       
                    </div>
@@ -676,27 +549,6 @@
                    </div>
                   </section>
  
-                  <script>
- 
- 
-                  function printSelectedArea() {
- 
-   var selectedArea = document.getElementById("selected-area");
-   
- 
-   var printWindow = window.open('', 'PrintWindow', 'height=800,width=800');
-   
- 
-   printWindow.document.write('<html><head><title>Print Selected Area</title></head><body>' + selectedArea.innerHTML + '</body></html>');
-   
-  
-   printWindow.print();
-   
-   
-   printWindow.close();
- }
- 
-                 </script>
        
  
             </div>
@@ -723,6 +575,43 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 </section>
+
+<script>
+  function printSelectedArea(area){
+    if(area==1){
+      var printContents = document.getElementById("overview").innerHTML;
+
+var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+    }
+    if(area==2){
+      var printContents = document.getElementById("selected-area").innerHTML;
+      document.getElementById("selected-area").style.backgroundColor = "white"
+var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+      
+    }
+  }
+</script>
+
+<script>
+      function exportToPDF(){
+        var content = document.getElementById('overview');
+        html2pdf()
+        .from(content)
+        .save('sales_order.pdf')
+    }
+</script>
 
 <script>
 

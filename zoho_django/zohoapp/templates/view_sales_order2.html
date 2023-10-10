@@ -1,115 +1,373 @@
 {% extends 'base.html' %}
-{% block content %}
 {% load static %}
 
+{% block content %}
+
 <style>
-  #over:hover{
-        background-color: rgba(110, 110, 110, 0.616);
-        
-    }
+
+
+
+
+  .daterangepicker{
+    color: black;
+  }
+
+  .daterangepicker td.available, .daterangepicker th {
+    color: black;
+  }
+
+  @media print {
+    body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin-left: 2vh;
+        } 
+  }
+
+  #reportrange span, #selectedEndDate, .daterangepicker .ranges ul li {
+    font-size: 14px; /* Adjust the font size as needed */
+  }
+
+
+
 </style>
 
-<div class="fixed-top" style="top: 7rem; margin-left: 18rem;">
-    <div style="height: 600px;overflow-y: scroll;">
-        <div class="row">
-            <div class="col-md-3"><a class="text-white" style="font-size: 2rem;">All Sales Order</a></div>
-        </div>    
-            <div class="row mb-3">
-              <div class="col-md-5">
-                <input type="text" id="search" class="form-control bg-light text-dark" placeholder="Search.." autocomplete="off">
 
-              </div>
-              <div class="col-md-3"></div>
-              <div class="col-md-1 d-flex">
-                <div class="dropdown ">
-                  <a class="dropdown-toggle btn btn-secondary text-dark m-2" href="" data-toggle="dropdown">
-                    <i style="color: chocolate;" class="fa fa-filter"></i>
-                  </a>
-                  <div class="dropdown-menu m-1">
-                    <a class="dropdown-item" href="{% url 'view_sales_order_all' %}">All</a>
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6">
+          <form class="form-inline">
+            <label class="mr-2" for="fromdate">From:</label>&nbsp;
+            <input type="date" class="form-control" id="fromdate" style="color: black !important;">
+            <label class="mx-2" for="todate">To:</label>
+            <input type="date" class="form-control" id="todate" style="color: black !important;">
+          </form>
+      </div>
+
+      <div class="col-md-6" style="text-align: right;">
+        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsPDF()" style="margin-right: 2vh;"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>PDF</a>
+
+
+        <a class="btn text-center btn-outline-warning printdrop p-2" href="#" onclick="printPageContent()" style="margin-right: 2vh;"><i class="fa fa-print" aria-hidden="true"></i>Print</a>
     
-                    <a class="dropdown-item" href="{% url 'view_sales_order_Draft' %}">Draft</a>
-                    <a class="dropdown-item" href="{% url 'view_sales_order_approved' %}">Approved</a>
-                  </div>
-                </div>
+        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsXLS()" style="margin-right: 2vh;"><i class="fa fa-file-excel-o" aria-hidden="true"></i>EXCEL</a>
     
-                <a style="color: #ccc;background-color: chocolate;" class="btn btn-success m-2" href="{% url 'create_sales_order' %}">
-                  <i class="fa-solid fa-plus"></i>New
-              </a>
-              </div>
-            </div>
-          
-      
     
-        <div class="row">
-            <div class="col-sm-12 col-md-11 col-lg-11">
-                <table class="table  text-white" id="myTable">
-                    <thead>
-                      <tr>
-                        <th>DATE</th>
-                        <th>SALES ORDER</th>
-                        <th>CUSTOMER NAME</th>
-                        <th>CUSTOMER MAIL</th>
-                        <th>STATUS</th>
-                        <th>REFERENCE</th>
-                        <th>PAYMENT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for i in sale %}
-             
-                      <tr id="over">
-
-                        <td>{{i.sales_date}}</td>
-             
-                       <!-- <td onclick="location.href ='' " > {{v.Name}}</td> -->
-                        <td><a href="{% url 'sales_order_det' i.id %}" style="color: rgb(230, 171, 45);">{{i.sales_no}}</a></td>
-                        
-                        <td>{{i.customer.customerName}}</td>
-                        <td>{{i.customer.customerEmail}}</td>
-                        <td>{{i.status}}</td>
-                        <td>{{i.reference}}</td>
-                        <td>{{i.grandtotal}}</td>
-                        <td></td>
-        
-                       
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-sm-12 col-md-1 col-lg-1"></div>
-
-        </div>
-      
-
-           
-        
+          <a class="btn btn-outline-warning p-2" href="{% url 'report_inventory_view' %}" >&times;</a>
+      </div>
 
     </div>
 
+
 </div>
 
+<div class="row">
+  <div class="col-md-3"><br><br>
+    <input class="form-control text-black" type="text" id="searchInput" placeholder="Search by Name">
+    
+    <!-- The tooltip-like list -->
+    <div class="tooltip" id="nameTooltip">
+      {% for name in name_list %}
+        <div class="tooltip-item">{{name}}</div>
+      {% endfor %}
+    </div>
+  </div>
 
+</div>
+<div id="demo"><p></p></div>
+<div class="container-fluid" id="container-to-print"> 
+  <div class="row pt-5">
+    <center>
+      <div class="col-md-4">
+        {% if company.company_name != None %}
+          <a class="text" style="font-size: 1rem; color: white;">{{ company.company_name }}</a><br>
+        {% else %}
+          <a class="text" style="font-size: 1rem; color: white;">Add Company</a><br>
+        {% endif %}
+        <a class="text" style="font-size: 1.5rem; color: white;">Sale Order</a><br>
+        <h5 class="text" id="selectedEndDate"></h5><br>
+      </div>
+    </center>   
+  </div> 
+
+
+  <div style="overflow-x: auto; overflow-x: hidden;">
+    <div class="row pt-2">
+      <div class="col-sm-10 col-md-11 col-lg-12">
+        <table class="table text-white" id="myTable" style="width: 100%;">
+          <thead>
+            <tr>
+              <th>DATE 
+              </th>
+              <th>ORDER NO 
+              </th>
+              <th>NAME 
+              </th>
+              <th>DUE DATE 
+              </th>
+              <th>STATUS 
+              </th>
+
+              <th>TOTAL 
+              </th>
+              <th>ADVANCE 
+              </th>
+              <th>BALANCE 
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for d in data %}
+            <tr>
+              <td>{{ d.sales_date }}</td>
+              <td>{{ d.sales_no }}</td>
+              <td>{{ d.customer.customerName}}</td>
+              <td>{{ d.ship_date }}</td>
+              <td>{{ d.status }}</td>
+              <td>{{ d.subtotal }}</td>
+              <td>{{ d.advance }}</td>
+              <td>{{ d.balance }}</td>
+            </tr>
+            
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>  
+
+<script>
+  function updateEndDateMin() {
+      const startDateInput = document.getElementById('fromdate');
+      const endDateInput = document.getElementById('todate');
+      
+      // Set the minimum allowed date for the end date input
+      endDateInput.min = startDateInput.value;
+  }
+</script>
 
 
 <script>
-  var $rows = $('table tbody tr');
-  $('#search').keyup(function() {
-      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-      
-      $rows.hide().filter(function() {
-          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
-          return ~text.indexOf(val);
-      }).show();
-  });
+  function ApplyDateFilter() {
+    updateEndDateMin()
+    var fromDate = new Date(document.getElementById('fromdate').value);
+    var toDate = new Date(document.getElementById('todate').value);
 
+    // Set the time part to the beginning and end of the day
+    fromDate.setHours(0, 0, 0, 0);
+    toDate.setHours(23, 59, 59, 999);
+
+    var table = document.getElementById("myTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+      var row = tr[i];
+      var td = row.getElementsByTagName("td")[0]; // Assuming the date is in the first column.
+
+      if (td) {
+        var txtValue = td.textContent || td.innerText;
+        var check = new Date(txtValue);
+
+        // Set the time part of check to match the format of fromDate and toDate
+        check.setHours(0, 0, 0, 0);
+
+        if (check >= fromDate && check <= toDate) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      }
+    }
+    // Update the selectedEndDate div
+    var start = fromDate;
+    var end = toDate;
+    document.getElementById('selectedEndDate').textContent = 'From ' + start.toDateString() + ' to ' + end.toDateString();
+  }
+
+  // Add event listeners to the date inputs to trigger ApplyDateFilter on change
+  document.getElementById('fromdate').addEventListener('change', ApplyDateFilter);
+  document.getElementById('todate').addEventListener('change', ApplyDateFilter);
+
+  // Initialize the filter when the page loads (optional)
+  ApplyDateFilter();
+
+  // Function to show full table when no dates are selected
+  function ShowFullTable() {
+    var table = document.getElementById("myTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 1; i < tr.length; i++) {
+      tr[i].style.display = "";
+    }
+
+    // Reset the selectedEndDate div
+    document.getElementById('selectedEndDate').textContent = '';
+  }
+
+  // Call the function to show full table initially
+  ShowFullTable();
+</script>
+
+<script>
+  function printPageContent(){
+
+      var printContents = document.getElementById("container-to-print").innerHTML;
+
+var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+  }
+</script>
+
+
+
+
+  <script>
+    function exportAsXLS() {
+        const data = [
+            ['DATE', 'ORDER NO', 'NAME', 'DUE DATE', 'STATUS', 'TYPE', 'TOTAL', 'ADVANCE', 'BALANCE'],
+            ['Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6', 'Data 7', 'Data 8', 'Data 9'],
+            // Add more rows as needed
+        ];
+    
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    
+        // Save the XLS file
+        XLSX.writeFile(wb, 'sales_order.xlsx');
+    }
+    
+    function exportAsPDF() {
+      const container = document.getElementById('container-to-print');
+    
+      // change colour 
+      container.style.backgroundColor = 'white';
+    
+      const textWhiteElements = container.querySelectorAll('.text');
+      textWhiteElements.forEach(element => {
+        element.style.color = '#000000';
+      });
+
+      const table_rows = document.querySelectorAll('#myTable tbody tr');
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'white'; 
+            row.style.color = 'black'; 
+        });
+    
+      const pdfOptions = {
+        margin: 0,
+        filename: 'Sales_order.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' },
+      };
+    
+      // Generate PDF from the container
+      html2pdf().from(container).set(pdfOptions).save().then(() => {
+
+
+        container.style.backgroundColor = 'transparent';
+
+        // Restore the original background color'
+      textWhiteElements.forEach(element => {
+        element.style.color = 'white'; 
+      });
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'transparent'; 
+            row.style.color = 'white'; 
+        });
+    
+
+      });
+    }
+    
   </script>
 
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
-{% endblock %}
+<script>
+  nameTooltip.style.display = 'block';
+  const searchInput = document.getElementById('searchInput');
+  const nameTooltip = document.getElementById('nameTooltip');
+  const dataTable = document.getElementById('myTable');
+  const tableBody = dataTable.getElementsByTagName('tbody')[0];
+  const initialTableData = [...tableBody.querySelectorAll('tr')];
+  
+  searchInput.addEventListener('input', showTooltip);
+  nameTooltip.addEventListener('click', filterTable);
+  
+  function showTooltip() {
+    const searchText = searchInput.value.toLowerCase();
+    
+    // Show the tooltip if there's text in the input
+    if (searchText.length > 0) {
+      nameTooltip.style.display = 'block';
+      document.getElementById("demo").innerHTML=searchText
+          nameTooltip.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + 'px';
+          nameTooltip.style.left = searchInput.offsetLeft + 'px';
+      } else {
+          nameTooltip.style.display = 'none';
+          // If search input is empty, restore the initial table
+          restoreInitialTable();
+      }
+
+      // Filter the tooltip items based on the input
+      const items = nameTooltip.getElementsByClassName('tooltip-item');
+      for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const itemName = item.textContent.toLowerCase();
+          if (itemName.includes(searchText)) {
+              item.style.display = 'block';
+          } else {
+              item.style.display = 'none';
+          }
+      }
+  }
+
+  function filterTable(event) {
+      if (event.target.classList.contains('tooltip-item')) {
+          const selectedName = event.target.textContent.toLowerCase();
+          const rows = tableBody.getElementsByTagName('tr');
+
+          // Loop through table rows and hide/show based on selected name
+          for (let i = 0; i < rows.length; i++) {
+              const row = rows[i];
+              const cell = row.getElementsByTagName('td')[0];
+              if (cell && cell.textContent.toLowerCase() === selectedName) {
+                  row.style.display = 'table-row';
+              } else {
+                  row.style.display = 'none';
+              }
+          }
+
+          // Hide the tooltip after selecting
+          nameTooltip.style.display = 'none';
+      }
+  }
+
+  function restoreInitialTable() {
+      // Restore all rows to the initial state
+      initialTableData.forEach((row) => {
+          row.style.display = 'table-row';
+      });
+  }
+</script>
+
+{% endblock content %}
+

@@ -4,69 +4,9 @@
 {% block content %}
 
 <style>
-  table, th, td, tr {
-    color: white; 
-    border: 1px solid white;
-  }
 
-  .topnav {
-    background-color: #333;
-  }
-  
-  .a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 14px;
-  }
 
-  .customize {
-    float: left;
-    text-align: center;
-    padding: 20px 130px;
-    text-decoration: none;
-    font-size: 14px;
-  }
-  
-  .topnav-right {
-    float: right;
-  }
 
-  .nav-item {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 4px 4px;
-    text-decoration: none;
-    font-size: 14px;
-  }
-
-  .dropdown, .printdrop{
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 4px;
-    text-decoration: none;
-    font-size: 14px;
-  }
-
-  .dropdown-item:hover{
-    color: white;
-  }
-
-  .printdrop:hover{
-    color: white;
-  }
-
-  .b {
-    float: left;
-    color: #f2f2f2;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 14px;
-  }
 
   .daterangepicker{
     color: black;
@@ -77,53 +17,28 @@
   }
 
   @media print {
-    table, th, td, tr {
-      border: 1px solid black; /* Ensure black borders when printing */
-    }
+    body{
+            visibility: hidden !important; /* hide everything in body when in print mode*/
+        }
+
+        .printContainer {
+            visibility: visible !important; /* Override the rule above to only show the printables*/
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin-left: 2vh;
+        } 
   }
 
   #reportrange span, #selectedEndDate, .daterangepicker .ranges ul li {
     font-size: 14px; /* Adjust the font size as needed */
   }
 
-  .filter-dropdown {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    z-index: 1;
-    border-radius: 10%;
-  }
-  .filter-option,
-  .filter-value {
-      width: 100%;
-      padding: 5px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 1px;
-  }
-
-  .filter-buttons {
-      display: flex;
-      justify-content: space-between;
-  }
-
-  .filter-buttons button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-  }
-
-  .apply-filter {
-      background-color: #4caf50;
-      color: white;
-  }
-
-  .clear-filter {
-      background-color: #f44336;
-      color: white;
+  .dropdown-item:hover{
+    color: chocolate;
   }
 
 
@@ -131,39 +46,57 @@
 
 
 <div class="container-fluid">
-  <ul class="nav nav-pills">
-    <li class="nav-item">
-      <form class="form-inline">
-        <label class="mr-2" for="fromdate">From:</label>&nbsp;
-        <input type="date" class="form-control" id="fromdate" style="color: black !important;">
-        <label class="mx-2" for="todate">To:</label>
-        <input type="date" class="form-control" id="todate" style="color: black !important;">
-      </form>
-    </li>
+    <div class="row">
+      <div class="col-md-6">
+          <form class="form-inline">
+            <label class="mr-2" for="fromdate">From:</label>&nbsp;
+            <input type="date" class="form-control" id="fromdate" style="color: black !important;">
+            <label class="mx-2" for="todate">To:</label>
+            <input type="date" class="form-control" id="todate" style="color: black !important;">
+          </form>
+      </div>
 
-    <li class="nav-item dropdown" style="margin-left: 27.5vw; margin-top: -1rem;">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="background: white; color: black;">
-        <i class="fa fa-file-excel"></i>
+      <div class="col-md-6" style="text-align: right;">
+        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsPDF()" style="margin-right: 2vh;"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>PDF</a>
+
+
+        <a class="btn text-center btn-outline-warning printdrop p-2" href="#" onclick="printPageContent()" style="margin-right: 2vh;"><i class="fa fa-print" aria-hidden="true"></i>Print</a>
+    
+        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsXLS()" style="margin-right: 2vh;"><i class="fa fa-file-excel-o" aria-hidden="true"></i>EXCEL</a>
+    
+    
+          <a class="btn btn-outline-warning p-2" href="{% url 'report_inventory_view' %}" >&times;</a>
+      </div>
+
+    </div>
+
+
+</div>
+
+<div class="row">
+  <div class="col-md-3"><br><br>
+    <input class="form-control text-black" type="text" id="search" placeholder="Search by Name">
+    
+    <!-- The tooltip-like list -->
+    <div class="tooltip" id="nameTooltip">
+      {% for name in name_list %}
+        <div class="tooltip-item">{{name}}</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-md-2"><br><br>
+    <div class="dropdown">
+      <a class="btn text-center px-4 pt-2 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+        <i  class="fas fa-sort m-1"></i>
       </a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" style="font-size:10px;" onclick="exportAsPDF()">PDF</a></li>
-        <li><a class="dropdown-item" style="font-size:10px;" onclick="exportAsXLS()">XLS (Microsoft Excel 1997-2004 Compatible)</a></li>
-      </ul>
-    </li>
+      <div class="dropdown-menu m-1">
+        <a class="dropdown-item" href="{% url 'sales_order' %}">All</a>
+        <a class="dropdown-item" onclick="sortTable(2)">Customer Name</a>
+        <a class="dropdown-item" onclick="sortTable(7)">Balance</a>
+      </div>
+    </div>
+  </div>
 
-    <li class="nav-item dropdown" style="margin-top: -1rem;">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" style="background: white; color: black;">
-        <i class="fa fa-print"></i>
-      </a>
-      <ul class="dropdown-menu">
-        <li><a class="printdrop" href="#" onclick="printPageContent()" style="font-size:10px;">Print Preference</a></li>
-      </ul>
-    </li>
-
-    <li class="nav-item">
-      <button type="button" onclick="history.go(-1);" class="btn btn-danger">&times;</button>
-    </li>
-  </ul>
 </div>
 
 <div class="container-fluid" id="container-to-print"> 
@@ -185,107 +118,25 @@
   <div style="overflow-x: auto; overflow-x: hidden;">
     <div class="row pt-2">
       <div class="col-sm-10 col-md-11 col-lg-12">
-        <table class="table" id="myTable" style="width: 100%;">
+        <table class="table text-white" id="myTable" style="width: 100%;">
           <thead>
             <tr>
-              <th>DATE <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>DATE 
               </th>
-              <th>ORDER NO <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>ORDER NO 
               </th>
-              <th>NAME <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>NAME 
               </th>
-              <th>DUE DATE <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>DUE DATE 
               </th>
-              <th>STATUS <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>STATUS 
               </th>
-              <th>TYPE <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+
+              <th>TOTAL 
               </th>
-              <th>TOTAL <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>ADVANCE 
               </th>
-              <th>ADVANCE <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
-              </th>
-              <th>BALANCE <i class="fas fa-filter filter-button"></i>
-                <div class="filter-dropdown">
-                  <select class="filter-option">
-                    <option value="contains">Contains</option>
-                    <option value="exact-match">Excat Match</option>
-                  </select><br>
-                  <input type="text" class="filter-value"><br>
-                  <button class="apply-filter btn-primary">Apply</button>
-                  <button class="clear-filter btn-primary">Clear</button>
-                </div><br>
+              <th>BALANCE 
               </th>
             </tr>
           </thead>
@@ -297,25 +148,79 @@
               <td>{{ d.sales_no }}</td>
               <td>{{ d.customer.customerName }}</td>
               <td>{{ d.ship_date }}</td>
-              <td></td>
-              <td>{{ d.customer.customerType }}</td>
-
+              <td>{{ d.status }}</td>
               <td>{{ d.subtotal }}</td>
-              <td></td>
-              <td></td>
+              <td>{{ d.advance }}</td>
+              <td>{{ d.balance }}</td>
             </tr>
             
+            {% endfor %}
           </tbody>
-          {% endfor %}
         </table>
       </div>
     </div>
   </div>
 </div>  
 
+<script>
+  var $rows = $('table tbody tr');
+  $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      
+      $rows.hide().filter(function() {
+          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+          return ~text.indexOf(val);
+      }).show();
+  });
+
+  </script>
+
+<script>
+  // Function to sort the table by the selected column
+  function sortTable(columnIndex) {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
+
+      while (switching) {
+          switching = false;
+          rows = table.rows;
+
+          for (i = 1; i < rows.length - 1; i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("td")[columnIndex];
+              y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                  shouldSwitch = true;
+                  break;
+              }
+          }
+
+          if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+          }
+      }
+  }
+
+
+</script>
+
+<script>
+  function updateEndDateMin() {
+      const startDateInput = document.getElementById('fromdate');
+      const endDateInput = document.getElementById('todate');
+      
+      // Set the minimum allowed date for the end date input
+      endDateInput.min = startDateInput.value;
+  }
+</script>
+
 
 <script>
   function ApplyDateFilter() {
+    updateEndDateMin()
     var fromDate = new Date(document.getElementById('fromdate').value);
     var toDate = new Date(document.getElementById('todate').value);
 
@@ -374,44 +279,22 @@
   ShowFullTable();
 </script>
 
+<script>
+  function printPageContent(){
+
+      var printContents = document.getElementById("container-to-print").innerHTML;
+
+var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+$printerDiv.html(printContents); // add the content to be printed
+$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+window.print(); // call print
+$printerDiv.remove(); // remove the div
+$('body').removeClass("printingContent");
+  }
+</script>
 
 
-
-
-  <script>
-    function printPageContent() {
-      const contentToPrint = document.getElementById('container-to-print');
-      const clonedContent = contentToPrint.cloneNode(true);
-
-      // Find all the elements with the class "text" within the cloned content
-      const textElements = clonedContent.querySelectorAll('.text');
-      const filterDropdowns = clonedContent.querySelectorAll('.filter-dropdown');
-
-
-      // Set the text color to black for each element with the class "text"
-      textElements.forEach(element => {
-        element.style.color = '#000000';  // Text color (black)
-      });
-
-      //Set the dropdown element with th "none"
-      filterDropdowns.forEach(dropdown => {
-        dropdown.style.display = 'none';
-      });
-  
-
-      // Set table styles to black
-      const tableElements = clonedContent.querySelectorAll('table, th, td, tr');
-      for (const element of tableElements) {
-      element.style.border = '1px solid black';
-      }
-  
-      // Print the cloned content
-      const printWindow = window.open('', '_blank');
-      printWindow.document.body.appendChild(clonedContent);
-      printWindow.print();
-      printWindow.close();
-    }
-  </script>
 
 
   <script>
@@ -433,36 +316,20 @@
     function exportAsPDF() {
       const container = document.getElementById('container-to-print');
     
-      // Save the original background color
-      const originalBackgroundColor = container.style.backgroundColor;
-    
-      // Set the container's background color to white
+      // change colour 
       container.style.backgroundColor = 'white';
     
-      // Apply styling changes to the container's content
       const textWhiteElements = container.querySelectorAll('.text');
       textWhiteElements.forEach(element => {
-        element.style.color = '#000000'; // Set text color to black
+        element.style.color = '#000000';
       });
-    
-      const tableElements = container.querySelectorAll('table');
-      const tableCells = container.querySelectorAll('td, th');
-      const tableRows = container.querySelectorAll('tr');
-    
-      tableElements.forEach(table => {
-        table.style.backgroundColor = '#ffffff'; // Set background color to white
-        table.style.color = '#000000'; // Set text color to black
-      });
-    
-      tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#ffffff'; // Set background color to white
-        cell.style.color = '#000000'; // Set text color to black
-        cell.style.border = '1px solid black'; // Add a black border
-      });
-    
-      tableRows.forEach(row => {
-        row.style.backgroundColor = '#000000'; // Set background color to black
-      });
+
+      const table_rows = document.querySelectorAll('#myTable tbody tr');
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'white'; 
+            row.style.color = 'black'; 
+        });
     
       const pdfOptions = {
         margin: 0,
@@ -475,156 +342,26 @@
       // Generate PDF from the container
       html2pdf().from(container).set(pdfOptions).save().then(() => {
 
-        // Restore the original background color
-        container.style.backgroundColor = originalBackgroundColor;
 
-        textWhiteElements.forEach(element => {
-          element.style.color = 'white'; // Restore original text color
+        container.style.backgroundColor = 'transparent';
 
-        // Remove the pdf-background class after generating the PDF
-        container.classList.remove('pdf-background');
+        // Restore the original background color'
+      textWhiteElements.forEach(element => {
+        element.style.color = 'white'; 
+      });
+
+      table_rows.forEach(row => {
+            row.style.backgroundColor = 'transparent'; 
+            row.style.color = 'white'; 
         });
+    
+
       });
     }
     
   </script>
 
-  <script>
-    $(document).ready(function() {
-      $('.filter-button').on('click', function() {
-        $(this).closest('th').find('.filter-dropdown').toggle();
-      });
-  
-      $('.apply-filter').on('click', function() {
-        const $table = $('#myTable');
-        const columnIndex = $(this).closest('th').index();
-        const filterOption = $(this).siblings('.filter-option').val();
-        const filterValue = $(this).siblings('.filter-value').val().trim();
-  
-        $table.find('tbody tr').hide();  // Hide all rows
-  
-        if (filterOption === 'exact-match') {
-          applyExactMatchFilter($table, columnIndex, filterValue);
-        } else if (filterOption === 'contains') {
-          applyContainsFilter($table, columnIndex, filterValue);
-        }
-
-        // Close the filter dropdown
-        $(this).closest('.filter-dropdown').hide();
-      });
-  
-      $('.clear-filter').on('click', function() {
-        $('#myTable tbody tr').show();
-        $(this).siblings('.filter-option').val('contains');
-        $(this).siblings('.filter-value').val('');
-  
-        // Close the filter dropdown
-        $(this).closest('.filter-dropdown').hide();
-      });
-    });
-  
-    function applyExactMatchFilter($table, columnIndex, filterValue) {
-      $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-        if ($(this).text().trim() === filterValue) {
-          $(this).parent().show();
-        }
-      });
-    }
-  
-    function applyContainsFilter($table, columnIndex, filterValue) {
-      $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-        if ($(this).text().toLowerCase().includes(filterValue.toLowerCase())) {
-          $(this).parent().show();
-        }
-      });
-    }
-  
-  </script>
   
 
 {% endblock content %}
 
-
-{% comment %}
-# code for exact-match, contains, greater-than, lesser-than, equal-to in table filter
-
- <script>
-  $(document).ready(function() {
-    $('.filter-button').on('click', function() {
-      $(this).closest('th').find('.filter-dropdown').toggle();
-    });
-
-    $('.apply-filter').on('click', function() {
-      const $table = $('#myTable');
-      const columnIndex = $(this).closest('th').index();
-      const filterOption = $(this).siblings('.filter-option').val();
-      const filterValue = $(this).siblings('.filter-value').val().trim();
-
-      $table.find('tbody tr').hide();  // Hide all rows
-
-      if (filterOption === 'exact-match') {
-        applyExactMatchFilter($table, columnIndex, filterValue);
-      } else if (filterOption === 'contains') {
-        applyContainsFilter($table, columnIndex, filterValue);
-      } else if (filterOption === 'equal-to') {
-        applyEqualToFilter($table, columnIndex, filterValue);
-      } else if (filterOption === 'greater-than') {
-        applyGreaterThanFilter($table, columnIndex, filterValue);
-      } else if (filterOption === 'less-than') {
-        applyLessThanFilter($table, columnIndex, filterValue);
-      }
-
-      // Close the filter dropdown
-      $(this).closest('.filter-dropdown').hide();
-    });
-
-    $('.clear-filter').on('click', function() {
-      $('#myTable tbody tr').show();
-      $(this).siblings('.filter-option').val('contains');
-      $(this).siblings('.filter-value').val('');
-
-      // Close the filter dropdown
-      $(this).closest('.filter-dropdown').hide();
-    });
-  });
-
-  function applyExactMatchFilter($table, columnIndex, filterValue) {
-    $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-      if ($(this).text().trim() === filterValue) {
-        $(this).parent().show();
-      }
-    });
-  }
-
-  function applyContainsFilter($table, columnIndex, filterValue) {
-    $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-      if ($(this).text().toLowerCase().includes(filterValue.toLowerCase())) {
-        $(this).parent().show();
-      }
-    });
-  }
-
-  function applyEqualToFilter($table, columnIndex, filterValue) {
-    $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-      if (parseFloat($(this).text().trim()) === parseFloat(filterValue)) {
-        $(this).parent().show();
-      }
-    });
-  }
-
-  function applyGreaterThanFilter($table, columnIndex, filterValue) {
-    $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-      if (parseFloat($(this).text().trim()) > parseFloat(filterValue)) {
-        $(this).parent().show();
-      }
-    });
-  }
-
-  function applyLessThanFilter($table, columnIndex, filterValue) {
-    $table.find(`tbody tr td:nth-child(${columnIndex + 1})`).each(function() {
-      if (parseFloat($(this).text().trim()) < parseFloat(filterValue)) {
-        $(this).parent().show();
-      }
-    });
-  }
-</script> {% endcomment %}
