@@ -90,6 +90,11 @@
     width: 80%;
   }
  
+
+  #item_table{
+    background-color: rgba(58, 57, 57, 0.8);
+  }
+
    
 
     </style>
@@ -330,7 +335,7 @@
               <tr id="row{{forloop.counter}}">
                   <td>
                       <div ><select
-                              class='form-control bg-light text-dark border-0 item_select itm'
+                              class='form-control border-0 bg-transparent text-white border-0 item_select itm'
                               name='item[]' id='item{{forloop.counter}}'>
                               <option selected value="{{i.product}}" hidden>{{i.product}}</option>
                               {% for j in itm %}
@@ -339,46 +344,46 @@
                           </select></div>
                   </td>
                   <td class='text-right' style="width: 15%;">
-                    <input type='number' id='hsn1' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+                    <input type='number' id='hsn{{forloop.counter}}' class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
                   </td>
                 
                    
                   <td style="width: 17%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
-                          class=' text-right qty form-control bg-light text-dark' name='quantity[]'
+                          class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
                           value='{{i.quantity}}' style="margin-top: 4vh;"><br>
-                          Available Stock : <span id="stock_data"></span>
+                          <span class="text-warning">Available Stock : <span id="stock_data{{forloop.counter}}" class="text-warning"></span></span>
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate{{forloop.counter}}'
-                          class=' text-right rate form-control bg-light text-dark' name='rate[]'
+                          class=' text-right rate form-control border-0 bg-transparent text-white' name='rate[]'
                           value='{{i.rate}}' readonly>
                   </td>
                   <td style="width: 10%;" class='text-right text-dark'><input type='number' id='discount{{forloop.counter}}'
-                          class=' text-right discount bg-light text-dark form-control' name='desc[]'
+                          class=' text-right discount border-0 bg-transparent text-white form-control' name='desc[]'
                           value='{{i.desc}}'>
                   </td>
                   <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax{{forloop.counter}}'
-                          class='form-control bg-light text-dark  text-right border-0 tax' onclick="toggleDateInput()">
+                          class='form-control border-0 bg-transparent text-white  text-right border-0 tax' onclick="toggleDateInput()">
                          
                           {% if i.sale.sos == '[KL] Kerala' %}
                           <option value="{{i.tax}} " hidden>{{i.tax}}.0%  GST({{i.tax}}%)</option>
                             {% else %}
                             <option value="{{i.tax}} " hidden>{{i.tax}}.0% IGST({{i.tax}}%)</option>
                             {% endif %}
-                            <optgroup  class="text-center" label="GST">
-                            <option value="0">0% GST(0%)</option>
-                            <option value="3">3.0% GST(3%)</option>
-                            <option value="5">5.0% GST(5%)</option>
-                            <option value="12">12.0% GST(12%)</option>
-                            <option value="18">18.0% GST(18%)</option>
-                            <option value="28">28.0% GST(28%)</option>
+                            <optgroup  class="text-center text-black" label="GST">
+                            <option class="text-black" value="0">0% GST(0%)</option>
+                            <option class="text-black" value="3">3.0% GST(3%)</option>
+                            <option class="text-black" value="5">5.0% GST(5%)</option>
+                            <option class="text-black" value="12">12.0% GST(12%)</option>
+                            <option class="text-black" value="18">18.0% GST(18%)</option>
+                            <option class="text-black" value="28">28.0% GST(28%)</option>
                           </optgroup>
-                          <optgroup  class="text-center" label="IGST">
-                            <option value="0">0% IGST(0%)</option>
-                            <option value="3">3.0% IGST(3%)</option>
-                            <option value="5">5.0% IGST(5%)</option>
-                            <option value="12">12.0% IGST(12%)</option>
-                            <option value="18">18.0% IGST(18%)</option>
-                            <option value="28">28.0% IGST(28%)</option>             
+                          <optgroup  class="text-center text-black" label="IGST">
+                            <option class="text-black" value="0">0% IGST(0%)</option>
+                            <option class="text-black" value="3">3.0% IGST(3%)</option>
+                            <option class="text-black" value="5">5.0% IGST(5%)</option>
+                            <option class="text-black" value="12">12.0% IGST(12%)</option>
+                            <option class="text-black" value="18">18.0% IGST(18%)</option>
+                            <option class="text-black" value="28">28.0% IGST(28%)</option>             
                             </optgroup>
                       </select></td>
                   <td style="display: none;">
@@ -386,7 +391,7 @@
                           class=" taxamount text-dark" />
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='amount{{forloop.counter}}'
-                          class=' text-right form-control amount bg-light text-dark' name='amount[]'
+                          class=' text-right form-control amount border-0 bg-transparent text-white' name='amount[]'
                           value='{{i.total}}' readonly></td>
                   <td class='text-center'><button type='button' id='del_btn1'
                           class='btn btn-transparent text-danger btn-sm btn-outline-danger rounded-circle delete-row'
@@ -450,8 +455,7 @@
                 </tr>
                 <td>Adjustment</td>
                     
-                <td><input type="hidden" id="adjustment"  step="any" value="0.00" 
-                    class="form-control bg-transparent border-0 text-right adjustment  "></td>
+                <td></td>
                 <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" name="adjust"> </td>
             </tr>
                 <tr>
@@ -507,8 +511,8 @@
        
     
         <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" type="submit" class="btn mt-2" value="Draft" name="Draft">
-        <input style="width: 150px;margin-right: 2rem;" type="submit" class="btn btn-success mt-2" value="Save" name="Save">
-           <input style="width: 150px;margin-right: 2rem;" class="btn btn-danger mt-2" type="reset" value="Cancel">
+        <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" type="submit" class="btn mt-2" value="Save" name="Save">
+           <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
      
         
        
@@ -1525,6 +1529,199 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <script>
+
+  function qtychange1(){
+    var qty = $('#qty1').val();
+    var avl = document.getElementById('stock_data1').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange2(){
+    var qty = $('#qty2').val();
+    var avl = document.getElementById('stock_data2').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange3(){
+    var qty = $('#qty3').val();
+    var avl = document.getElementById('stock_data3').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange4(){
+    var qty = $('#qty4').val();
+    var avl = document.getElementById('stock_data4').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange5(){
+    var qty = $('#qty5').val();
+    var avl = document.getElementById('stock_data5').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange6(){
+    var qty = $('#qty6').val();
+    var avl = document.getElementById('stock_data6').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange7(){
+    var qty = $('#qty7').val();
+    var avl = document.getElementById('stock_data7').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange8(){
+    var qty = $('#qty8').val();
+    var avl = document.getElementById('stock_data8').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange9(){
+    var qty = $('#qty9').val();
+    var avl = document.getElementById('stock_data9').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange10(){
+    var qty = $('#qty10').val();
+    var avl = document.getElementById('stock_data10').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange11(){
+    var qty = $('#qty11').val();
+    var avl = document.getElementById('stock_data11').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange12(){
+    var qty = $('#qty12').val();
+    var avl = document.getElementById('stock_data12').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange13(){
+    var qty = $('#qty13').val();
+    var avl = document.getElementById('stock_data13').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange14(){
+    var qty = $('#qty14').val();
+    var avl = document.getElementById('stock_data14').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange15(){
+    var qty = $('#qty15').val();
+    var avl = document.getElementById('stock_data15').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange16(){
+    var qty = $('#qty16').val();
+    var avl = document.getElementById('stock_data16').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange17(){
+    var qty = $('#qty17').val();
+    var avl = document.getElementById('stock_data17').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange18(){
+    var qty = $('#qty18').val();
+    var avl = document.getElementById('stock_data18').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange19(){
+    var qty = $('#qty19').val();
+    var avl = document.getElementById('stock_data19').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange20(){
+    var qty = $('#qty20').val();
+    var avl = document.getElementById('stock_data20').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+
+  function qtychange21(){
+    var qty = $('#qty21').val();
+    var avl = document.getElementById('stock_data21').innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }    
+  
+</script>
+
+<script>
   $(document).ready(function() {
     var x = $('#pay_method').val();
     if(x==='cash'){
@@ -2286,7 +2483,7 @@ function reloadAccount() {
 });
 </script>
 <script>
-var rowCount = 1;
+var rowCount = "{{rowcount}}";
 $(document).ready(function () {
   // Counter for row IDs
 
@@ -2331,7 +2528,8 @@ function calculateGrandTotal() {
   var shippingCharges = parseFloat($('#shipping').val());
   grandTotal += shippingCharges;
 
-
+  document.getElementById("adjust").value = 0;
+  document.getElementById("advance").value = 0;
 
 
   $('#grandtotal').val(grandTotal.toFixed(2));
@@ -2353,10 +2551,10 @@ function calculateGrandTotal() {
       <tr id='row${rowCount}'>
         <td>
           <div>
-            <select class='form-control bg-light text-dark  border-0 item_select itm' name='item[]' id='item${rowCount}'>
-              <option value=" " selected disabled>Select Item</option>
+            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}'>
+              <option value=" " selected disabled hidden>Select Item</option>
               {% for i in itm %}
-                <option value="{{i.Name}}">{{ i.Name }}</option>
+                <option class="text-black" value="{{i.Name}}">{{ i.Name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -2364,50 +2562,51 @@ function calculateGrandTotal() {
 
       
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control bg-light text-dark' name='hsn[]' readonly>
+          <input type='number' id='hsn${rowCount}' class=' text-right hsn form-control border-0 bg-transparent text-white' name='hsn[]' readonly>
         </td>
         
         <td style="width: 17%;" class='text-right'>
-          <input type='number' id='qty${rowCount}' class='text-right bg-light text-dark qty form-control' name='quantity[]' value='0'>
+          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange${rowCount}()'><br>
+          <span class="text-warning">Available Stock : <span id="stock_data${rowCount}" class=text-warning></span></span>
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='rate${rowCount}' class='text-right bg-light text-dark rate form-control' name='rate[]' value='0'>
+          <input type='number' id='rate${rowCount}' class='text-right border-0 bg-transparent text-white rate form-control' name='rate[]' value='0'>
         </td>
         
         <td style="width: 10%;" class='text-right'>
-          <input type='number' id='discount${rowCount}' class='text-right bg-light text-dark discount form-control' name='des[]' value='0'>
+          <input type='number' id='discount${rowCount}' class='text-right border-0 bg-transparent text-white discount form-control' name='desc[]' value='0'>
         </td>
         
         <td style="width: 22%;" class='text-right'>
-          <select name='tax[]'  id='tax${rowCount}' class='form-control bg-light text-dark text-right border-0 tax' onclick=' toggleDateInput()'>
-            <optgroup class="text-center" label="GST">
-                            <option value="0" selected></option>
-                            <option value="0">0% GST(0%)</option>
-                            <option value="3">3.0% GST(3%)</option>
-                            <option value="5">5.0% GST(5%)</option>
-                            <option value="12">12.0% GST(12%)</option>
-                            <option value="18">18.0% GST(18%)</option>
-                            <option value="28">28.0% GST(28%)</option>
+          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onclick=' toggleDateInput()'>
+            <optgroup class="text-center text-black" label="GST">
+                            <option class="text-black" value="0"  selected hidden>Tax Percentage</option>
+                            <option class="text-black" value="0">0% GST(0%)</option>
+                            <option class="text-black" value="3">3.0% GST(3%)</option>
+                            <option class="text-black" value="5">5.0% GST(5%)</option>
+                            <option class="text-black" value="12">12.0% GST(12%)</option>
+                            <option class="text-black" value="18">18.0% GST(18%)</option>
+                            <option class="text-black" value="28">28.0% GST(28%)</option>
                           </optgroup>
-                          <optgroup  class="text-center" label="IGST">
+                          <optgroup  class="text-center text-black" label="IGST">
                            
-                            <option value="0">0% IGST(0%)</option>
-                            <option value="3">3.0% IGST(3%)</option>
-                            <option value="5">5.0% IGST(5%)</option>
-                            <option value="12">12.0% IGST(12%)</option>
-                            <option value="18">18.0% IGST(18%)</option>
-                            <option value="28">28.0% IGST(28%)</option>             
+                            <option  class="text-black" value="0">0% IGST(0%)</option>
+                            <option  class="text-black" value="3">3.0% IGST(3%)</option>
+                            <option  class="text-black" value="5">5.0% IGST(5%)</option>
+                            <option  class="text-black" value="12">12.0% IGST(12%)</option>
+                            <option  class="text-black" value="18">18.0% IGST(18%)</option>
+                            <option  class="text-black" value="28">28.0% IGST(28%)</option>             
                             </optgroup>
           </select>
         </td>
         
         <td style="display: none;">
-          <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control bg-light text-dark taxamount" />
+          <input type="text" name='taxamount' id="taxamount${rowCount}" class="form-control border-0 bg-transparent text-white taxamount" />
         </td>
         
         <td style="width: 15%;" class='text-right'>
-          <input type='number' id='amount${rowCount}' class='text-right bg-light text-dark form-control amount' name='amount[]' value='0.00'>
+          <input type='number' id='amount${rowCount}' class='text-right border-0 bg-transparent text-white form-control amount' name='amount[]' value='0.00'>
         </td>
         
           <td class='text-center'>
@@ -2575,6 +2774,8 @@ function calculateTaxAmount() {
 
         document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
         var grandtotal = subtotal + total_taxamount + shipping;
+        document.getElementById("adjust").value = 0;
+        document.getElementById("advance").value = 0;
         document.getElementById("grandtotal").value = grandtotal.toFixed(2);
         document.getElementById("balance").value = grandtotal.toFixed(2);
     }
@@ -2690,7 +2891,7 @@ function toggleDateInput() {
                   stock=response.stock
                   hsn=response.hsn
                   document.getElementById("hsn1").value = hsn
-                  document.getElementById("stock_data").innerHTML = stock
+                  document.getElementById("stock_data1").innerHTML = stock
                   document.getElementById('rate1').value = data
 
                   if (data3 == '{{ company.state }}') {
@@ -3407,10 +3608,14 @@ function toggleDateInput() {
                   stock=response.stock
                   hsn=response.hsn
                   document.getElementById("hsn1").value = hsn
-                  document.getElementById("stock_data").innerHTML = stock
+                  document.getElementById("stock_data1").innerHTML = stock
               }
           });
 
+
+    })
+
+  $(document).ready(function () {
 
           select2 = $('#item2').val();
           customer2 = $('#customer_sel').val();
@@ -3424,28 +3629,17 @@ function toggleDateInput() {
                   cust: customer2
               },
               success: function (response) {
-                  console.log(response)
-                  data = response.rate
-                  data1 = response.gst
-                  data2 = response.igst
-                  data3 = response.pos
                   stock=response.stock
                   hsn=response.hsn
                   document.getElementById("hsn2").value = hsn
                   document.getElementById("stock_data2").innerHTML = stock
-                  document.getElementById('rate2').value = data
-
-                  if (data3 == '{{ company.state }}') {
-                      document.getElementById('tgst2').innerHTML = data1 + ' % GST';
-                      document.getElementById('tgst2').value = data1
-                  }
-                  document.getElementById('tigst2').innerHTML = data2 + ' % IGST';
-                  document.getElementById('tigst2').value = data2
 
               }
           });
 
+        })
 
+$(document).ready(function () {
           select3 = $('#item3').val();
           customer3 = $('#customer_sel').val();
           $.ajax({
@@ -3477,7 +3671,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select4 = $('#item4').val();
           customer4 = $('#customer_sel').val();
           $.ajax({
@@ -3509,7 +3705,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select5 = $('#item5').val();
           customer5 = $('#customer_sel').val();
           $.ajax({
@@ -3541,7 +3739,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select6 = $('#item6').val();
           customer6 = $('#customer_sel').val();
           $.ajax({
@@ -3573,7 +3773,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select7 = $('#item7').val();
           customer7 = $('#customer_sel').val();
           $.ajax({
@@ -3604,7 +3806,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
           select8 = $('#item8').val();
           customer8 = $('#customer_sel').val();
           $.ajax({
@@ -3636,7 +3840,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select9 = $('#item9').val();
           customer9 = $('#customer_sel').val();
           $.ajax({
@@ -3668,7 +3874,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select10 = $('#item10').val();
           customer10 = $('#customer_sel').val();
           $.ajax({
@@ -3700,7 +3908,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select11 = $('#item11').val();
           customer11 = $('#customer_sel').val();
           $.ajax({
@@ -3732,7 +3942,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select12 = $('#item12').val();
           customer12 = $('#customer_sel').val();
           $.ajax({
@@ -3763,7 +3975,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
 
           select13 = $('#item13').val();
           customer13 = $('#customer_sel').val();
@@ -3796,7 +4010,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select14 = $('#item14').val();
           customer14 = $('#customer_sel').val();
           $.ajax({
@@ -3827,7 +4043,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
 
           select15 = $('#item15').val();
           customer15 = $('#customer_sel').val();
@@ -3859,7 +4077,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
 
           select16 = $('#item16').val();
           customer16 = $('#customer_sel').val();
@@ -3891,7 +4111,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
 
           select17 = $('#item17').val();
           customer17 = $('#customer_sel').val();
@@ -3924,7 +4146,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select18 = $('#item18').val();
           customer18 = $('#customer_sel').val();
           $.ajax({
@@ -3956,7 +4180,9 @@ function toggleDateInput() {
               }
           });
 
+        })
 
+$(document).ready(function () {
           select19 = $('#item19').val();
           customer19 = $('#customer_sel').val();
           $.ajax({
@@ -3987,7 +4213,9 @@ function toggleDateInput() {
 
               }
           });
+        })
 
+$(document).ready(function () {
 
           select20 = $('#item20').val();
           customer20 = $('#customer_sel').val();
@@ -4019,7 +4247,9 @@ function toggleDateInput() {
 
               }
           });
+    })
 
+  $(document).ready(function () {
 
           select21 = $('#item21').val();
           customer21 = $('#customer_sel').val();
@@ -4039,6 +4269,7 @@ function toggleDateInput() {
           });
 
       });
+
 
 
 </script>

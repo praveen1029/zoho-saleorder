@@ -1,132 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table and Tooltip Search with Filtering</title>
-    <style>
-        /* Style for the tooltip-like list */
-        .tooltip {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            padding: 10px;
-            z-index: 1;
-            width: 200px; /* Adjust the width as needed */
-        }
-
-        /* Style for the list items in the tooltip */
-        .tooltip-item {
-            padding: 5px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
-    <div style="position: relative;">
-        <input type="text" id="searchInput" placeholder="Search by Name">
-        
-        <!-- The tooltip-like list -->
-        <div class="tooltip" id="nameTooltip">
-            <div class="tooltip-item">John</div>
-            <div class="tooltip-item">Mary</div>
-            <div class="tooltip-item">David</div>
-            <div class="tooltip-item">Alice</div>
-            <div class="tooltip-item">Bob</div>
-        </div>
-    </div>
-    
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Additional Column</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>John</td>
-                <td>123</td>
-            </tr>
-            <tr>
-                <td>Mary</td>
-                <td>456</td>
-            </tr>
-            <tr>
-                <td>David</td>
-                <td>789</td>
-            </tr>
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
+  <select id="mySelect">
+    <option value="option1" hidden>Option 0</option>
+    <option value="option1">Option 1</option>
+    <option value="option2">Option 2</option>
+    <option value="option3">Option 3</option>
+  </select>
+  
+  <button onclick="selectOptionByIndex(1)">Select Option 2</button>
+  <button onclick="selectOptionByValue('option3')">Select Option 3</button>
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const nameTooltip = document.getElementById('nameTooltip');
-        const dataTable = document.getElementById('dataTable');
-        const tableBody = dataTable.getElementsByTagName('tbody')[0];
-        const initialTableData = [...tableBody.querySelectorAll('tr')];
-    
-        searchInput.addEventListener('input', showTooltip);
-        nameTooltip.addEventListener('click', filterTable);
-    
-        function showTooltip() {
-            const searchText = searchInput.value.toLowerCase();
-    
-            // Show the tooltip if there's text in the input
-            if (searchText.length > 0) {
-                nameTooltip.style.display = 'block';
-                nameTooltip.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + 'px';
-                nameTooltip.style.left = searchInput.offsetLeft + 'px';
-            } else {
-                nameTooltip.style.display = 'none';
-                // If search input is empty, restore the initial table
-                restoreInitialTable();
-            }
-    
-            // Filter the tooltip items based on the input
-            const items = nameTooltip.getElementsByClassName('tooltip-item');
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const itemName = item.textContent.toLowerCase();
-                if (itemName.includes(searchText)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        }
-    
-        function filterTable(event) {
-            if (event.target.classList.contains('tooltip-item')) {
-                const selectedName = event.target.textContent.toLowerCase();
-                const rows = tableBody.getElementsByTagName('tr');
-    
-                // Loop through table rows and hide/show based on selected name
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i];
-                    const cell = row.getElementsByTagName('td')[0];
-                    if (cell && cell.textContent.toLowerCase() === selectedName) {
-                        row.style.display = 'table-row';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
-    
-                // Hide the tooltip after selecting
-                nameTooltip.style.display = 'none';
-            }
-        }
-    
-        function restoreInitialTable() {
-            // Restore all rows to the initial state
-            initialTableData.forEach((row) => {
-                row.style.display = 'table-row';
-            });
-        }
-    </script>
-    
-    
+  <script>
+    function selectOptionByIndex(index) {
+      document.getElementById('mySelect').value = document.getElementById('mySelect').options[0].value;
+    }
+
+    function selectOptionByValue(value) {
+      document.getElementById('mySelect').value = value;
+    }
+  </script>
 </body>
 </html>

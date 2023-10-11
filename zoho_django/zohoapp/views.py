@@ -3382,14 +3382,14 @@ def add_sales_order(request):
                 file="/static/images/alt.jpg"
 
             tc=request.POST['ter_cond']
-            product=request.POST.getlist('item[]')
-            hsn=request.POST.getlist('hsn[]')
-            quantity=request.POST.getlist('quantity[]')
-            rate=request.POST.getlist('rate[]')
-            desc=request.POST.getlist('desc[]')
-            tax=request.POST.getlist('tax[]')
-            total=request.POST.getlist('amount[]')
-            adjust=request.POST.getlist('adjust')
+            product=tuple(request.POST.getlist('item[]'))
+            hsn=tuple(request.POST.getlist('hsn[]'))
+            quantity=tuple(request.POST.getlist('quantity[]'))
+            rate=tuple(request.POST.getlist('rate[]'))
+            desc=tuple(request.POST.getlist('desc[]'))
+            tax=tuple(request.POST.getlist('tax[]'))
+            total=tuple(request.POST.getlist('amount[]'))
+            adjust=(request.POST.getlist('adjust'))
             adjust = float(adjust[0])
 
             if 'Draft' in request.POST:
@@ -3481,7 +3481,7 @@ def edit_sales_order(request,id):
         term=request.POST['term']
         sales.terms = payment_terms.objects.get(id=term)
         sales.sales_date = request.POST['sa_date']
-        sales.shipdate=request.POST['sh_date']
+        sales.ship_date=request.POST['sh_date']
         sales.cxnote = request.POST['customer_note']
         sales.igst = request.POST['igst']
         sales.cgst = request.POST['cgst']
@@ -3547,8 +3547,8 @@ def edit_sales_order(request,id):
         "unit":unit,
         "reford":(last_record.id)+1,
         "sales":sale,
-        "purchase":purchase
-
+        "purchase":purchase,
+        "rowcount":len(salesitem)
 
     }
     return render(request,'edit_sale_page.html',context)
@@ -10624,7 +10624,11 @@ def cust_Attach_files(request,id):
 def sales_order(request):
     company = company_details.objects.get(user = request.user)
     data = SalesOrder.objects.all()
-    return render(request, 'sales_order.html', {'data':data, 'company': company})
+    name_list =[]
+    for item in data :
+        if item.customer.customerName[3:] not in name_list:
+            name_list.append(item.customer.customerName[3:])
+    return render(request, 'sales_order.html',{'data':data, 'company': company,'name_list':name_list})
     
     
 def sales_summery(request):

@@ -5,7 +5,31 @@
 
 <style>
 
+        /* Style for the tooltip-like list */
+        #nameTooltip {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 10px;
+            z-index: 1;
+            width: 200px; /* Adjust the width as needed */
+            color: black;
+            margin-top: 1vh;
+  border-radius: 1vh;
 
+        }
+
+        /* Style for the list items in the tooltip */
+        .tooltip-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .tooltip-item:hover {
+          background-color: #555;
+          color: white;
+        }
 
 
   .daterangepicker{
@@ -28,7 +52,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 1vh;
             margin-left: 2vh;
         } 
   }
@@ -36,7 +60,11 @@
   #reportrange span, #selectedEndDate, .daterangepicker .ranges ul li {
     font-size: 14px; /* Adjust the font size as needed */
   }
+  #nameTooltip .scrollable-tooltip {
+  max-height: 130px; /* Maximum height for the tooltip */
+  overflow-y: auto; /* Add vertical scrollbar when content overflows */
 
+}
 
 
 </style>
@@ -70,35 +98,46 @@
 
 </div>
 
-<div class="row">
-  <div class="col-md-3"><br><br>
+
     <input class="form-control text-black" type="text" id="searchInput" placeholder="Search by Name">
     
     <!-- The tooltip-like list -->
-    <div class="tooltip" id="nameTooltip">
+    <div id="nameTooltip" >
+      <div class="scrollable-tooltip">
       {% for name in name_list %}
         <div class="tooltip-item">{{name}}</div>
-      {% endfor %}
+        {% endfor %}
+        <div class="tooltip-item ">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
+        <div class="tooltip-item">Abi</div>
     </div>
-  </div>
+    </div>
 
-</div>
-<div id="demo"><p></p></div>
-<div class="container-fluid" id="container-to-print"> 
-  <div class="row pt-5">
-    <center>
-      <div class="col-md-4">
-        {% if company.company_name != None %}
-          <a class="text" style="font-size: 1rem; color: white;">{{ company.company_name }}</a><br>
-        {% else %}
-          <a class="text" style="font-size: 1rem; color: white;">Add Company</a><br>
-        {% endif %}
-        <a class="text" style="font-size: 1.5rem; color: white;">Sale Order</a><br>
-        <h5 class="text" id="selectedEndDate"></h5><br>
-      </div>
-    </center>   
-  </div> 
 
+    <div class="container-fluid" id="container-to-print"> 
+      <div class="row pt-5">
+        <center>
+          <div class="col-md-4">
+            {% if company.company_name != None %}
+            <a class="text" style="font-size: 1rem; color: white;">{{ company.company_name }}</a><br>
+            {% else %}
+            <a class="text" style="font-size: 1rem; color: white;">Add Company</a><br>
+            {% endif %}
+            <a class="text" style="font-size: 1.5rem; color: white;">Sale Order</a><br>
+            <h5 class="text" id="selectedEndDate"></h5><br>
+          </div>
+        </center>   
+      </div> 
+      
+      <div id="demo"><p></p></div>
 
   <div style="overflow-x: auto; overflow-x: hidden;">
     <div class="row pt-2">
@@ -302,54 +341,59 @@ $('body').removeClass("printingContent");
   </script>
 
 <script>
-  nameTooltip.style.display = 'block';
   const searchInput = document.getElementById('searchInput');
   const nameTooltip = document.getElementById('nameTooltip');
   const dataTable = document.getElementById('myTable');
   const tableBody = dataTable.getElementsByTagName('tbody')[0];
   const initialTableData = [...tableBody.querySelectorAll('tr')];
-  
-  searchInput.addEventListener('input', showTooltip);
-  nameTooltip.addEventListener('click', filterTable);
-  
-  function showTooltip() {
-    const searchText = searchInput.value.toLowerCase();
-    
-    // Show the tooltip if there's text in the input
-    if (searchText.length > 0) {
-      nameTooltip.style.display = 'block';
-      document.getElementById("demo").innerHTML=searchText
-          nameTooltip.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + 'px';
-          nameTooltip.style.left = searchInput.offsetLeft + 'px';
-      } else {
-          nameTooltip.style.display = 'none';
-          // If search input is empty, restore the initial table
-          restoreInitialTable();
-      }
 
-      // Filter the tooltip items based on the input
-      const items = nameTooltip.getElementsByClassName('tooltip-item');
-      for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          const itemName = item.textContent.toLowerCase();
-          if (itemName.includes(searchText)) {
-              item.style.display = 'block';
-          } else {
-              item.style.display = 'none';
-          }
-      }
+  searchInput.addEventListener('click', showTooltip);
+  searchInput.addEventListener('keyup', filterTooltip);
+  nameTooltip.addEventListener('click', filterTable);
+
+  function showTooltip(){
+      nameTooltip.style.display = 'block';
   }
+
+  function filterTooltip() {
+            const searchText = searchInput.value.toLowerCase();
+    
+            // Show the tooltip if there's text in the input
+            if (searchText.length > 0) {
+                nameTooltip.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + 'px';
+                nameTooltip.style.left = searchInput.offsetLeft + 'px';
+            } else {
+              nameTooltip.style.display = 'block';
+                // If search input is empty, restore the initial table
+                restoreInitialTable();
+            }
+    
+            // Filter the tooltip items based on the input
+            const items = nameTooltip.getElementsByClassName('tooltip-item');
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const itemName = item.textContent.toLowerCase();
+                if (itemName.includes(searchText)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        }
 
   function filterTable(event) {
       if (event.target.classList.contains('tooltip-item')) {
-          const selectedName = event.target.textContent.toLowerCase();
+        searchInput.value = event.target.textContent
+        const selectedName = event.target.textContent.toLowerCase();
+        document.getElementById("demo").innerHTML = selectedName
+
           const rows = tableBody.getElementsByTagName('tr');
 
           // Loop through table rows and hide/show based on selected name
           for (let i = 0; i < rows.length; i++) {
               const row = rows[i];
-              const cell = row.getElementsByTagName('td')[0];
-              if (cell && cell.textContent.toLowerCase() === selectedName) {
+              const cell = row.getElementsByTagName('td')[2];
+              if (cell.textContent.slice(3,).toLowerCase() === selectedName) {
                   row.style.display = 'table-row';
               } else {
                   row.style.display = 'none';
@@ -367,6 +411,17 @@ $('body').removeClass("printingContent");
           row.style.display = 'table-row';
       });
   }
+
+  // Close the tooltip when clicking outside of it
+document.addEventListener("click", function(event) {
+  const tooltip = document.getElementById("nameTooltip");
+  if (event.target != tooltip) {
+    if(event.target != document.getElementById("searchInput")){
+
+      tooltip.style.display ="none";
+    }
+  }
+});
 </script>
 
 {% endblock content %}
