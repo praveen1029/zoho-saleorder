@@ -2263,20 +2263,34 @@ def itemdata(request):
     company = company_details.objects.get(user = user)
     id = request.GET.get('id')
     cust = request.GET.get('cust')
-    item = AddItem.objects.get(Name=id)
     cus=customer.objects.get(id=cust)
-    rate = item.s_price
-    place=company.state
-    gst = item.intrastate
-    igst = item.interstate
-    desc=item.s_desc
-    mail=cus.customerEmail
-    stock=item.stock
-    hsn=item.hsn
-    place_of_supply = customer.objects.get(id=cust).placeofsupply
-    return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
-                         'stock':stock,'hsn':hsn})
-    
+
+    try:
+        item = AddItem.objects.get(Name=id)
+        rate = item.s_price
+        place=company.state
+        gst = item.intrastate
+        igst = item.interstate
+        desc=item.s_desc
+        mail=cus.customerEmail
+        stock=item.stock
+        hsn=item.hsn
+
+        place_of_supply = customer.objects.get(id=cust).placeofsupply
+        return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
+                            'stock':stock,'hsn':hsn})
+    except AddItem.DoesNotExist:
+        rate = 0
+        place=''
+        gst = 0
+        igst = 0
+        desc=0
+        mail=''
+        stock=0
+        hsn=0
+        place_of_supply = customer.objects.get(id=cust).placeofsupply
+        return JsonResponse({"status":" not",'mail':mail,'desc':desc,'place':place,'rate':rate,'pos':place_of_supply,'gst':gst,'igst':igst,
+                            'stock':stock,'hsn':hsn})
 
 def deleteestimate(request,est_id):
     user = request.user
@@ -2403,7 +2417,7 @@ def add_account_est(request):
 def customerdata(request):
     customer_id = request.GET.get('id')
     cust = customer.objects.get(id=customer_id)
-    data7 = {'email': cust.customerEmail,'gstno':cust.GSTIN,'place':cust.placeofsupply}
+    data7 = {'email': cust.customerEmail,'gstno':cust.GSTIN,'place':cust.placeofsupply,'gsttreat':cust.GSTTreatment}
     return JsonResponse(data7)
 
 
@@ -6738,7 +6752,6 @@ def purchase_item(request):
         name=request.POST['name']
         ut=request.POST['unit']
         hsn=request.POST['hsn']
-        stock=request.POST['stock']
         inter=request.POST['inter']
         intra=request.POST['intra']
         sell_price=request.POST.get('sell_price')
@@ -6747,6 +6760,10 @@ def purchase_item(request):
         cost_price=request.POST.get('cost_price')
         cost_acc=request.POST.get('cost_acc')      
         cost_desc=request.POST.get('cost_desc')
+        invasset=request.POST.get('invasset')
+        opening_stock=request.POST.get('opening_stock')
+        opening_stock_unit=request.POST.get('opening_stock_unit')
+        active_type=request.POST.get('active_type')
         units=Unit.objects.get(id=ut)
         sel=Sales.objects.get(id=sell_acc)
         cost=Purchase.objects.get(id=cost_acc)
@@ -6754,8 +6771,9 @@ def purchase_item(request):
         history="Created by " + str(request.user)
         user = User.objects.get(id = request.user.id)
 
-        item=AddItem(type=type,hsn=hsn,stock=stock,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,p_price=cost_price,
-                    user=user,creat=history,interstate=inter,intrastate=intra)
+        item=AddItem(type=type,hsn=hsn,unit=units,sales=sel,purchase=cost,Name=name,p_desc=cost_desc,s_desc=sell_desc,s_price=sell_price,
+                    p_price=cost_price,user=user,creat=history,interstate=inter,intrastate=intra,invacc=invasset,stock=opening_stock,
+                    rate=opening_stock_unit,satus=active_type,status_stock=active_type)
 
         item.save()
         return HttpResponse({"message": "success"})

@@ -152,6 +152,13 @@
       </div>
     </div>
 
+    <div class="row mt-2" id="treatmentdiv" style="display:none;">
+      <div class="col-md-9 d-flex">
+        <label for="" style="width: 52%;">GST Treatment</label>
+        <input type="text" class="form-control bg-light text-dark"   id="cx_treat" name="cx_treat" readonly>
+      </div>
+    </div>
+
     <div class="row mt-2">
       <div class="col-md-3">
         <label for="prof_name" >Sales Order</label>
@@ -408,45 +415,45 @@
             <td>Sub Total</td>
             <td></td>
             <td><input type="number" id="subtotal" name="subtotal" step="any" value="0.00" 
-                       class="form-control bg-transparent border-0 text-right subtotal text-white" readonly></td>
+                       class="form-control bg-transparent border-0 text-right subtotal text-white" style="text-align: right;" readonly></td>
           </tr>
           <tr style="display: none;" id="tr_igst">
             <td>IGST</td>
             <td></td>
             <td><input type="number" id='igst' name="igst" step="any" value="0.00"
-                       class="form-control bg-transparent border-0 text-right igst  text-white" readonly></td>
+                       class="form-control bg-transparent border-0 text-right igst  text-white" style="text-align: right;"  readonly></td>
           </tr>
           <tr style="display: none;" id="tr_cgst">
             <td>CGST</td>
             <td></td>
             <td><input type="number" id='cgst' name="cgst" step="any" value="0.00"
-                       class="form-control bg-transparent border-0 text-right cgst text-white" readonly></td>
+                       class="form-control bg-transparent border-0 text-right cgst text-white" style="text-align: right;"  readonly></td>
           </tr>
           <tr style="display: none;" id="tr_sgst">
             <td>SGST</td>
             <td></td>
             <td><input type="number" id='sgst' name="sgst" step="any" value="0.00"
-                       class="form-control bg-transparent border-0 text-right sgst  text-white" readonly></td>
+                       class="form-control bg-transparent border-0 text-right sgst  text-white" style="text-align: right;"  readonly></td>
           </tr>
           <tr>
             <td>Tax Amount</td>
             <td></td>
             <td><input type="number" id="total_taxamount" name="totaltax" step="any" value="0.00" 
-                       class="total_taxamount form-control bg-transparent border-0 text-right  text-white" readonly></td>
+                       class="total_taxamount form-control bg-transparent border-0 text-right  text-white" style="text-align: right;"  readonly></td>
           </tr>
           <tr>
               <td>Shipping Charges</td>
               <td><input type="hidden" id="shipping_charge"  step="any" value="0.00" 
-                  class="form-control bg-transparent border-0 text-right shipping_charge  "></td>
+                  class="form-control bg-transparent border-0 text-right shipping_charge  "  style="text-align: right;" ></td>
               <td>
-                <input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="0" name="shipping_charge">
+                <input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="0" name="shipping_charge" style="text-align: right;" >
               </td>
           </tr>
             <tr>
               <td>Adjustment</td>
               <td></td>
               <td>
-                <input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0" name="adjust"> 
+                <input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="0" name="adjust" style="text-align: right;" > 
               </td>
           </tr>
           <tr>
@@ -458,7 +465,7 @@
               <th>Total ( &#x20B9; )</th>
               <th></th>
               <th><input type="number" id="grandtotal" name="t_total" step="any" value="0.00" 
-                         class="form-control bg-transparent border-0 text-right grandtotal  text-white" readonly></th>
+                         class="form-control bg-transparent border-0 text-right grandtotal  text-white" style="text-align: right;"  readonly></th>
           </tr>
         </table>
 
@@ -468,14 +475,14 @@
                 <td>Advance Paid</td>
                 <td></td>
                 <td><input type="number" id="advance" name="advance" step="any" value="0.00"
-                           class="form-control bg-transparent border-0 text-right advance text-white"></td>
+                           class="form-control bg-transparent border-0 text-right advance text-white" style="text-align: right;" ></td>
             </tr>
             <tr>
                 <td>Balance</td>
                 <td></td>
                 <td>
                   <input type="number" id='balance' name="balance" step="any" value="0.00"
-                         class="form-control bg-transparent border-0 text-right balance  text-white" readonly>
+                         class="form-control bg-transparent border-0 text-right balance  text-white" style="text-align: right;"  readonly>
                   <div style="color: red; display: none;" id="advancediv">Advance is greater than Total</div>
                 </td>
             </tr>
@@ -1139,20 +1146,11 @@
 
               <div class="row mt-2">
                 <div class="col-md-3 ">
-                  <label for="">HSN</label>
+                  <label for="">HSN Code</label>
                 </div>
                 <div class="col-md-6">
                   <input type="number" class="form-control bg-light text-dark" id="hsn" name="hsn" required>
                   <label id="hsn_war" style="display: none;"></label>
-                </div>
-              </div>
-
-              <div class="row mt-2">
-                <div class="col-md-3 ">
-                  <label for="">Stock</label>
-                </div>
-                <div class="col-md-6">
-                  <input type="number" class="form-control bg-light text-dark" id="stock" name="stock" required>
                 </div>
               </div>
 
@@ -1291,6 +1289,62 @@
                   <input  type="text" name="cost_desc" class="form-control bg-light text-dark"  id="cost_desc">
                 </div>
 
+              </div> <br>
+
+              <div class="col-md-5">
+                <input type="checkbox" id="track" onclick="trackinventory()">  Track Inventory for this item
+              </div>
+
+              <div class="row mt-2 " id="trackdiv1" style="display: none;">
+                <div class="d-flex">
+                  <div class="col-md-4">
+                    <label for="name" >Inventory Account *</label>
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-control bg-light text-dark" id="invasset" name="invasset" required>
+                      <option value="0" hidden> Choose ..</option>
+                      <option value="inventory assets">Inventory Asset</option>
+                    </select>    
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2 " id="trackdiv2" style="display: none;">
+                <div class="d-flex">
+                  <div class="col-md-4">
+                    <label for="name" >Opening Stock </label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="opening_stock" name="opening_stock" value="0" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2 " id="trackdiv3" style="display: none;">
+                <div class="d-flex">
+                  <div class="col-md-4">
+                    <label for="name" >Opening Stock Rate per unit</label>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control bg-light text-dark" id="opening_stock_unit" name="opening_stock_unit" value="0" required>  
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2" id="trackdiv4" style="display: none;">
+                <div class="col-md-4 mr-0">
+                  <label class="col-form-label p-0">Activation Type</label>
+                </div>
+                <div class="col-md-7 ml-0 d-flex">
+                  <div class="mx-5 ">
+                    <input type="radio" id="active" name="activation" value="active" >
+                    <label>Active</label>
+                  </div>
+                  <div class="mx-5 ">
+                    <input type="radio" id="nonactive" name="activation" value="nonactive" >
+                    <label>Non-Active</label>
+                  </div>
+                </div>
               </div>
 
               <div class="row mt-3">
@@ -1444,6 +1498,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script>
+ function trackinventory(){
+  $("#trackdiv1").toggle();
+  $("#trackdiv2").toggle();
+  $("#trackdiv3").toggle();
+  $("#trackdiv4").toggle();
+  document.getElementById("invasset").value="0"
+  document.getElementById("opening_stock").value=0
+  document.getElementById("opening_stock_unit").value=0
+  document.getElementById("active").checked=false
+  document.getElementById("nonactive").checked=false
+ }
+</script>
 
 <script>
 
@@ -1689,8 +1757,8 @@
     $("#adjust").change(function() {
       var x=$('#adjust').val();
         total = document.getElementById("grandtotal").value
-        document.getElementById("grandtotal").value=total-x
-        document.getElementById("balance").value=total-x
+        document.getElementById("grandtotal").value=parseFloat(total) + parseFloat(x)
+        document.getElementById("balance").value=parseFloat(total) + parseFloat(x)
     });
   });
 </script>
@@ -2133,16 +2201,23 @@ $(document).on("click","#itemSave",function(){
   else{
     itemtype = $('#item_type2').val();
   }
-
+  
   if ($('input[name="radioOption1"]:checked').val() == 'Taxable'){
-      inter = $('#inter').val();
-      intra = $('#intra').val();
-    }
+    inter = $('#inter').val();
+    intra = $('#intra').val();
+  }
   else{
     inter = 0;
     intra = 0;
   }
+  
+  if ($('input[name="activation"]:checked').val() == 'active'){
 
+      active_type = "active"
+    }
+  else{
+    active_type = "nonactive"
+  }
 
   
   $.ajax({
@@ -2155,7 +2230,6 @@ $(document).on("click","#itemSave",function(){
         name : $("#item_name").val(),
         unit : $("#item_units").val(),
         hsn : $("#hsn").val(),
-        stock : $("#stock").val(),
         inter : inter,
         intra : intra,
         sell_price : $("#sell_price").val(),
@@ -2164,6 +2238,10 @@ $(document).on("click","#itemSave",function(){
         cost_acc : $("#cost_acc").val(),
         sell_desc : $("#sell_desc").val(),
         cost_desc : $("#cost_desc").val(),
+        active_type : active_type,
+        invasset : $("#invasset").val(),
+        opening_stock : $("#opening_stock").val(),
+        opening_stock_unit : $("#opening_stock_unit").val(),
         
         csrfmiddlewaretoken: '{{ csrf_token }}'
         
@@ -2260,12 +2338,17 @@ function reloadAccount() {
           data7 = response.email
           data_gst = response.gstno
           place = response.place
+          gsttreat = response.gsttreat
           document.getElementById('cx_mail').value = data7
           if(data_gst == ""){
             document.getElementById('gstdiv').style.display = "none"
+            document.getElementById('treatmentdiv').style.display = "block"
+           document.getElementById('cx_treat').value = gsttreat
           }else{
             document.getElementById('gstdiv').style.display = "block"
+            document.getElementById('treatmentdiv').style.display = "block"
             document.getElementById('cx_gst').value = data_gst
+            document.getElementById('cx_treat').value = gsttreat
           }
 
           var selectElement = document.getElementById("srcofsupply");

@@ -125,6 +125,11 @@
             text-align: left; /* Optional: Adjust text alignment */
         }
 
+        #productinfo{
+          max-height: 100%; /* Maximum height for the tooltip */
+  overflow-y: auto; 
+        }
+
         tr.clickable {
             cursor: pointer;
         }
@@ -143,9 +148,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            margin-left: 2vh;
         } 
     }
+
+    .scrollable-table {
+  max-height: 80%; /* Maximum height for the tooltip */
+  overflow-y: auto; /* Add vertical scrollbar when content overflows */
+        }
+
                   </style>
     
 <section >
@@ -169,7 +179,7 @@
               <div class="dropdown-menu m-1">
                 <a class="dropdown-item" href="{% url 'sales_order_det' sale.id %}">All</a>
                 <a class="dropdown-item" onclick="sortTable()">Customer Name</a>
-                <a class="dropdown-item" onclick="sortTablebal()">Balance</a>
+                <a class="dropdown-item" onclick="sortTablebal()">Total</a>
               </div>
             </div>
           </div>
@@ -178,27 +188,31 @@
             <a style="width: 4rem;height: 2rem; width: fit-content;" class="btn btn btn-outline-warning text-right px-3 py-2 mt-1" href="{% url 'create_sales_order' %}"><i class="fa fa-plus "></i>New</a>
           </div>
           </div>   
-          <table class="table  text-white" id="myTable">
+
+          <div class="scrollable-table">
+            <table class="table  text-white" id="myTable">
             
-            <tbody>
-              {% for i in sale_order %}
-     
-              <tr class="clickable" id="{{i.id}}">
-     
-                <td class="justify-content-between align-items-center ">
-                  {{i.sales_no}}<br><br>
-                      <label>{{i.customer.customerName}} </label>
-                </td>
-                <td><br><br>
-                    <label class="text-end d-block">₹{{i.grandtotal}}</label>
-                    
-                </td>
-              </tr>
-             
-              {% endfor %}
-             
-            </tbody>
-          </table>
+              <tbody>
+                {% for i in sale_order %}
+       
+                <tr class="clickable" id="{{i.id}}">
+       
+                  <td class="justify-content-between align-items-center ">
+                    {{i.sales_no}}<br><br>
+                        <label>{{i.customer.customerName}} </label>
+                  </td>
+                  <td><br><br>
+                      <label class="text-end d-block">₹{{i.grandtotal}}</label>
+                      
+                  </td>
+                </tr>
+               
+                {% endfor %}
+               
+              </tbody>
+            </table>
+          </div>
+
        
         </div> 
 
@@ -230,11 +244,11 @@
                <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
                 <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
               </a>
-              <a class="  text-dark" >
-                <button class="btn btn-outline-warning"  title="Pdf" onclick="exportToPDF()"><i class="fas fa-file-pdf-o"></i></button>
+              <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
+                <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
               </a>
 
-              <a class=" text-dark" href="" onclick="printSelectedArea(1)"  >
+              <a class=" text-dark" href="" onclick="printSelectedArea()"  >
                 <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
                 </button> 
                </a>
@@ -244,8 +258,8 @@
             <div class="tab-content pt-2 m-2 mb-5" style="background-color: rgba(252, 236, 217, 0.8); overflow-y: scroll;height: 600px;width: 100%;">
               <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
                   <div class="row">
-                      <div class="col-md-6" style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0;" >
-                          <div class="overview text-dark" style="background-color: #ffddb0;" >
+                      <div class="col-md-6" style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0; border-radius: 1vh;" >
+                          <div class="overview text-dark" style="background-color: #ffddb0;" ><br>
                               <h2 class="text-dark" style="text-transform: uppercase;">Sales Order</h2>
                               
                               <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
@@ -378,9 +392,9 @@
                       </div>
                       <div class="col-md-6" style="height: 100%;">
                           <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
-                          <div class="card" style="background-color:#8b3131; padding:1rem;">
-                              <div class="row">
-                                  <div class="card-title h2">PRODUCT INFORMATION
+                          <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem; height: 100vh;">
+                              <div class="row" >
+                                  <div class="card-title h2" >PRODUCT INFORMATION
                                   </div>
                                       <table class="table table-responsive" id="producttable">
                                         <tbody>
@@ -405,11 +419,14 @@
                                             <td>:</td>
                                             <td>{{i.tax}}</td>
                                           </tr>
-                                          <tr style="border-bottom: solid; border-bottom-width: thin; ">
+                                          <tr >
                                             <td>Product Total</td>
                                             <td>:</td>
                                             <td>{{i.total}}
                                             </td>
+                                          </tr>
+                                          <tr style="border-bottom: solid; border-bottom-width: thin; ">
+                                            <td></td>
                                           </tr>
                                           {% endfor %}
                                         </tbody>
@@ -438,7 +455,7 @@
             <div class="col-md-6" >
               <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: white; color: black;"><i class="fas fa-eye"></i> Overview</a>
               <a class="btn" style="background-color: chocolate; margin-left: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
-              {% if sale.status == "DRAFT" %}
+              {% if sale.status == "draft" %}
               <a href="{% url 'convert_view' sale.id %}" class="btn btn-outline-warning" style="margin-left: 2vh;"><i class="fa fa-exchange" aria-hidden="true"></i>Convert</a>
               {% endif %}
             </div>
@@ -460,7 +477,7 @@
             <a href="{% url 'export_sales_pdf' sale.id %}" class="  text-dark" >
               <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
             </a>
-            <a class=" text-dark"  onclick="printSelectedArea(2)"  >
+            <a class=" text-dark"  onclick="printSelectedArea()"  >
               <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
               </button> 
              </a>
@@ -578,18 +595,7 @@
 
 <script>
   function printSelectedArea(area){
-    if(area==1){
-      var printContents = document.getElementById("overview").innerHTML;
-
-var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
-$printerDiv.html(printContents); // add the content to be printed
-$('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
-
-window.print(); // call print
-$printerDiv.remove(); // remove the div
-$('body').removeClass("printingContent");
-    }
-    if(area==2){
+      
       var printContents = document.getElementById("selected-area").innerHTML;
       document.getElementById("selected-area").style.backgroundColor = "white"
 var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
@@ -600,17 +606,7 @@ window.print(); // call print
 $printerDiv.remove(); // remove the div
 $('body').removeClass("printingContent");
       
-    }
   }
-</script>
-
-<script>
-      function exportToPDF(){
-        var content = document.getElementById('overview');
-        html2pdf()
-        .from(content)
-        .save('sales_order.pdf')
-    }
 </script>
 
 <script>

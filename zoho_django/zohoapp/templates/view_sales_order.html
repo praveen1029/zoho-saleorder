@@ -31,8 +31,8 @@
             </a>
             <div class="dropdown-menu m-1">
               <a class="dropdown-item" href="{% url 'view_sales_order_all' %}">All</a>
-              <a class="dropdown-item" onclick="sortTable(2)">Customer Name</a>
-              <a class="dropdown-item" onclick="sortTable(6)">Balance</a>
+              <a class="dropdown-item" onclick="sortTableName()">Customer Name</a>
+              <a class="dropdown-item" onclick="sortTableTotal()">Total</a>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@
 
 <script>
   // Function to sort the table by the selected column
-  function sortTable(columnIndex) {
+  function sortTableName() {
     var table, rows, switching, i, x, y, shouldSwitch;
     table = document.getElementById("myTable");
     switching = true;
@@ -106,9 +106,32 @@
       rows = table.rows;
       for (i = 1; i < rows.length - 1; i++) {
         shouldSwitch = false;
-        x = rows[i].getElementsByTagName("td")[columnIndex];
-        y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+        x = rows[i].getElementsByTagName("td")[2];
+        y = rows[i + 1].getElementsByTagName("td")[2];
         if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+      if (shouldSwitch) {
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+      }
+    }
+  }
+
+  function sortTableTotal() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("td")[4];
+        y = rows[i + 1].getElementsByTagName("td")[4];
+        if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
           shouldSwitch = true;
           break;
         }

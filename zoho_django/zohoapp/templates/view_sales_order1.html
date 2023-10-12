@@ -1,26 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-</head>
-<body>
-  <select id="mySelect">
-    <option value="option1" hidden>Option 0</option>
-    <option value="option1">Option 1</option>
-    <option value="option2">Option 2</option>
-    <option value="option3">Option 3</option>
-  </select>
-  
-  <button onclick="selectOptionByIndex(1)">Select Option 2</button>
-  <button onclick="selectOptionByValue('option3')">Select Option 3</button>
-
   <script>
-    function selectOptionByIndex(index) {
-      document.getElementById('mySelect').value = document.getElementById('mySelect').options[0].value;
-    }
-
-    function selectOptionByValue(value) {
-      document.getElementById('mySelect').value = value;
+    function toggleDiv() {
+      var div = document.getElementById('myDiv');
+      var checkbox = document.getElementById('myCheckbox');
+      
+      if (checkbox.checked) {
+        div.style.display = 'block';
+      } else {
+        div.style.display = 'none';
+      }
     }
   </script>
+</head>
+<body>
+  <input type="checkbox" id="myCheckbox" onclick="toggleDiv()"> Show/Hide Div
+  <div id="myDiv" style="display: none;">
+    This is the content of the div.
+  </div>
 </body>
 </html>

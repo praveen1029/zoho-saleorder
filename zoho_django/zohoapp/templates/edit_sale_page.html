@@ -146,6 +146,21 @@
           <input type="email" class="form-control bg-light text-dark"   id="cx_mail" name="cx_mail" value="{{sale.customer.customerEmail}}" readonly>
         </div>
       </div>
+
+      <div class="row mt-2" id="gstdiv" style="display:none;">
+        <div class="col-md-9 d-flex">
+          <label for="" style="width: 52%;">GST Number</label>
+          <input type="text" class="form-control bg-light text-dark"   id="cx_gst" name="cx_gst" readonly>
+        </div>
+      </div>
+  
+      <div class="row mt-2" id="treatmentdiv" style="display:none;">
+        <div class="col-md-9 d-flex">
+          <label for="" style="width: 52%;">GST Treatment</label>
+          <input type="text" class="form-control bg-light text-dark"   id="cx_treat" name="cx_treat" readonly>
+        </div>
+      </div>
+
       <div class="row mt-2">
         <div class="col-md-3">
           <label for="prof_name" >Sales Order</label>
@@ -339,7 +354,7 @@
                               name='item[]' id='item{{forloop.counter}}'>
                               <option selected value="{{i.product}}" hidden>{{i.product}}</option>
                               {% for j in itm %}
-                                <option value="{{j.Name}}">{{ j.Name  }} </option>
+                                <option class="text-black" value="{{j.Name}}">{{ j.Name  }} </option>
                               {% endfor %}
                           </select></div>
                   </td>
@@ -350,8 +365,8 @@
                    
                   <td style="width: 17%;" class='text-right'><input type='number' id='qty{{forloop.counter}}'
                           class=' text-right qty form-control border-0 bg-transparent text-white' name='quantity[]'
-                          value='{{i.quantity}}' style="margin-top: 4vh;"><br>
-                          <span class="text-warning">Available Stock : <span id="stock_data{{forloop.counter}}" class="text-warning"></span></span>
+                          value='{{i.quantity}}' style="margin-top: 4vh;" onchange="qtychange(this.id)"><br>
+                          <span class="text-warning">Available Stock : <span id="stock_data{{forloop.counter}}" class="text-warning">{{saleitm.stock}}</span></span>
                   </td>
                   <td style="width: 15%;" class='text-right'><input type='number' id='rate{{forloop.counter}}'
                           class=' text-right rate form-control border-0 bg-transparent text-white' name='rate[]'
@@ -420,43 +435,43 @@
                     <td>Sub Total</td>
                     <td></td>
                     <td><input type="number" id="subtotal" name="subtotal" step="any" value="0.00"
-                            class="bg-transparent border-0 text-right subtotal text-white" readonly></td>
+                            class="form-control bg-transparent border-0  text-white"  style="text-align:right;" readonly></td>
                 </tr>
                 <tr style="display: none;" id="tr_igst">
                     <td>IGST</td>
                     <td></td>
                     <td><input type="number" id='igst' name="igst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right igst  text-white"readonly ></td>
+                            class="form-control bg-transparent border-0 text-right igst  text-white" style="text-align: right;"  readonly ></td>
                 </tr>
                 <tr style="display: none;" id="tr_cgst">
                     <td>CGST</td>
                     <td></td>
                     <td><input type="number" id='cgst' name="cgst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right cgst text-white" ></td>
+                            class="form-control bg-transparent border-0 text-right cgst text-white" style="text-align: right;"  ></td>
                 </tr>
                 <tr style="display: none;" id="tr_sgst">
                     <td>SGST</td>
                     <td></td>
                     <td><input type="number" id='sgst' name="sgst" step="any" value="0.00"
-                            class="form-control bg-transparent border-0 text-right sgst  text-white" readonly></td>
+                            class="form-control bg-transparent border-0 text-right sgst  text-white" style="text-align: right;"  readonly></td>
                 </tr>
                 <tr>
                     <td>Tax Amount</td>
                     <td></td>
                     <td><input type="number" id="total_taxamount" name="totaltax" step="any" value="0.00" 
-                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white" readonly></td>
+                        class="total_taxamount form-control bg-transparent border-0 text-right  text-white" style="text-align: right;"  readonly></td>
                 </tr>
                 <tr>
                     <td>Shipping Charges</td>
                     
                     <td><input type="hidden" id="shipping_charge" step="any" value="0.0" 
-                        class="form-control bg-transparent border-0 text-right shipping_charge  "></td>
-                        <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="{{sale.sh_charge}}" name="shipping_charge" > </td>
+                        class="form-control bg-transparent border-0 text-right shipping_charge  " style="text-align: right;" ></td>
+                        <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="shipping" value="{{sale.sh_charge}}" name="shipping_charge" style="text-align: right;" > </td>
                 </tr>
+              <tr>
                 <td>Adjustment</td>
-                    
                 <td></td>
-                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" name="adjust"> </td>
+                <td><input type="number" class="form-control  bg-transparent border-0  text-light" id="adjust" value="{{sale.adjust}}" name="adjust" style="text-align: right;" > </td>
             </tr>
                 <tr>
                     <td></td>
@@ -467,7 +482,7 @@
                     <th>Total ( &#x20B9; )</th>
                     <th></th>
                     <th><input type="number" id="grandtotal" name="t_total" step="any" value="0.00" 
-                            class="form-control bg-transparent border-0 text-right grandtotal  text-white" readonly></th>
+                            class="form-control bg-transparent border-0 text-right grandtotal  text-white" style="text-align: right;"  readonly></th>
                 </tr>
             </table>
             <div class="col-sm-12 mt-4" >
@@ -475,14 +490,14 @@
                   <tr>
                       <td>Advance Paid</td>
                       <td></td>
-                      <td><input type="number" id="advance" name="advance" step="any" value="0.00"
-                              class="form-control bg-transparent border-0 text-right advance text-white"></td>
+                      <td><input type="number" id="advance" name="advance" step="any" 
+                              class="form-control bg-transparent border-0 text-right advance text-white" style="text-align: right;" value="{{sale.advance}}" ></td>
                   </tr>
                   <tr>
                       <td>Balance</td>
                       <td></td>
                       <td><input type="number" id='balance' name="balance" step="any" value="0.00"
-                              class="form-control bg-transparent border-0 text-right balance  text-white" readonly>
+                              class="form-control bg-transparent border-0 text-right balance  text-white" style="text-align: right;"  readonly>
                             <div style="color: red; display: none;" id="advancediv">Advance is greater than Total</div>
                             </td>
                   </tr>
@@ -1221,20 +1236,11 @@
 
                 <div class="row mt-2">
                   <div class="col-md-3 ">
-                    <label for="">HSN</label>
+                    <label for="">HSN Code</label>
                   </div>
                   <div class="col-md-6">
                     <input type="number" class="form-control bg-light text-dark" id="hsn" name="hsn" required>
                     <label id="hsn_war" style="display: none;"></label>
-                  </div>
-                </div>
-
-                <div class="row mt-2">
-                  <div class="col-md-3 ">
-                    <label for="">Stock</label>
-                  </div>
-                  <div class="col-md-6">
-                    <input type="number" class="form-control bg-light text-dark" id="stock" name="stock" required>
                   </div>
                 </div>
  
@@ -1376,6 +1382,63 @@
                   </div>
 
                 </div>
+
+                <div class="col-md-5">
+                  <input type="checkbox" id="track" onclick="trackinventory()">  Track Inventory for this item
+                </div>
+  
+                <div class="row mt-2 " id="trackdiv1" style="display: none;">
+                  <div class="d-flex">
+                    <div class="col-md-4">
+                      <label for="name" >Inventory Account *</label>
+                    </div>
+                    <div class="col-md-6">
+                      <select class="form-control bg-light text-dark" id="invasset" name="invasset" required>
+                        <option value="0" hidden> Choose ..</option>
+                        <option value="inventory assets">Inventory Asset</option>
+                      </select>    
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="row mt-2 " id="trackdiv2" style="display: none;">
+                  <div class="d-flex">
+                    <div class="col-md-4">
+                      <label for="name" >Opening Stock </label>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" class="form-control bg-light text-dark" id="opening_stock" name="opening_stock" value="0" required>
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="row mt-2 " id="trackdiv3" style="display: none;">
+                  <div class="d-flex">
+                    <div class="col-md-4">
+                      <label for="name" >Opening Stock Rate per unit</label>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="number" class="form-control bg-light text-dark" id="opening_stock_unit" name="opening_stock_unit" value="0" required>  
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="row mt-2" id="trackdiv4" style="display: none;">
+                  <div class="col-md-4 mr-0">
+                    <label class="col-form-label p-0">Activation Type</label>
+                  </div>
+                  <div class="col-md-7 ml-0 d-flex">
+                    <div class="mx-5 ">
+                      <input type="radio" id="active" name="activation" value="active" >
+                      <label>Active</label>
+                    </div>
+                    <div class="mx-5 ">
+                      <input type="radio" id="nonactive" name="activation" value="nonactive" >
+                      <label>Non-Active</label>
+                    </div>
+                  </div>
+                </div>
+  
 
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -1529,197 +1592,382 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <script>
-
-  function qtychange1(){
-    var qty = $('#qty1').val();
-    var avl = document.getElementById('stock_data1').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange2(){
-    var qty = $('#qty2').val();
-    var avl = document.getElementById('stock_data2').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange3(){
-    var qty = $('#qty3').val();
-    var avl = document.getElementById('stock_data3').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange4(){
-    var qty = $('#qty4').val();
-    var avl = document.getElementById('stock_data4').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange5(){
-    var qty = $('#qty5').val();
-    var avl = document.getElementById('stock_data5').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange6(){
-    var qty = $('#qty6').val();
-    var avl = document.getElementById('stock_data6').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange7(){
-    var qty = $('#qty7').val();
-    var avl = document.getElementById('stock_data7').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange8(){
-    var qty = $('#qty8').val();
-    var avl = document.getElementById('stock_data8').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange9(){
-    var qty = $('#qty9').val();
-    var avl = document.getElementById('stock_data9').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange10(){
-    var qty = $('#qty10').val();
-    var avl = document.getElementById('stock_data10').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange11(){
-    var qty = $('#qty11').val();
-    var avl = document.getElementById('stock_data11').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange12(){
-    var qty = $('#qty12').val();
-    var avl = document.getElementById('stock_data12').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange13(){
-    var qty = $('#qty13').val();
-    var avl = document.getElementById('stock_data13').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange14(){
-    var qty = $('#qty14').val();
-    var avl = document.getElementById('stock_data14').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange15(){
-    var qty = $('#qty15').val();
-    var avl = document.getElementById('stock_data15').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange16(){
-    var qty = $('#qty16').val();
-    var avl = document.getElementById('stock_data16').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange17(){
-    var qty = $('#qty17').val();
-    var avl = document.getElementById('stock_data17').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange18(){
-    var qty = $('#qty18').val();
-    var avl = document.getElementById('stock_data18').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange19(){
-    var qty = $('#qty19').val();
-    var avl = document.getElementById('stock_data19').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange20(){
-    var qty = $('#qty20').val();
-    var avl = document.getElementById('stock_data20').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-
-  function qtychange21(){
-    var qty = $('#qty21').val();
-    var avl = document.getElementById('stock_data21').innerHTML;
-    if(parseInt(qty)>parseInt(avl)){
-      alert("Entered quantity greater than available quantity");  
-      location.reload();
-    }
-  }    
-  
+  $(document).ready( function () {
+   var customer = $('#customer_sel').val();
+   $.ajax({
+     type: "GET",
+     url: "{% url 'customerdata' %}",
+     data: {
+       id: customer
+      },
+      success: function (response) {
+        data_gst = response.gstno
+        gsttreat = response.gsttreat
+        if(data_gst == ""){
+           document.getElementById('gstdiv').style.display = "none"
+           document.getElementById('treatmentdiv').style.display = "block"
+           document.getElementById('cx_treat').value = gsttreat
+         }else{
+           document.getElementById('gstdiv').style.display = "block"
+           document.getElementById('treatmentdiv').style.display = "block"
+           document.getElementById('cx_gst').value = data_gst
+           document.getElementById('cx_treat').value = gsttreat
+         }
+       }
+   });
+});
 </script>
+
+<script>
+  function trackinventory(){
+   $("#trackdiv1").toggle();
+   $("#trackdiv2").toggle();
+   $("#trackdiv3").toggle();
+   $("#trackdiv4").toggle();
+   document.getElementById("invasset").value="0"
+   document.getElementById("opening_stock").value=0
+   document.getElementById("opening_stock_unit").value=0
+   document.getElementById("active").checked=false
+   document.getElementById("nonactive").checked=false
+  }
+ </script>
+
+
+<script>
+  function qtychange(id){
+    digit = id.charAt(id.length - 1)
+    var qty = $(`#${id}`).val();
+    var avl = document.getElementById(`stock_data${digit}`).innerHTML;
+    if(parseInt(qty)>parseInt(avl)){
+      alert("Entered quantity greater than available quantity");  
+      location.reload();
+    }
+  }
+</script>
+
+<script>
+    function reset(){
+      document.getElementById('adjust').value = 0
+      document.getElementById('advance').value = 0
+    }
+
+    $(document).ready(function() {
+      $("#item1").change(function() {
+        reset()
+      });
+      $("#qty1").change(function() {
+        reset()
+      });
+      $("#discount1").change(function() {
+        reset()
+      });
+      $("#tax1").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item2").change(function() {
+        reset()
+      });
+      $("#qty2").change(function() {
+        reset()
+      });
+      $("#discount2").change(function() {
+        reset()
+      });
+      $("#tax2").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item3").change(function() {
+        reset()
+      });
+      $("#qty3").change(function() {
+        reset()
+      });
+      $("#discount3").change(function() {
+        reset()
+      });
+      $("#tax3").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item4").change(function() {
+        reset()
+      });
+      $("#qty4").change(function() {
+        reset()
+      });
+      $("#discount4").change(function() {
+        reset()
+      });
+      $("#tax4").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item5").change(function() {
+        reset()
+      });
+      $("#qty5").change(function() {
+        reset()
+      });
+      $("#discount5").change(function() {
+        reset()
+      });
+      $("#tax5").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item6").change(function() {
+        reset()
+      });
+      $("#qty6").change(function() {
+        reset()
+      });
+      $("#discount6").change(function() {
+        reset()
+      });
+      $("#tax6").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item7").change(function() {
+        reset()
+      });
+      $("#qty7").change(function() {
+        reset()
+      });
+      $("#discount7").change(function() {
+        reset()
+      });
+      $("#tax7").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item8").change(function() {
+        reset()
+      });
+      $("#qty8").change(function() {
+        reset()
+      });
+      $("#discount8").change(function() {
+        reset()
+      });
+      $("#tax8").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item9").change(function() {
+        reset()
+      });
+      $("#qty9").change(function() {
+        reset()
+      });
+      $("#discount9").change(function() {
+        reset()
+      });
+      $("#tax9").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item10").change(function() {
+        reset()
+      });
+      $("#qty10").change(function() {
+        reset()
+      });
+      $("#discount10").change(function() {
+        reset()
+      });
+      $("#tax10").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item11").change(function() {
+        reset()
+      });
+      $("#qty11").change(function() {
+        reset()
+      });
+      $("#discount11").change(function() {
+        reset()
+      });
+      $("#tax11").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item12").change(function() {
+        reset()
+      });
+      $("#qty12").change(function() {
+        reset()
+      });
+      $("#discount12").change(function() {
+        reset()
+      });
+      $("#tax12").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item13").change(function() {
+        reset()
+      });
+      $("#qty13").change(function() {
+        reset()
+      });
+      $("#discount13").change(function() {
+        reset()
+      });
+      $("#tax13").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item14").change(function() {
+        reset()
+      });
+      $("#qty14").change(function() {
+        reset()
+      });
+      $("#discount14").change(function() {
+        reset()
+      });
+      $("#tax14").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item15").change(function() {
+        reset()
+      });
+      $("#qty15").change(function() {
+        reset()
+      });
+      $("#discount15").change(function() {
+        reset()
+      });
+      $("#tax15").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item16").change(function() {
+        reset()
+      });
+      $("#qty16").change(function() {
+        reset()
+      });
+      $("#discount16").change(function() {
+        reset()
+      });
+      $("#tax16").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item17").change(function() {
+        reset()
+      });
+      $("#qty17").change(function() {
+        reset()
+      });
+      $("#discount17").change(function() {
+        reset()
+      });
+      $("#tax17").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item18").change(function() {
+        reset()
+      });
+      $("#qty18").change(function() {
+        reset()
+      });
+      $("#discount18").change(function() {
+        reset()
+      });
+      $("#tax18").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item19").change(function() {
+        reset()
+      });
+      $("#qty19").change(function() {
+        reset()
+      });
+      $("#discount19").change(function() {
+        reset()
+      });
+      $("#tax19").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item20").change(function() {
+        reset()
+      });
+      $("#qty20").change(function() {
+        reset()
+      });
+      $("#discount20").change(function() {
+        reset()
+      });
+      $("#tax20").change(function() {
+        reset()
+      });
+    });
+
+    $(document).ready(function() {
+      $("#item21").change(function() {
+        reset()
+      });
+      $("#qty21").change(function() {
+        reset()
+      });
+      $("#discount21").change(function() {
+        reset()
+      });
+      $("#tax21").change(function() {
+        reset()
+      });
+    });
+</script>
+
+
 
 <script>
   $(document).ready(function() {
@@ -1770,8 +2018,8 @@
     $("#adjust").change(function() {
       var x=$('#adjust').val();
         total = document.getElementById("grandtotal").value
-        document.getElementById("grandtotal").value=total-x
-        document.getElementById("balance").value=total-x
+        document.getElementById("grandtotal").value= parseFloat(total) + parseFloat(x)
+        document.getElementById("balance").value=parseFloat(total) + parseFloat(x)
     });
   });
 </script>
@@ -2358,7 +2606,14 @@ $(document).on("click","#itemSave",function(){
     inter = 0;
     intra = 0;
   }
+  
+  if ($('input[name="activation"]:checked').val() == 'active'){
 
+active_type = "active"
+}
+else{
+active_type = "nonactive"
+}
   
   $.ajax({
     
@@ -2379,6 +2634,10 @@ $(document).on("click","#itemSave",function(){
         cost_acc : $("#cost_acc").val(),
         sell_desc : $("#sell_desc").val(),
         cost_desc : $("#cost_desc").val(),
+        active_type : active_type,
+        invasset : $("#invasset").val(),
+        opening_stock : $("#opening_stock").val(),
+        opening_stock_unit : $("#opening_stock_unit").val(),
         
         csrfmiddlewaretoken: '{{ csrf_token }}'
         
@@ -2528,8 +2787,8 @@ function calculateGrandTotal() {
   var shippingCharges = parseFloat($('#shipping').val());
   grandTotal += shippingCharges;
 
-  document.getElementById("adjust").value = 0;
-  document.getElementById("advance").value = 0;
+  
+  
 
 
   $('#grandtotal').val(grandTotal.toFixed(2));
@@ -2566,7 +2825,7 @@ function calculateGrandTotal() {
         </td>
         
         <td style="width: 17%;" class='text-right'>
-          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange${rowCount}()'><br>
+          <input type='number' id='qty${rowCount}' class='text-right border-0 bg-transparent text-white qty form-control' name='quantity[]' value='0' style="margin-top: 4vh;" onchange='qtychange(this.id)'><br>
           <span class="text-warning">Available Stock : <span id="stock_data${rowCount}" class=text-warning></span></span>
         </td>
         
@@ -2774,8 +3033,8 @@ function calculateTaxAmount() {
 
         document.getElementById("total_taxamount").value = total_taxamount.toFixed(2);
         var grandtotal = subtotal + total_taxamount + shipping;
-        document.getElementById("adjust").value = 0;
-        document.getElementById("advance").value = 0;
+        
+        
         document.getElementById("grandtotal").value = grandtotal.toFixed(2);
         document.getElementById("balance").value = grandtotal.toFixed(2);
     }
