@@ -156,6 +156,24 @@
   overflow-y: auto; /* Add vertical scrollbar when content overflows */
         }
 
+                /* Style for the container */
+                .table-container {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+        }
+
+        /* Style for table row */
+        .table-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Style for table cell */
+        .table-cell {
+            padding: 5px;
+        }
+
                   </style>
     
 <section >
@@ -255,12 +273,12 @@
               </div>
           </div><br>
           <div class="row">
-            <div class="tab-content pt-2 m-2 mb-5" style="background-color: rgba(252, 236, 217, 0.8); overflow-y: scroll;height: 600px;width: 100%;">
+            <div class="tab-content pt-2 m-2 mb-5" style="background-color: rgba(252, 236, 217, 0.8); ">
               <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
                   <div class="row">
-                      <div class="col-md-6" style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0; border-radius: 1vh;" >
+                      <div class="col-md-7" id="orderinfo" style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0; border-radius: 1vh; overflow-y: scroll;height: 600px;" >
                           <div class="overview text-dark" style="background-color: #ffddb0;" ><br>
-                              <h2 class="text-dark" style="text-transform: uppercase;">Sales Order</h2>
+                              <h2 class="text-dark mb-3" style="text-transform: uppercase; font-size: x-large;"><b>Sales Order</b></h2>
                               
                               <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
                                 <tbody>
@@ -279,6 +297,23 @@
                                     <td>:</td>
                                     <td>{{sale.customer.customerName}}</td>
                                   </tr>
+                                  <tr>
+                                    <td>Customer Mail</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerEmail}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>GST Treatment</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTTreatment}}</td>
+                                  </tr>
+                                  {% if sale.customer.GSTIN %}
+                                  <tr>
+                                    <td>GST Number</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTIN}}</td>
+                                  </tr>
+                                  {% endif %}
                                   <tr>
                                     <td>Customer Mail</td>
                                     <td>:</td>
@@ -390,11 +425,11 @@
                               </table> 
                           </div>
                       </div>
-                      <div class="col-md-6" style="height: 100%;">
+                      <div class="col-md-5" >
                           <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
-                          <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem; height: 100vh;">
+                          <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem;">
                               <div class="row" >
-                                  <div class="card-title h2" >PRODUCT INFORMATION
+                                  <div class="card-title mb-4" style="font-size: x-large;"><b>PRODUCT INFORMATION</b>
                                   </div>
                                       <table class="table table-responsive" id="producttable">
                                         <tbody>
@@ -497,38 +532,85 @@
                        </div>
                        <div style="background: #8b3131;color: white;" class="company-info">
                            <h2 class="text-white">{{company.company_name}}</h2>
-                           <p class="text-white"> {{company.address}}<br>{{comp.city}}<br>Ph: {{company.contact_number}}<br>Email: {{company.company_email}}</p>
+                           <p class="text-white"> {{company.address}}<br>{{comp.city}}</p><p> {{company.contact_number}}</p><p>{{company.company_email}}</p>
                        </div>
                    </header>
                    <div class="invoice-box">
                        <h1 class="text-dark">SalesOrder</h1>
                        <div class="invoice-header">
                            <div class="invoice-details text-dark">
-                             <p class="text-dark">Sales No#: {{sale.sales_no}}</p>
- 
-                
-                               <p class="text-dark">Sales Order Date: {{sale.sales_date}}</p>
+                            <div class="table-container" style="margin-top: 20%;">
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Sales No#</div>
+                                  <div class="table-cell text-black" style="margin-right: -7vh;">:</div>
+                                  <div class="table-cell text-black" style="margin-right: 7vh;">{{sale.sales_no}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Sales Order Date</div>
+                                  <div class="table-cell text-black">:</div>
+                                  <div class="table-cell text-black">{{sale.sales_date}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Expiry Date</div>
+                                  <div class="table-cell text-black" style="margin-right: -6vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.ship_date}}</div>
+                              </div>
+                          </div>
                            </div>
-                           <div class="client-details">
-                               <p class="text-dark">Client Name: {{sale.customer.customerName}}</p>
-                               <p class="text-dark">Address: {{sale.customer.Address1}}<br>{{sale.customer.Address2}}</p>
-                           </div>
+                          <div class="client-details" style="width: 45vh;">
+                            <div class="table-container">
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Client Name</div>
+                                  <div class="table-cell text-black">:</div>
+                                  <div class="table-cell text-black"><b>{{sale.customer.customerName}}</b></div>
+                              </div>
+                              {% if sale.customer.Address1 %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Primary Address</div>
+                                  <div class="table-cell text-black">:</div>
+                                  <div class="table-cell text-black">{{sale.customer.Address1}}</div>
+                                </div>
+                              {% endif %}
+                              {% if sale.customer.Address2 %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Secondary Address</div>
+                                  <div class="table-cell text-black" style="margin-left: -1vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.customer.Address2}}</div>
+                                </div>
+                              {% endif %}
+                              <div class="table-row">
+                                <div class="table-cell text-black">GST Treatment</div>
+                                <div class="table-cell text-black">:</div>
+                                <div class="table-cell text-black">{{sale.customer.GSTTreatment}}</div>
+                            </div>
+                              {% if sale.customer.GSTIN %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">GST Number</div>
+                                  <div class="table-cell text-black">:</div>
+                                  <div class="table-cell text-black">{{sale.customer.GSTIN}}</div>
+                              </div>
+                              {% endif %}
+                          </div>
+                          </div>
                        </div>
-                       <table>
+                       
+                       <table >
                            <thead>
                                <tr>
                                  
                                  <th id="th">Product</th>
+                                 <th id="th">HSN</th>
                                    <th id="th">Quantity</th>
                                    <th id="th">Price</th>
                                    <th id="th">Tax %</th>
                                    <th id="th"> Total</th>
                                </tr>
                            </thead>
-                           <tbody>
+                           <tbody id="templatetable">
                              {% for i in saleitem %}
                              <tr style="color: black;">
-                               <td>{{i.product}}</td>
+                               <td class="productname">{{i.product}}</td>
+                               <td class="hsn_value"></td>
                                <td>{{i.quantity}}</td>
                                <td>{{i.rate}}</td>
                                <td>{{i.tax}}</td>
@@ -537,23 +619,73 @@
                              {% endfor %}
  
                          </tbody>
-                       </table>
+                       </table><br>
                        
-                       <div class="invoice-total">
-                           <p class="text-dark ">Subtotal: <b>{{sale.subtotal}}</b></p>
-                           {% if sale.igst != '0.00' %}
-                           <p class="text-dark ">IGST: <span class="ml-4"></span><b>{{sale.igst}}</b></p>
-                           {% else %}
-                           <p class="text-dark">SGST: <span class="ml-4"></span> <b>{{sale.sgst}}</p></b>
-                           <p class="text-dark">CGST: <span class="ml-4"></span><b>{{sale.cgst}}</p></b>
-                           {% endif %}
-                           <p class="text-dark">Tax Amount: <span class="ml-4"></span> <b>{{sale.t_tax}}</b></p>
-                           <p class="text-dark">Shipping Charge: <span class="ml-4"></span> <b>{{sale.sh_charge}}</b></p>
-                           <p class="text-dark">Total: <span class="ml-4"></span> <b>{{sale.grandtotal}}</b></p>
-                           {% if sale.advance != 0.0 %}
-                           <p class="text-dark">Advance: <span class="ml-4"></span> <b>{{sale.advance}}</b></p>
-                           <p class="text-dark">Balance: <span class="ml-4"></span> <b>{{sale.balance}}</b></p>
-                           {% endif %}
+                       <div class="invoice-total" >
+                        <div class="row">
+                          <div class="col-md-7"></div>
+                          <div class="col-md-4">
+                            <div class="table-container" style="margin-left: 7vh;">
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Subtotal</div>
+                                  <div class="table-cell text-black" >:</div>
+                                  <div class="table-cell text-black" ><b>{{sale.subtotal}}</b></div>
+                              </div>
+                              {% if sale.igst != '0.00' %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">IGST</div>
+                                  <div class="table-cell text-black" style="margin-left: 3vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.igst}}</div>
+                              </div>
+                              {% else %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">SGST</div>
+                                  <div class="table-cell text-black" >:</div>
+                                  <div class="table-cell text-black">{{sale.sgst}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">CGST</div>
+                                  <div class="table-cell text-black" >:</div>
+                                  <div class="table-cell text-black">{{sale.cgst}}</div>
+                              </div>
+                              {% endif %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Tax Amount</div>
+                                  <div class="table-cell text-black" style="margin-left: -4vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.t_tax}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Shipping Charge</div>
+                                  <div class="table-cell text-black" style="margin-left: -13vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.sh_charge}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Adjustment</div>
+                                  <div class="table-cell text-black" style="margin-left: -5vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.adjust}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Total</div>
+                                  <div class="table-cell text-black" style="margin-left: 4vh;">:</div>
+                                  <div class="table-cell text-black">{{sale.grandtotal}}</div>
+                              </div>
+                              {% if sale.advance != 0.0 %}
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Advance</div>
+                                  <div class="table-cell text-black" >:</div>
+                                  <div class="table-cell text-black">{{sale.advance}}</div>
+                              </div>
+                              <div class="table-row">
+                                  <div class="table-cell text-black">Balance</div>
+                                  <div class="table-cell text-black" >:</div>
+                                  <div class="table-cell text-black">{{sale.balance}}</div>
+                              </div>
+                              {% endif %}
+                          </div>
+                          </div>
+
+                        </div>
+
                        </div>
                       
                    </div>
@@ -592,6 +724,21 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 </section>
+
+  <script>
+    // Get the div element by its ID
+    var divElement = document.getElementById("orderinfo");
+
+    // Get the height of the div using offsetHeight
+    var divHeight = divElement.offsetHeight;
+
+    var divElement = document.getElementById("productinfo");
+
+        // Set the height of the div
+        divElement.style.height = `${divHeight}px`;
+
+    // Log the height to the console
+</script>
 
 <script>
   function printSelectedArea(area){
@@ -709,5 +856,44 @@ rows.forEach(row => {
   }
 
 </script>
+
+<script>
+    $(document).ready(function () {
+      var table = document.getElementById('templatetable'); // Get all table rows
+      var rows = table.querySelectorAll('tr'); // Get all table rows
+      var idCounter = 1; // Counter to create unique IDs
+      
+      // Loop through each row and assign an ID to the second td element
+      rows.forEach(function(row) {
+        var firstTD = row.querySelector('.productname'); // Get the second td with class "second"
+        var secondTD = row.querySelector('.hsn_value'); // Get the second td with class "second"
+        if (secondTD) {
+          firstTD.id = 'product' + idCounter; // Assign a unique ID
+          secondTD.id = 'hsn' + idCounter; // Assign a unique ID
+          idCounter++;
+        }
+      });
+      for(let i = 1; i < idCounter; i++){
+
+        name= document.getElementById(`product${i}`).innerHTML
+        $.ajax({
+          type: "GET",
+          url: "{% url 'hsndata' %}",
+          data: {
+              name: name,
+          },
+          success: function (response) {
+              data = response.hsn_data
+
+              document.getElementById(`hsn${i}`).textContent = data
+
+          }
+        });
+        }
+
+});
+
+</script>
+
 
 {% endblock %}

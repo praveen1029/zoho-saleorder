@@ -3349,6 +3349,12 @@ def convert_view(request,pk):
     sale.save()
     return redirect('sales_order_det',pk)
 
+def hsndata(request):
+    name = request.GET.get('name')
+    item = AddItem.objects.get(Name=name)
+    data = {'hsn_data': item.hsn}
+    return JsonResponse(data)
+
 
     
 @login_required(login_url='login')
@@ -3510,11 +3516,6 @@ def edit_sales_order(request,id):
             sales.file = "/static/images/alt.jpg"
 
             sales.terms_condition = request.POST.get('ter_cond')
-        
-        if 'Draft' in request.POST:
-            sales.status="draft"
-        if "Save" in request.POST:
-            sales.status = "approved"
 
         sales.balance=request.POST['balance']
         sales.advance=request.POST['advance']

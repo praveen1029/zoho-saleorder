@@ -503,10 +503,10 @@
       </div>
     </div>
 
-    <div class="row mt-5 mb-3 m-5 ">
-      <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" type="submit" class="btn mt-2" value="Draft" name="Draft">
-      <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" type="submit" class="btn mt-2" value="Save" name="Save">
-      <input style="width: 150px;margin-right: 2rem; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
+    <div class="row mt-5 mb-3">
+      <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2" value="Draft" name="Draft">
+      <input style="width: 150px;margin-right: 1vh; background-color: chocolate;" type="submit" class="btn mt-2" value="Save" name="Save">
+      <input style="width: 150px; background-color: chocolate;" class="btn mt-2" type="reset" value="Cancel">
     </div>
   </form>
   
@@ -829,7 +829,11 @@
                 <div class="col-md-3 mt-2">
                   <label for="c_open">Opening Balance</label>
                 </div>
-                <div class="col-md-6 mt-2">
+                <div class="col-md-6 mt-2 d-flex">
+                  <select name="bal" id="bal" style="width: 35%; height: 80%;" class="form-gr form-select text-dark bg-light" >
+                    <option value="credit">Credit</option>
+                    <option value="debit">Debit</option>
+                  </select>
                   <input type="text" class="form-control bg-light text-dark" id="c_open" name="c_open">
                 </div>       
               </div>
@@ -2020,6 +2024,13 @@ $(document).on("click","#customersave",function(){
     inte = $('#item-tax4').val();
   }
 
+  if($('#bal').val()=='credit'){
+    openbal = $("#c_open").val()
+    openbal = -openbal
+  }else{
+    openbal = $("#c_open").val()
+  }
+
 
   $.ajax({
     
@@ -2048,7 +2059,7 @@ $(document).on("click","#customersave",function(){
         panno : $("#c_pan").val(),
         placesupply :$("#placesupply").val(),
         currency : $("#c_curn").val(),
-        openingbalance : $("#c_open").val(),
+        openingbalance : openbal,
         paymentterms : $("#c_terms").val(),
         street : $("#cstreet").val(),
         city : $("#ccity").val(),

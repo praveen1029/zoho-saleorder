@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script>
-    function toggleDiv() {
-      var div = document.getElementById('myDiv');
-      var checkbox = document.getElementById('myCheckbox');
-      
-      if (checkbox.checked) {
-        div.style.display = 'block';
-      } else {
-        div.style.display = 'none';
-      }
-    }
-  </script>
+
 </head>
 <body>
-  <input type="checkbox" id="myCheckbox" onclick="toggleDiv()"> Show/Hide Div
-  <div id="myDiv" style="display: none;">
-    This is the content of the div.
-  </div>
+    <div class="table-container">
+        <div class="table-row">
+            <div class="table-cell">Row 1, Cell 1</div>
+            <div class="table-cell">Row 1, Cell 2</div>
+        </div>
+        <div class="table-row">
+            <div class="table-cell">Row 2, Cell 1</div>
+            <div class="table-cell">Row 2, Cell 2</div>
+        </div>
+        <div class="table-row">
+            <div class="table-cell">Row 3, Cell 1</div>
+            <div class="table-cell">Row 3, Cell 2</div>
+        </div>
+    </div>
 </body>
 </html>
