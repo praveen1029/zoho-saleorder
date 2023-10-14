@@ -2734,7 +2734,6 @@ function reloadAccount() {
 <script>
    $(document).on('change', '#customer_sel', function () {
     var customer = $('#customer_sel').val();
-    console.log(customer)
     $.ajax({
         type: "GET",
         url: "{% url 'customerdata' %}",
@@ -2744,8 +2743,17 @@ function reloadAccount() {
         success: function (response) {
             console.log(response)
             data7 = response.email
-            console.log(data7)
+            gst = response.gstno
+            treat = response.gsttreat
             document.getElementById('cx_mail').value = data7
+            document.getElementById('cx_treat').value = treat
+            if(gst !=''){
+              document.getElementById('gstdiv').style.display = "block"
+              document.getElementById('cx_gst').value = gst
+            }else{
+              document.getElementById('gstdiv').style.display = "none"
+              document.getElementById('cx_gst').value = ''
+            }
             
         }
     });

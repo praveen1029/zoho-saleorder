@@ -1758,9 +1758,12 @@ class EmailAttachementView(View):
     form_class = EmailForm
     template_name = 'newmail.html'
 
+
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, self.template_name, {'email_form': form})
+        user = self.request.user
+        company = company_details.objects.get(user=user)
+        return render(request, self.template_name, {'email_form': form,"company":company})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
@@ -3345,7 +3348,7 @@ def convert_to_invoice(request,pk):
 
 def convert_view(request,pk):
     sale=SalesOrder.objects.get(id=pk)
-    sale.status = "draft"
+    sale.status = "approved"
     sale.save()
     return redirect('sales_order_det',pk)
 
@@ -3424,13 +3427,14 @@ def add_sales_order(request):
             sales.save()
             sale_id=SalesOrder.objects.get(id=sales.id)
           
-            if len(product)==len(quantity)==len(tax)==len(total)==len(rate):
-                mapped = zip(product,quantity,tax,total,rate,desc)
+            if len(product)==len(quantity)==len(tax)==len(total)==len(rate)==len(hsn):
+                mapped = zip(hsn,product,quantity,tax,total,rate,desc)
                 mapped = list(mapped)
                 for element in mapped:
-                    created =sales_item(sale=sale_id,product=element[0],quantity=element[1],tax=element[2],total=element[3],
-                                        rate=element[4],desc=element[5])
+                    created =sales_item(sale=sale_id,hsn=element[0],product=element[1],quantity=element[2],tax=element[3],total=element[4],
+                                        rate=element[5],desc=element[6])
                     created.save()
+
             return redirect('view_sales_order')          
     
 @login_required(login_url='login')
@@ -3527,25 +3531,24 @@ def edit_sales_order(request,id):
         sales.adjust=adjust
         
         sales.save()
-        
-        product=request.POST.getlist('item[]')
-        quantity=request.POST.getlist('quantity[]')
-        rate=request.POST.getlist('rate[]')
-        tax=request.POST.getlist('tax[]')
-        total=request.POST.getlist('amount[]')
-        desc=request.POST.getlist('desc[]')
+        hsn=tuple(request.POST.getlist('hsn[]'))
+        product=tuple(request.POST.getlist('item[]'))
+        quantity=tuple(request.POST.getlist('quantity[]'))
+        rate=tuple(request.POST.getlist('rate[]'))
+        tax=tuple(request.POST.getlist('tax[]'))
+        total=tuple(request.POST.getlist('amount[]'))
+        desc=tuple(request.POST.getlist('desc[]'))
         obj_dele=sales_item.objects.filter(sale_id=sales.id)
         obj_dele.delete()
        
         if len(product)==len(quantity)==len(tax)==len(total)==len(rate):
 
-            mapped = zip(product,quantity,tax,total,rate,desc)
+            mapped = zip(hsn,product,quantity,tax,total,rate,desc)
             mapped = list(mapped)
         
             for element in mapped:
-
-                created =sales_item(sale=sales,product=element[0],
-                                    quantity=element[1],tax=element[2],total=element[3],rate=element[4],desc=element[5])
+                created =sales_item(sale=sales,hsn=element[0],product=element[1],quantity=element[2],tax=element[3],total=element[4],
+                                        rate=element[5],desc=element[6])
                 created.save()
                     
                
@@ -10643,10 +10646,11 @@ def cust_Attach_files(request,id):
 def sales_order(request):
     company = company_details.objects.get(user = request.user)
     data = SalesOrder.objects.all()
+    cust = customer.objects.all()
     name_list =[]
-    for item in data :
-        if item.customer.customerName[3:] not in name_list:
-            name_list.append(item.customer.customerName[3:])
+    for item in cust :
+        if item.customerName[3:] not in name_list:
+            name_list.append(item.customerName[3:])
     return render(request, 'sales_order.html',{'data':data, 'company': company,'name_list':name_list})
     
     

@@ -146,10 +146,10 @@
     </center>   
   </div> 
 
-
+  <div>
     <table class="table text-white" id="myTable">
-      <thead>
-        <tr>
+      <thead >
+        <tr style="text-align: center;">
           <th>DATE 
           </th>
           <th>ORDER NO 
@@ -170,14 +170,18 @@
         </tr>
       </thead>
 
-      <tbody>
+      <tbody style="text-align: center;">
         {% for d in data %}
         <tr>
           <td>{{ d.sales_date }}</td>
           <td>{{ d.sales_no }}</td>
           <td>{{ d.customer.customerName }}</td>
           <td>{{ d.ship_date }}</td>
-          <td>{{ d.status }}</td>
+          {% if d.complete_status == 1 %}
+            <td>Invoice</td>
+            {% else %}
+            <td>Sales Order</td>
+            {% endif %}
           <td>{{ d.subtotal }}</td>
           <td>{{ d.advance }}</td>
           <td>{{ d.balance }}</td>
@@ -186,6 +190,9 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+
 </div>  
 
 <script>

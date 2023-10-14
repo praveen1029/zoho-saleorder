@@ -63,31 +63,31 @@
           <table class="table  text-white" id="myTable">
             <thead>
               <tr>
-                <th>DATE</th>
-                <th>SALES ORDER</th>
-                <th>CUSTOMER NAME</th>
-                <th>CUSTOMER MAIL</th>
-                <th>AMOUNT</th>
-                <th>STATUS</th>
-                <th>BALANCE</th>
-                <th>ACTION</th>
+                <th style="text-align: center;">DATE</th>
+                <th style="text-align: center;">SALES ORDER</th>
+                <th style="text-align: center;">CUSTOMER NAME</th>
+                <th style="text-align: center;">CUSTOMER MAIL</th>
+                <th style="text-align: center;">AMOUNT</th>
+                <th style="text-align: center;">STATUS</th>
+                <th style="text-align: center;">BALANCE</th>
+                <th style="text-align: center;">ACTION</th>
               </tr>
             </thead>
             <tbody>
               {% for i in sale %}
                 <tr id="over" class='clickable-row' data-href="sales_order_det/{{ i.id }}">
-                  <td>{{i.sales_date}}</td>
-                  <!-- <td onclick="location.href ='' " > {{v.Name}}</td> -->
-                  <td>{{i.sales_no}}</td>
-                  <td>{{i.customer.customerName}}</td>
-                  <td>{{i.customer.customerEmail}}</td>
-                  <td>{{i.grandtotal}}</td>
-                  <td>{{i.status}}</td>
-                  <td>{{i.balance}}</td>
+                  <td style="text-align: center;">{{i.sales_date}}</td>
+                  <!-- <td style="text-align: center;" onclick="location.href ='' " > {{v.Name}}</td> -->
+                  <td style="text-align: center;">{{i.sales_no}}</td>
+                  <td style="text-align: center;">{{i.customer.customerName}}</td>
+                  <td style="text-align: center;">{{i.customer.customerEmail}}</td>
+                  <td style="text-align: center;">{{i.grandtotal}}</td>
+                  <td style="text-align: center;">{{i.status}}</td>
+                  <td style="text-align: center;">{{i.balance}}</td>
                   {% if i.complete_status == 0 %}
-                    <td><a href="{% url 'convert_to_invoice' i.id %}" style="color: chocolate;">Convert to invoice</a></td>
+                    <td style="text-align: center;"><a href="{% url 'convert_to_invoice' i.id %}" style="color: chocolate;">Convert to invoice</a></td>
                   {% else %}
-                    <td style="color: green;">Completed</td>
+                    <td style="text-align: center; color: green;">Completed</td>
                   {% endif %}
                 </tr>
               {% endfor %}
