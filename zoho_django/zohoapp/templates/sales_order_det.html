@@ -246,7 +246,7 @@
                </a>
                <div class="dropdown-menu " >
                  <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
-                 <a class="dropdown-item" href="#">WhatsApp</a>
+                 <a class="dropdown-item" href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share">WhatsApp</a>
                </div>
                <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
                 <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
@@ -261,7 +261,234 @@
                </a>
               </div>
           </div><br>
-          <div class="row">
+
+          <div class="div-to-pdf row" id="div-to-pdf" style="background-color: #ffddb0; overflow-y: scroll; height: 530px; margin-right: 2vh; margin-left: 1vh;">
+
+            <div class="row text-center">
+                <h2 style="color: #000000;"><br>SALES ORDER
+                    <hr>
+                </h2>
+            </div>
+            <div class="gen-info col-6 " style="padding-left: 3rem; overflow-y: scroll; height: 500px;">
+                <div class="row mt-1">
+                    <div class="col-5"><label class="text-dark" for="">Sale Order No :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.sales_no}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Reference :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.reference}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Customer Name :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.customer.customerName}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Customer Mail :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.customer.customerEmail}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">GST Treatment :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.customer.GSTTreatment}}</p>
+                    </div>
+                </div>
+                {% if sale.customer.GSTIN %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">GST Number :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.customer.GSTIN}}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Source of Supply :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.sos}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Sale Order Date :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.sales_date}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Expiry Date :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.ship_date}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Payment Term :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.terms.Terms}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Payment Method :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.pay_method}}</p>
+                    </div>
+                </div>
+                {% if sale.pay_method == 'upi' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">UPI ID :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.upi_id}}</p>
+                    </div>
+                </div>
+                {% elif sale.pay_method == 'cheque' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Cheque ID :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.cheque_id}}</p>
+                    </div>
+                </div>
+                {% elif sale.pay_method != 'cash' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Bank Account :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{bank.ac_no}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Subtotal :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.subtotal}}</p>
+                    </div>
+                </div>
+                {% if sale.igst != '0.00' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">IGST :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.igst}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if sale.cgst != '0.00' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">CGST :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.cgst}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if sale.sgst != '0.00' %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">SGST :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.sgst}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Tax Amount :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.t_tax}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Shipping Charge :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.sh_charge}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Adjustment :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.adjust}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Total Amount :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.grandtotal}}</p>
+                    </div>
+                </div>
+                {% if sale.advance != 0.0 %}
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Advance :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.advance}}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-5"><label class="text-dark" for="">Balance Amount :</label></div>
+                    <div class="col-7">
+                        <p class="bold text-dark" style="max-width: 15rem;word-wrap: break-word;">{{sale.balance}}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="p-info col-6 my-2" style="height: 100%;">
+                <div class="card" style="background-color: rgb(110, 61, 46); padding:1rem; height: 500px; overflow-y: scroll;">
+                  <div class="row text-center">
+                    <h2>PRODUCT INFORMATION
+                        <hr>
+                    </h2>
+                </div>
+                {% for i in saleitem %}
+                                          
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Name :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.product}}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">HSN Number :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.hsn}}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Quantity :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.quantity}}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Rate :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.rate}}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Discount :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.desc}}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Tax :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.tax}}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-5"><label for="">Product Total :</label></div>
+                        <div class="col-7">
+                            <p class="bold">{{i.total}}</p>
+                        </div>
+                        <hr>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+          <!-- <div class="row">
             <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); ">
               <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
                   <div class="row">
@@ -305,11 +532,6 @@
                                     <td>{{sale.customer.GSTIN}}</td>
                                   </tr>
                                   {% endif %}
-                                  <tr>
-                                    <td>Customer Mail</td>
-                                    <td>:</td>
-                                    <td>{{sale.customer.customerEmail}}</td>
-                                  </tr>
                                   <tr>
                                     <td>Source of Supply</td>
                                     <td>:</td>
@@ -417,7 +639,6 @@
                           </div>
                       </div>
                       <div class="col-md-6" >
-                          <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
                           <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem; margin-top: -2vh;" >
                               <div class="row" style="overflow-y: scroll;height: 500px; margin-top: -2vh; " >
                                   <div class="card-title mb-4 mt-3" style="font-size: x-large;"><b>PRODUCT INFORMATION</b>
@@ -477,7 +698,7 @@
 
              
           </div>
-          </div>
+          </div> -->
           
         </div>
         
@@ -506,7 +727,7 @@
              </a>
              <div class="dropdown-menu " >
                <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
-               <a class="dropdown-item" href="#">WhatsApp</a>
+               <a class="dropdown-item" href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share">WhatsApp</a>
              </div>
 
              <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >

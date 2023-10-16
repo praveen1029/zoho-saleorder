@@ -1,47 +1,137 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
 
-<style>
+<style>            
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    padding: 1px;
+    margin: 0;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+  }
+  
+  .logo img {
+    max-height: 100px;
+  }
+  
+  .company-info h2 {
+    margin: 0;
+    font-size: 2em;
+  }
+  
+  .company-info p {
+    margin: 0;
+    line-height: 1.5;
+  }
+  
+  .i.invoice-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  .invoice-box h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-details p, .client-details p {
+    margin: 5px 0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #th {
+    background-color: #f2f2f2;
+    color: black;
+  }
+  
+  .invoice-total {
+    margin-top: 20px;
+    text-align: right;
+  }
+  
+  .invoice-total p {
+    margin: 5px 0;
+  }
+  
+  footer {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    text-align: center;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 20px;
+  }
+  
+  footer p {
+    margin: 5px 0;
+  }
+ 
+  .dropdown-item:hover{
+       color: chocolate;
+     }
+  
+     ::-webkit-scrollbar{
+    display: none;
+  }
 
-        /* Style for the tooltip-like list */
-        #nameTooltip {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            padding: 10px;
-            z-index: 1;
-            width: 200px; /* Adjust the width as needed */
-            color: black;
-            margin-top: 1vh;
-  border-radius: 1vh;
-
+  .saleordertable {
+            border-collapse: collapse; /* Collapse table borders */
+            border: none; /* Remove table border */
         }
 
-        /* Style for the list items in the tooltip */
-        .tooltip-item {
-            padding: 5px;
+        .saleordertable  td {
+            border: none; /* Remove cell borders */
+            padding: 8px; /* Add padding for cell content */
+            text-align: left; /* Optional: Adjust text alignment */
+        }
+  #producttable {
+            border-collapse: collapse; /* Collapse table borders */
+            border: none; /* Remove table border */
+            color: white;
+        }
+
+        #producttable  td {
+            border: none; /* Remove cell borders */
+            padding: 8px; /* Add padding for cell content */
+            text-align: left; /* Optional: Adjust text alignment */
+        }
+
+        tr.clickable {
             cursor: pointer;
         }
 
-        .tooltip-item:hover {
-          background-color: #555;
-          color: white;
-        }
 
-
-  .daterangepicker{
-    color: black;
-  }
-
-  .daterangepicker td.available, .daterangepicker th {
-    color: black;
-  }
-
-  @media print {
-    body{
+        @media print{
+        body{
             visibility: hidden !important; /* hide everything in body when in print mode*/
         }
 
@@ -51,378 +141,704 @@
             z-index: 99999;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 1vh;
-            margin-left: 2vh;
+            width: 103vh;
+            height: 150vh;
         } 
-  }
+    }
 
-  #reportrange span, #selectedEndDate, .daterangepicker .ranges ul li {
-    font-size: 14px; /* Adjust the font size as needed */
-  }
-  #nameTooltip .scrollable-tooltip {
-  max-height: 130px; /* Maximum height for the tooltip */
+    .scrollable-table {
+  max-height: 80%; /* Maximum height for the tooltip */
   overflow-y: auto; /* Add vertical scrollbar when content overflows */
-
-}
-
-
-</style>
-
-
-<div class="container-fluid">
-    <div class="row">
-      <div class="col-md-6">
-          <form class="form-inline">
-            <label class="mr-2" for="fromdate">From:</label>&nbsp;
-            <input type="date" class="form-control" id="fromdate" style="color: black !important;">
-            <label class="mx-2" for="todate">To:</label>
-            <input type="date" class="form-control" id="todate" style="color: black !important;">
-          </form>
-      </div>
-
-      <div class="col-md-6" style="text-align: right;">
-        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsPDF()" style="margin-right: 2vh;"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>PDF</a>
-
-
-        <a class="btn text-center btn-outline-warning printdrop p-2" href="#" onclick="printPageContent()" style="margin-right: 2vh;"><i class="fa fa-print" aria-hidden="true"></i>Print</a>
-    
-        <a class="btn text-center btn-outline-warning p-2"  onclick="exportAsXLS()" style="margin-right: 2vh;"><i class="fa fa-file-excel-o" aria-hidden="true"></i>EXCEL</a>
-    
-    
-          <a class="btn btn-outline-warning p-2" href="{% url 'report_inventory_view' %}" >&times;</a>
-      </div>
-
-    </div>
-
-
-</div>
-
-
-    <input class="form-control text-black" type="text" id="searchInput" placeholder="Search by Name">
-    
-    <!-- The tooltip-like list -->
-    <div id="nameTooltip" >
-      <div class="scrollable-tooltip">
-      {% for name in name_list %}
-        <div class="tooltip-item">{{name}}</div>
-        {% endfor %}
-        <div class="tooltip-item ">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-        <div class="tooltip-item">Abi</div>
-    </div>
-    </div>
-
-
-    <div class="container-fluid" id="container-to-print"> 
-      <div class="row pt-5">
-        <center>
-          <div class="col-md-4">
-            {% if company.company_name != None %}
-            <a class="text" style="font-size: 1rem; color: white;">{{ company.company_name }}</a><br>
-            {% else %}
-            <a class="text" style="font-size: 1rem; color: white;">Add Company</a><br>
-            {% endif %}
-            <a class="text" style="font-size: 1.5rem; color: white;">Sale Order</a><br>
-            <h5 class="text" id="selectedEndDate"></h5><br>
-          </div>
-        </center>   
-      </div> 
-      
-      <div id="demo"><p></p></div>
-
-  <div style="overflow-x: auto; overflow-x: hidden;">
-    <div class="row pt-2">
-      <div class="col-sm-10 col-md-11 col-lg-12">
-        <table class="table text-white" id="myTable" style="width: 100%;">
-          <thead>
-            <tr>
-              <th>DATE 
-              </th>
-              <th>ORDER NO 
-              </th>
-              <th>NAME 
-              </th>
-              <th>DUE DATE 
-              </th>
-              <th>STATUS 
-              </th>
-
-              <th>TOTAL 
-              </th>
-              <th>ADVANCE 
-              </th>
-              <th>BALANCE 
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {% for d in data %}
-            <tr>
-              <td>{{ d.sales_date }}</td>
-              <td>{{ d.sales_no }}</td>
-              <td>{{ d.customer.customerName}}</td>
-              <td>{{ d.ship_date }}</td>
-              <td>{{ d.status }}</td>
-              <td>{{ d.subtotal }}</td>
-              <td>{{ d.advance }}</td>
-              <td>{{ d.balance }}</td>
-            </tr>
-            
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>  
-
-<script>
-  function updateEndDateMin() {
-      const startDateInput = document.getElementById('fromdate');
-      const endDateInput = document.getElementById('todate');
-      
-      // Set the minimum allowed date for the end date input
-      endDateInput.min = startDateInput.value;
-  }
-</script>
-
-
-<script>
-  function ApplyDateFilter() {
-    updateEndDateMin()
-    var fromDate = new Date(document.getElementById('fromdate').value);
-    var toDate = new Date(document.getElementById('todate').value);
-
-    // Set the time part to the beginning and end of the day
-    fromDate.setHours(0, 0, 0, 0);
-    toDate.setHours(23, 59, 59, 999);
-
-    var table = document.getElementById("myTable");
-    var tr = table.getElementsByTagName("tr");
-
-    for (var i = 1; i < tr.length; i++) {
-      var row = tr[i];
-      var td = row.getElementsByTagName("td")[0]; // Assuming the date is in the first column.
-
-      if (td) {
-        var txtValue = td.textContent || td.innerText;
-        var check = new Date(txtValue);
-
-        // Set the time part of check to match the format of fromDate and toDate
-        check.setHours(0, 0, 0, 0);
-
-        if (check >= fromDate && check <= toDate) {
-          row.style.display = "";
-        } else {
-          row.style.display = "none";
         }
-      }
+
+                /* Style for the container */
+
+
+        /* Style for table cell */
+        .table-cell {
+            padding: 5px;
+        }
+
+                  </style>
+    
+<section >
+  <div class="row fixed-top  " style="top: 7rem; margin-left: 15rem;position: fixed; ">
+   
+  <div>
+    <div class="col-md-12"  style="width: 100%;">
+      <div class="row">
+        
+        <div class="col-md-3" style="border-right: 1px solid white; overflow-y: scroll; height: 610px;">
+          <div class="row">
+            <a class="text-white" style="font-size: 1.5rem;">Sales Order</a>
+            <div class="col-md-12">
+            <input type="text" id="search" class="form-control bg-light text-dark mt-2 " placeholder="Search.." autocomplete="off">
+          </div>
+          <div class="col-md-2">
+            <div class="dropdown">
+              <a class="btn text-center px-4 pt-1 mt-1 btn-outline-warning" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" style="width: 4rem;height: 2rem;">
+                <i  class="fas fa-sort m-1"></i>
+              </a>
+              <div class="dropdown-menu m-1">
+                <a class="dropdown-item" href="{% url 'sales_order_det' sale.id %}">All</a>
+                <a class="dropdown-item" onclick="sortTable()">Customer Name</a>
+                <a class="dropdown-item" onclick="sortTablebal()">Total</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6"></div>
+          <div class="col-md-4">              
+            <a style="width: 4rem;height: 2rem; width: fit-content;" class="btn btn btn-outline-warning text-right px-3 py-2 mt-1" href="{% url 'create_sales_order' %}"><i class="fa fa-plus "></i>New</a>
+          </div>
+          </div>   
+
+          <div class="scrollable-table">
+            <table class="table  text-white" id="myTable">
+            
+              <tbody>
+                {% for i in sale_order %}
+       
+                <tr class="clickable" id="{{i.id}}">
+       
+                  <td class="justify-content-between align-items-center ">
+                    {{i.sales_no}}<br><br>
+                        <label>{{i.customer.customerName}} </label>
+                  </td>
+                  <td><br><br>
+                      <label class="text-end d-block">₹{{i.grandtotal}}</label>
+                      
+                  </td>
+                </tr>
+               
+                {% endfor %}
+               
+              </tbody>
+            </table>
+          </div>
+
+       
+        </div> 
+
+        <div class="col-md-9 ml-1  mb-5 " id="overviewdiv">
+          <div class="row">
+              <div class="col-md-7" >
+                <a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a>
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6" >
+              <a class="btn" style="background-color: chocolate; margin-right: 2vh;"><i class="fas fa-eye"></i> Overview</a>
+              <a class="btn" id="transactionbtn" onclick="totemplate()" style="background-color: white; color: black; margin-right: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
+
+            </div>
+            
+            <div class="col-md-6" style="text-align: right;">
+              {% if sale.status == "draft" %}
+              <a href="{% url 'convert_view' sale.id %}" class="btn btn-outline-warning" >
+                  <i class="fa fa-exchange" aria-hidden="true"></i>Convert
+                </a>
+              {% endif %}
+                <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
+                  <button class="btn btn-outline-warning"  title="Edit"><i class="fas fa-edit"></i></button>
+                </a>
+                <a class="text-dark"     data-toggle="dropdown"  >
+                  <button class="btn btn-outline-warning "  title="Share"><i class="fas fa-share"></i></button>
+               </a>
+               <div class="dropdown-menu " >
+                 <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
+                 <a class="dropdown-item" href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share">WhatsApp</a>
+               </div>
+               <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
+                <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
+              </a>
+              <a  class="  text-dark"  onclick="exportToPDF()">
+                <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+              </a>
+
+              <a class=" text-dark"  onclick="printSelectedArea()"  >
+                <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
+                </button> 
+               </a>
+              </div>
+          </div><br>
+          <div class="row">
+            <div class="tab-content" style="background-color: rgba(252, 236, 217, 0.8); ">
+              <div class="tab-pane fade active show" id="overview" role="tabpanel" aria-labelledby="home-tab">
+                  <div class="row">
+                      <div class="col-md-6" id="orderinfo" 
+                      style="box-shadow: 5px 5px 10px rgb(45, 45, 45); background-color: #ffddb0; 
+                      border-radius: 1vh; overflow-y: scroll;height: 500px; margin-top: -2vh; " >
+                          <div class="overview text-dark" style="background-color: #ffddb0;" ><br>
+                              <h2 class="text-dark" style="text-transform: uppercase; font-size: x-large;"><b>Sales Order</b></h2>
+                              
+                              <table class="table-responsive saleordertable" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                  <tr>
+                                    <td>Sale Order No</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_no}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Reference</td>
+                                    <td>:</td>
+                                    <td>{{sale.reference}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Name</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Customer Mail</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.customerEmail}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>GST Treatment</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTTreatment}}</td>
+                                  </tr>
+                                  {% if sale.customer.GSTIN %}
+                                  <tr>
+                                    <td>GST Number</td>
+                                    <td>:</td>
+                                    <td>{{sale.customer.GSTIN}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Source of Supply</td>
+                                    <td>:</td>
+                                    <td>{{sale.sos}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Sale Order Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.sales_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Expiry Date</td>
+                                    <td>:</td>
+                                    <td>{{sale.ship_date}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Term</td>
+                                    <td>:</td>
+                                    <td>{{sale.terms.Terms}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Payment Method</td>
+                                    <td>:</td>
+                                    <td>{{sale.pay_method}}</td>
+                                  </tr>
+                                  {% if sale.pay_method == 'upi' %}
+                                  <tr>
+                                    <td>UPI ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.upi_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method == 'cheque' %}
+                                  <tr>
+                                    <td>Cheque ID</td>
+                                    <td>:</td>
+                                    <td>{{sale.cheque_id}}</td>
+                                  </tr>
+                                  {% elif sale.pay_method != 'cash' %}
+                                  <tr>
+                                    <td>Bank Account</td>
+                                    <td>:</td>
+                                    <td>{{bank.ac_no}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Subtotal</td>
+                                    <td>:</td>
+                                    <td>{{sale.subtotal}}</td>
+                                  </tr>
+                                  {% if sale.igst != '0.00' %}
+                                  <tr>
+                                    <td>IGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.igst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.cgst != '0.00' %}
+                                  <tr>
+                                    <td>CGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.cgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  {% if sale.sgst != '0.00' %}
+                                  <tr>
+                                    <td>SGST</td>
+                                    <td>:</td>
+                                    <td>{{sale.sgst}}</td>
+                                  </tr>
+                                  {% endif %}
+                                  <tr>
+                                    <td>Tax Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.t_tax}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Shipping Charge</td>
+                                    <td>:</td>
+                                    <td>{{sale.sh_charge}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Adjustment</td>
+                                    <td>:</td>
+                                    <td>{{sale.adjust}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Total Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.grandtotal}}</td>
+                                  </tr>
+                                  {% if sale.advance != 0.0 %}
+                                  <tr>
+                                    <td>Advance</td>
+                                    <td>:</td>
+                                    <td>{{sale.advance}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Balance Amount</td>
+                                    <td>:</td>
+                                    <td>{{sale.balance}}</td>
+                                  </tr>
+                                  {% endif %}
+                                </tbody>
+                              </table> 
+                          </div>
+                      </div>
+                      <div class="col-md-6" >
+                          <!-- <h2 class="p-2 text-dark mt-4" for=""></h2> -->
+                          <div class="card" id="productinfo" style="background-color:#8b3131; padding:1rem; margin-top: -2vh;" >
+                              <div class="row" style="overflow-y: scroll;height: 500px; margin-top: -2vh; " >
+                                  <div class="card-title mb-4 mt-3" style="font-size: x-large;"><b>PRODUCT INFORMATION</b>
+                                  </div>
+                                      <table class="table table-responsive" id="producttable">
+                                        <tbody id="productbody">
+                                          {% for i in saleitem %}
+                                          <tr>
+                                            <td>Product Name</td>
+                                            <td>:</td>
+                                            <td>{{i.product}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>HSN Number</td>
+                                            <td>:</td>
+                                            <td>{{i.hsn}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Quantity</td>
+                                            <td>:</td>
+                                            <td>{{i.quantity}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Rate</td>
+                                            <td>:</td>
+                                            <td>{{i.rate}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Discount</td>
+                                            <td>:</td>
+                                            <td>{{i.desc}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Product Tax</td>
+                                            <td>:</td>
+                                            <td>{{i.tax}}</td>
+                                          </tr>
+                                          <tr >
+                                            <td>Product Total</td>
+                                            <td>:</td>
+                                            <td>{{i.total}}
+                                            </td>
+                                          </tr>
+                                          <tr style="border-bottom: solid; border-bottom-width: thin; ">
+                                            <td></td>
+                                          </tr>
+                                          {% endfor %}
+                                        </tbody>
+                                      </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+              </div>
+
+
+             
+          </div>
+          </div>
+          
+        </div>
+        
+        <div class="col-md-9" id="templatediv" style="display: none;">
+          <div class="row" >
+            <div class="col-md-7" >
+              <a class="text-white" style="font-size: 1.5rem;"><h2>{{sale.sales_no}}</h2></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6" >
+              <a class="btn" id="overviewbtn" onclick="tooverview()" style="background-color: white; color: black;"><i class="fas fa-eye"></i> Overview</a>
+              <a class="btn" style="background-color: chocolate; margin-left: 2vh;"><i class="fas fa-file-alt"></i>  Template</a>
+
+            </div>
+
+            <div class="col-md-6" style="text-align: right;">
+              {% if sale.status == "draft" %}
+              <a href="{% url 'convert_view' sale.id %}" class="btn btn-outline-warning" style="margin-left: 2vh;"><i class="fa fa-exchange" aria-hidden="true"></i>Convert</a>
+              {% endif %}
+              <a href="{% url 'edit_sales_order' sale.id %}"  class=" text-dark" >
+                <button class="btn btn-outline-warning"  title="Edit"><i class="fas fa-edit"></i></button>
+              </a>
+              <a class="text-dark"     data-toggle="dropdown"  >
+                <button class="btn btn-outline-warning "  title="Share"><i class="fas fa-share"></i></button>
+             </a>
+             <div class="dropdown-menu " >
+               <a class="dropdown-item" href="{% url 'emailattachment' %}">GMAIL</a>
+               <a class="dropdown-item" href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share">WhatsApp</a>
+             </div>
+
+             <a href="{% url 'delet_sales' sale.id %}" class="  text-dark" >
+              <button class="btn btn-outline-warning"  title="Delete"><i class="fas fa-trash-alt"></i></button>
+            </a>
+            <a  class="  text-dark"  onclick="exportToPDF()">
+              <button class="btn btn-outline-warning"  title="Pdf"><i class="fas fa-file-pdf-o"></i></button>
+            </a>
+            <a class=" text-dark"  onclick="printSelectedArea()"  >
+              <button class="btn btn-outline-warning"  title="Print"><i class="fas fa-print"></i>
+              </button> 
+             </a>
+            </div>
+          </div>
+
+          
+             
+
+
+             <div class="mt-4" style="overflow-y: scroll;height: 600px;width: 100%; margin-left: -1vh">
+         
+               <section id="selected-area" style="background-color: rgb(255, 221, 176);"class=" p-2 m-2">
+                   <header style="	background-color: #8b3131;border-radius: 1rem;">
+                       <div class="logo ">
+                           <img class="ml-2" width="100rem" style="border-radius: 50%;" src="{% static 'images/zlogo.png' %}" alt="Company Logo">
+                       </div>
+                       <div style="background: #8b3131;color: white;" class="company-info">
+                           <h2 class="text-white">{{company.company_name}}</h2>
+                           <p class="text-white"> {{company.address}}<br>{{comp.city}}</p><p> {{company.contact_number}}</p><p>{{company.company_email}}</p>
+                       </div>
+                   </header>
+                   <div class="invoice-box">
+                       <h1 class="text-dark">SalesOrder</h1>
+                       <div class="invoice-header">
+                           <div class="invoice-details text-dark">
+                            <table>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Sales No#</td>
+                                  <td class="table-cell text-black" style="border: none;">:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.sales_no}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Sales Order Date</td>
+                                  <td class="table-cell text-black" style="border: none;">:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.sales_date}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Expiry Date</td>
+                                  <td class="table-cell text-black" style="border: none;">:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.ship_date}}</td>
+                              </tr>
+                            </table>
+                           </div>
+                          <div class="client-details" style="width: 50vh;">
+                            <table>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;"><b>{{sale.customer.customerName}}</b></td>
+                              </tr>
+                              {% if sale.customer.Address1 %}
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.customer.Address1}}</td>
+                              </tr>
+                              {% endif %}
+                              <tr>
+                                <td class="table-cell text-black" style="border: none;">{{sale.customer.GSTTreatment}}</td>
+                              </tr>
+                              {% if sale.customer.GSTIN %}
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.customer.GSTIN}}</td>
+                              </tr>
+                              {% endif %}
+                            </table>
+                          </div>
+                       </div>
+                       
+                       <table >
+                           <thead >
+                               <tr>
+                                 
+                                 <th id="th" style="text-align: center;">Product</th>
+                                 <th id="th" style="text-align: center;">HSN</th>
+                                   <th id="th" style="text-align: center;">Quantity</th>
+                                   <th id="th" style="text-align: center;">Price</th>
+                                   <th id="th" style="text-align: center;">Discount</th>
+                                   <th id="th" style="text-align: center;">Tax %</th>
+                                   <th id="th" style="text-align: center;"> Total</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                             {% for i in saleitem %}
+                             <tr style="color: black;">
+                               <td style="text-align: center;">{{i.product}}</td>
+                               <td style="text-align: center;">{{i.hsn}}</td>
+                               <td style="text-align: center;">{{i.quantity}}</td>
+                               <td style="text-align: center;">{{i.rate}}</td>
+                               <td style="text-align: center;">{{i.desc}}</td>
+                               <td style="text-align: center;">{{i.tax}}</td>
+                               <td style="text-align: center;">{{i.total}}</td>
+                             </tr>
+                             {% endfor %}
+ 
+                         </tbody>
+                       </table><br>
+                       
+                       <div class="invoice-total" >
+                        <div class="row">
+                          <div class="col-md-7"></div>
+                          <div class="col-md-4">
+                            <table style="margin-left: 10vh;">
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Subtotal</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;" ><b>{{sale.subtotal}}</b></td>
+                              </tr>
+                              {% if sale.igst != '0.00' %}
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">IGST</td>
+                                  <td class="table-cell text-black" style="border: none;">:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.igst}}</td>
+                              </tr>
+                              {% else %}
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">SGST</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.sgst}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">CGST</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.cgst}}</td>
+                              </tr>
+                              {% endif %}
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Tax Amount</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.t_tax}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Shipping Charge</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.sh_charge}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Adjustment</td>
+                                  <td class="table-cell text-black" style="border: none;" >:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.adjust}}</td>
+                              </tr>
+                              <tr>
+                                  <td class="table-cell text-black" style="border: none;">Total</td>
+                                  <td class="table-cell text-black" style="border: none;">:</td>
+                                  <td class="table-cell text-black" style="border: none;">{{sale.grandtotal}}</td>
+                              </tr>
+                            </table>
+                          </div>
+
+                        </div>
+
+                       </div>
+                      
+                   </div>
+ 
+                   <footer class="mb-5">
+                       <p class="text-dark">&copy; Zho Books 2023 | Info park kakkanad kochi, Ernamkulam, kerala India 12345 | Phone: (123) 456-7890 | Email: info@zohodjango.com</p>
+                   </footer>
+                   <div class="mt-5 mb-5">
+       
+                   </div>
+                  </section>
+ 
+       
+ 
+            </div>
+ 
+ 
+               </div>
+               
+          </div>
+          
+                
+        </div>
+     
+        </div>
+     
+       </div>
+  </div>
+ 
+   </div>
+  
+ 
+
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</section>
+
+<script>
+      function exportToPDF(){
+        var content = document.getElementById('selected-area');
+        html2pdf()
+        .from(content)
+        .save('sales_order.pdf')
     }
-    // Update the selectedEndDate div
-    var start = fromDate;
-    var end = toDate;
-    document.getElementById('selectedEndDate').textContent = 'From ' + start.toDateString() + ' to ' + end.toDateString();
-  }
+</script>
 
-  // Add event listeners to the date inputs to trigger ApplyDateFilter on change
-  document.getElementById('fromdate').addEventListener('change', ApplyDateFilter);
-  document.getElementById('todate').addEventListener('change', ApplyDateFilter);
+  <script>
+    // Get the div element by its ID
+    var divElement = document.getElementById("orderinfo");
 
-  // Initialize the filter when the page loads (optional)
-  ApplyDateFilter();
+    // Get the height of the div using offsetHeight
+    var divHeight = divElement.offsetHeight;
 
-  // Function to show full table when no dates are selected
-  function ShowFullTable() {
-    var table = document.getElementById("myTable");
-    var tr = table.getElementsByTagName("tr");
+    var divElement = document.getElementById("productinfo");
 
-    for (var i = 1; i < tr.length; i++) {
-      tr[i].style.display = "";
-    }
+        // Set the height of the div
+        divElement.style.height = `${divHeight}px`;
 
-    // Reset the selectedEndDate div
-    document.getElementById('selectedEndDate').textContent = '';
-  }
-
-  // Call the function to show full table initially
-  ShowFullTable();
+    // Log the height to the console
 </script>
 
 <script>
-  function printPageContent(){
-
-      var printContents = document.getElementById("container-to-print").innerHTML;
-
-var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+  function printSelectedArea(area){
+      
+      var printContents = document.getElementById("selected-area").innerHTML;
+      document.getElementById("selected-area").style.backgroundColor = "white"
+var $printerDiv = $('<div class="printContainer bg-white"></div>'); // create the div that will contain the stuff to be printed
 $printerDiv.html(printContents); // add the content to be printed
 $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
 
 window.print(); // call print
 $printerDiv.remove(); // remove the div
 $('body').removeClass("printingContent");
+      
   }
 </script>
 
+<script>
+
+const rows = document.querySelectorAll('.clickable');
+
+rows.forEach(row => {
+    row.addEventListener('click', () => {
+      var currentURL = window.location.href
+      const rowId = row.id;
+      var newURL = currentURL.replace(/\d+$/, rowId);
+      window.location.href = newURL;
+    });
+});
 
 
 
-  <script>
-    function exportAsXLS() {
-        const data = [
-            ['DATE', 'ORDER NO', 'NAME', 'DUE DATE', 'STATUS', 'TYPE', 'TOTAL', 'ADVANCE', 'BALANCE'],
-            ['Data 1', 'Data 2', 'Data 3', 'Data 4', 'Data 5', 'Data 6', 'Data 7', 'Data 8', 'Data 9'],
-            // Add more rows as needed
-        ];
-    
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    
-        // Save the XLS file
-        XLSX.writeFile(wb, 'sales_order.xlsx');
-    }
-    
-    function exportAsPDF() {
-      const container = document.getElementById('container-to-print');
-    
-      // change colour 
-      container.style.backgroundColor = 'white';
-    
-      const textWhiteElements = container.querySelectorAll('.text');
-      textWhiteElements.forEach(element => {
-        element.style.color = '#000000';
-      });
-
-      const table_rows = document.querySelectorAll('#myTable tbody tr');
-
-      table_rows.forEach(row => {
-            row.style.backgroundColor = 'white'; 
-            row.style.color = 'black'; 
-        });
-    
-      const pdfOptions = {
-        margin: 0,
-        filename: 'Sales_order.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' },
-      };
-    
-      // Generate PDF from the container
-      html2pdf().from(container).set(pdfOptions).save().then(() => {
 
 
-        container.style.backgroundColor = 'transparent';
+</script>
 
-        // Restore the original background color'
-      textWhiteElements.forEach(element => {
-        element.style.color = 'white'; 
-      });
+<script>
+  function totemplate(){
+    document.getElementById('templatediv').style.display = 'block'
+    document.getElementById('overviewdiv').style.display = 'none'
+  }
 
-      table_rows.forEach(row => {
-            row.style.backgroundColor = 'transparent'; 
-            row.style.color = 'white'; 
-        });
-    
+  function tooverview(){
+    document.getElementById('templatediv').style.display = 'none'
+    document.getElementById('overviewdiv').style.display = 'block'
+  }
+</script>
 
-      });
-    }
-    
+<script>
+  var $rows = $('#myTable tbody tr');
+  $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      
+      $rows.hide().filter(function() {
+          var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+          return ~text.indexOf(val);
+      }).show();
+  });
+
   </script>
 
 <script>
-  const searchInput = document.getElementById('searchInput');
-  const nameTooltip = document.getElementById('nameTooltip');
-  const dataTable = document.getElementById('myTable');
-  const tableBody = dataTable.getElementsByTagName('tbody')[0];
-  const initialTableData = [...tableBody.querySelectorAll('tr')];
+  // Function to sort the table by the selected column
+  function sortTable() {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
 
-  searchInput.addEventListener('click', showTooltip);
-  searchInput.addEventListener('keyup', filterTooltip);
-  nameTooltip.addEventListener('click', filterTable);
+      while (switching) {
+          switching = false;
+          rows = table.rows;
 
-  function showTooltip(){
-      nameTooltip.style.display = 'block';
-  }
+          for (i = 0; i < rows.length - 1; i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("label")[0];
+              y = rows[i + 1].getElementsByTagName("label")[0];
 
-  function filterTooltip() {
-            const searchText = searchInput.value.toLowerCase();
-    
-            // Show the tooltip if there's text in the input
-            if (searchText.length > 0) {
-                nameTooltip.style.top = (searchInput.offsetTop + searchInput.offsetHeight) + 'px';
-                nameTooltip.style.left = searchInput.offsetLeft + 'px';
-            } else {
-              nameTooltip.style.display = 'block';
-                // If search input is empty, restore the initial table
-                restoreInitialTable();
-            }
-    
-            // Filter the tooltip items based on the input
-            const items = nameTooltip.getElementsByClassName('tooltip-item');
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const itemName = item.textContent.toLowerCase();
-                if (itemName.includes(searchText)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        }
-
-  function filterTable(event) {
-      if (event.target.classList.contains('tooltip-item')) {
-        searchInput.value = event.target.textContent
-        const selectedName = event.target.textContent.toLowerCase();
-        document.getElementById("demo").innerHTML = selectedName
-
-          const rows = tableBody.getElementsByTagName('tr');
-
-          // Loop through table rows and hide/show based on selected name
-          for (let i = 0; i < rows.length; i++) {
-              const row = rows[i];
-              const cell = row.getElementsByTagName('td')[2];
-              if (cell.textContent.slice(3,).toLowerCase() === selectedName) {
-                  row.style.display = 'table-row';
-              } else {
-                  row.style.display = 'none';
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                  shouldSwitch = true;
+                  break;
               }
           }
 
-          // Hide the tooltip after selecting
-          nameTooltip.style.display = 'none';
+          if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+          }
       }
   }
+  function sortTablebal() {
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("myTable");
+      switching = true;
 
-  function restoreInitialTable() {
-      // Restore all rows to the initial state
-      initialTableData.forEach((row) => {
-          row.style.display = 'table-row';
-      });
-  }
+      while (switching) {
+        switching = false;
+        rows = table.rows;
 
-  // Close the tooltip when clicking outside of it
-document.addEventListener("click", function(event) {
-  const tooltip = document.getElementById("nameTooltip");
-  if (event.target != tooltip) {
-    if(event.target != document.getElementById("searchInput")){
+        for (i = 0; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = parseFloat(rows[i].getElementsByTagName("td")[1].textContent.replace('₹', '').trim());
+            y = parseFloat(rows[i + 1].getElementsByTagName("td")[1].textContent.replace('₹', '').trim());
 
-      tooltip.style.display ="none";
+            if (x > y) {
+                shouldSwitch = true;
+                break;
+            }
+        }
+
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
     }
   }
-});
+
 </script>
 
-{% endblock content %}
 
+
+{% endblock %}
