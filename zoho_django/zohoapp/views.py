@@ -3215,6 +3215,7 @@ def create_sales_order(request):
     }
     return render(request,'create_sales_order.html',context)
 
+
     
 @login_required(login_url='login')
 def add_customer_for_sorder(request):
@@ -3358,6 +3359,15 @@ def hsndata(request):
     data = {'hsn_data': item.hsn}
     return JsonResponse(data)
 
+def terms_dropdowns(request):
+    terms = payment_terms.objects.all()
+    term_data = []
+    day_data = []
+    for i in terms:
+        term_data.append(i.Terms)
+        day_data.append(i.Days)
+    data = {'term_data': term_data,"day_data":day_data}
+    return JsonResponse(data)
 
     
 @login_required(login_url='login')

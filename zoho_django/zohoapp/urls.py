@@ -122,6 +122,7 @@ urlpatterns = [
     path('termdata',views.termdata,name='termdata'),
     path('bankdata',views.bankdata,name='bankdata'),
     path('hsndata',views.hsndata,name='hsndata'),
+    path('terms_dropdowns',views.terms_dropdowns,name='terms_dropdowns'),
     path('convert_to_invoice/<int:pk>',views.convert_to_invoice,name='convert_to_invoice'),
     path('convert_view/<int:pk>',views.convert_view,name='convert_view'),
     path('view_sales_order',views.view_sales_order,name='view_sales_order'),

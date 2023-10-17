@@ -1,9 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WhatsApp Share Example</title>
+    <title>Remove Duplicate Options</title>
 </head>
 <body>
-    <a href="whatsapp://send?text=Check out this website: [Your URL]" data-action="share/whatsapp/share">Share via WhatsApp</a>
+    <select id="mySelect">
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="2">Duplicate Option 2</option>
+        <option value="3">Option 3</option>
+        <option value="3">Duplicate Option 3</option>
+        <option value="4">Option 4</option>
+    </select>
+    <button onclick="removeDuplicates()">Remove Duplicates</button>
+
+    <script>
+        function removeDuplicates() {
+            const select = document.getElementById("mySelect");
+            const uniqueOptions = {};
+            const optionsToRemove = [];
+
+            for (let i = 0; i < select.options.length; i++) {
+                const option = select.options[i];
+                if (uniqueOptions[option.value]) {
+                    optionsToRemove.push(option);
+                } else {
+                    uniqueOptions[option.value] = true;
+                }
+            }
+
+            // Remove the duplicate options
+            for (const optionToRemove of optionsToRemove) {
+                select.removeChild(optionToRemove);
+            }
+        }
+    </script>
 </body>
 </html>

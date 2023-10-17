@@ -96,8 +96,24 @@
   }
 
 
+  .itm option{
+    color: black;
+  }
 
+  #customer_sel option{
+    color: black;
+  }
    
+   #termadd{
+    background-color: chocolate; 
+    color: black; 
+    margin-left: 2vh; 
+    font-size: large; padding-top: 1vh;
+   }
+
+   #pay_term option{
+    color: black;
+   }
 </style>
 
 
@@ -126,7 +142,7 @@
       </div>
       <div class="col-md-6 d-flex">
         <select name="cx_name" id="customer_sel" class="form-control bg-light text-dark" style="width: 91%;">
-          <option value="" hidden></option>
+          <option value="" hidden selected></option>
           {% for cust in c %}
           <option value="{{cust.id}}" data-pos="{{cust.placeofsupply}}" id="crt_cust">{{cust.customerName}}</option> 
           {% endfor %}
@@ -262,7 +278,7 @@
               <option value="{{p.id}}">{{p.Terms}}</option>
             {% endfor %}
           </select>
-          <a data-toggle="modal" data-target="#newpayment" class="btn" style="background-color: chocolate; color: black; margin-left: 2vh; font-size: large; padding-top: 1vh;">+</a>
+          <a data-toggle="modal" data-target="#newpayment" class="btn" id="termadd">+</a>
         </div> 
       </div>
     </div>  
@@ -316,7 +332,6 @@
         <input type="text" class="form-control text-black" name="bnk_id" id="bnk_id" readonly>
       </div>
     </div>  
-
     <div class="row mt-2">
       <div class="col-md-12 mt-3">
         <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
@@ -518,7 +533,7 @@
         <!-- Rest of your modal content here -->
         <form id="modalForm"  action="" onsubmit="return false">
           <div id="terms-container">
-            <div class="form-row">
+            <div class="form-row" id="termdrop">
               {% for p in pay %}
                 <div class="col-6" style="background-color: #191c24;">
                   <input type="text" value="{{p.Terms}}" class="form-control" placeholder="Terms" style="background-color: #191c24; color: white;">
@@ -1503,6 +1518,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
+
+
 <script>
   function changeitem(id_str){
     itemfunction(id_str)
@@ -1658,16 +1675,17 @@ addTermRowBtn.addEventListener('click', () => {
   // Create a new row div
   const newRow = document.createElement('div');
   newRow.classList.add('form-row');
+  newRow.id = "newtermrow";
 
   // Create the first input field for the new row
   const termsInput = document.createElement('div');
   termsInput.classList.add('col-6');
   const termsField = document.createElement('input');
   termsField.type = 'text';
-  termsField.name = 'term';
+  termsField.name = 'terms';
   termsField.placeholder = 'Terms';
   termsField.classList.add('form-control');
-  termsField.classList.add('text-black');
+  termsField.classList.add('text-white');
   termsField.style.backgroundColor = "#191c24";
   termsInput.appendChild(termsField);
   newRow.appendChild(termsInput);
@@ -1680,7 +1698,7 @@ addTermRowBtn.addEventListener('click', () => {
   daysField.name = 'days';
   daysField.placeholder = 'No of Days';
   daysField.classList.add('form-control');
-  daysField.classList.add('text-black');
+  daysField.classList.add('text-white');
   daysField.style.backgroundColor = "#191c24";
   daysInput.appendChild(daysField);
   newRow.appendChild(daysInput);
@@ -1815,14 +1833,22 @@ termsContainer.addEventListener('click', (event) => {
 
 //---payment terms
 
+$(document).on("click", "#termadd", function() {
+
+});
+
+
 
 $(document).on("click", "#payment", function() {
   var array1 = [];
   var array2 = [];
+  array1.length = 0;
+  array2.length = 0;
   $("input:text[name=terms]").each(function() {
     array1.push($(this).val());
-   
+    
   });
+
   $("input:text[name=days]").each(function() {
     array2.push($(this).val());
   });
@@ -1846,12 +1872,78 @@ $(document).on("click", "#payment", function() {
       const termsField = document.createElement('option');
       termsField.innerHTML = data;
       pay.appendChild(termsField);
-   
+
+    document.getElementById("modalForm").reset();
+    reloadterms()
       
   // Iterate through the data and create options
     },
   });
 });
+
+function reloadterms(){
+  $.ajax({
+    url: "{% url 'terms_dropdowns' %}",
+    type: "GET",
+    success: function(response) {
+      term_data = response.term_data
+      day_data = response.day_data
+      
+      var term_container = document.getElementById('terms-container');
+      var dropdow = document.getElementById('termdrop');
+      term_container.removeChild(dropdow);
+      
+      new_row = `<div class="form-row" id="termdrop"></div>`
+      $('#terms-container').append(new_row)
+      
+      for(let i=0; i<term_data.length;i++){
+        new_row = `      
+        <div class="col-6" style="background-color: #191c24;">
+          <input type="text" value="${term_data[i]}" class="form-control" style="background-color: #191c24; color: white;">
+          </div>
+          <div class="col-6">
+            <input type="text" value="${day_data[i]}" class="form-control" style="background-color: #191c24; color: white;">
+            </div>`
+            $('#termdrop').append(new_row)
+          }
+          
+          new_row = `      
+          <div class="col-6" style="background-color: #191c24;">
+            <input type="text"  class="form-control" style="background-color: #191c24; color: white;" placeholder="Terms" name="terms">
+            </div>
+            <div class="col-6">
+              <input type="text" class="form-control" style="background-color: #191c24; color: white;" placeholder="No of Days" name="days">
+              </div>`
+          $('#termdrop').append(new_row)
+
+          var termdroprow = document.getElementById('newtermrow');
+          term_container.removeChild(termdroprow);
+
+          let select = document.getElementById("pay_term");
+
+          while (select.options.length > 0) {
+          select.remove(0);
+          }
+          
+          for(let i=0; i<term_data.length;i++){
+                      // Create a new option element
+          let newOption = document.createElement("option");
+          newOption.text = term_data[i];
+          newOption.value = day_data[i]; // Set a value for the new option
+
+          // Append the new option to the select field
+          select.appendChild(newOption);
+
+          var dropdow = $('#pay_term');
+     
+          dropdow.append($('<option value="" selected hidden>Select Payment Term</option>'));
+          }
+    },
+    error: function(xhr, status, error) {
+    console.error(xhr.responseText);
+    }
+  });
+}
 
 //------customer create 
 
@@ -1947,8 +2039,9 @@ function reloadcustomer() {
     csrfmiddlewaretoken: '{{ csrf_token }}',
 
     success: function(data) {
-      var dropdow = $('#customer_sel');
-     
+      var dropdow = $('#termdrop');
+      dropdown.empty();
+      dropdow.append($('<option value="" hidden selected></option>'));
       $.each(data, function(key, value) {
           dropdow.append($('<option></option>').attr('value', key).text(value).val(key));
       });
@@ -2124,8 +2217,9 @@ function reloadItem() {
 
     success: function(data) {
       var dropdown = $('.itm');
-      
+      dropdown.empty();
 
+      dropdown.append($('<option value="" selected hidden>Select Item</option>'));
       $.each(data, function(key, value) {
           dropdown.append($('<option></option>').attr('value', key).text(value).val(value));
       });
