@@ -363,7 +363,7 @@
                   <td>
                       <div ><select
                               class='form-control border-0 bg-transparent text-white border-0 item_select itm'
-                              name='item[]' id='item{{forloop.counter}}'  onchange="changeitem(this.id)">
+                              name='item[]' id='item{{forloop.counter}}'  onchange="itemfunction(this.id)">
                               <option selected value="{{i.product}}" hidden>{{i.product}}</option>
                               {% for j in itm %}
                                 <option class="text-black" value="{{j.Name}}">{{ j.Name  }} </option>
@@ -389,7 +389,7 @@
                           value='{{i.desc}}'>
                   </td>
                   <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax{{forloop.counter}}'
-                          class='form-control border-0 bg-transparent text-white  text-right border-0 tax' onchange="changeDateInput()">
+                          class='form-control border-0 bg-transparent text-white  text-right border-0 tax' onchange="toggleDateInput()">
                          
                           {% if i.sale.sos == '[KL] Kerala' %}
                           <option value="{{i.tax}} " hidden>{{i.tax}}.0%  GST({{i.tax}}%)</option>
@@ -1607,16 +1607,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <script>
-  function changeitem(id_str){
-    itemfunction(id_str)
-  }
-
-  function changeDateInput(){
-    toggleDateInput()
-  }
-</script>
-
-<script>
   $(document).ready( function () {
    var customer = $('#customer_sel').val();
    $.ajax({
@@ -1659,10 +1649,10 @@
 
 
 <script>
-  function qtychange(id){
-    digit = id.charAt(id.length - 1)
+  function qtychange(id_str){
+    id = id_str.split("item")[1]
     var qty = $(`#${id}`).val();
-    var avl = document.getElementById(`stock_data${digit}`).innerHTML;
+    var avl = document.getElementById(`stock_data${id}`).innerHTML;
     if(parseInt(qty)>parseInt(avl)){
       alert("Entered quantity greater than available quantity");  
       location.reload();
@@ -2620,7 +2610,7 @@ function calculateGrandTotal() {
       <tr id='row${rowCount}'>
         <td>
           <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="changeitem(this.id)">
+            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
               <option value=" " selected disabled hidden>Select Item</option>
               {% for i in itm %}
                 <option class="text-black" value="{{i.Name}}">{{ i.Name }}</option>
@@ -2648,7 +2638,7 @@ function calculateGrandTotal() {
         </td>
         
         <td style="width: 22%;" class='text-right'>
-          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="changeDateInput()">
+          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
             <optgroup class="text-center text-black" label="GST">
                             <option class="text-black" value="0">0% GST(0%)</option>
                             <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -2945,7 +2935,7 @@ function toggleDateInput() {
 
 <script>
   function itemfunction(id_str){
-    id = id_str.charAt(id_str.length-1)
+    id = d_str.split("item")[1]
 
           select = $(`#item${id}`).val();
           customer = $('#customer_sel').val();

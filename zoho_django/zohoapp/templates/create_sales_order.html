@@ -332,6 +332,8 @@
         <input type="text" class="form-control text-black" name="bnk_id" id="bnk_id" readonly>
       </div>
     </div>  
+
+    <div id="demo"><p></p></div>
     <div class="row mt-2">
       <div class="col-md-12 mt-3">
         <table class="table table-bordered table-responsive" id="item_table" onclick='toggleDateInput()'>
@@ -350,7 +352,7 @@
           <tbody id="item_table_body">
             <tr id="row1">
               <td>
-                <select class='form-control border-0 bg-transparent text-white item_select itm' name='item[]' id='item1' onchange="changeitem(this.id)">
+                <select class='form-control border-0 bg-transparent text-white item_select itm' name='item[]' id='item1' onchange="itemfunction(this.id)">
                   <option value="" selected hidden>Select Item</option>
                   {% for i in itm %}
                     <option class="text-black" value="{{i.Name}}">{{ i.Name}} </option>
@@ -375,7 +377,7 @@
                   value='0'>
               </td>
               <td style="width: 22%;" class='text-right '> <select name='tax[]' id='tax1'
-                  class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="changeDateInput()">
+                  class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
                   <optgroup class="text-center text-black"  label="GST">
                   <option class="text-black" value="0">0% GST(0%)</option>
                   <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -1518,18 +1520,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-
-
-<script>
-  function changeitem(id_str){
-    itemfunction(id_str)
-  }
-
-  function changeDateInput(){
-    toggleDateInput()
-  }
-</script>
-
 <script>
   $(document).ready(function() {
     $("#adjust").change(function() {
@@ -1590,7 +1580,7 @@
 <script>
 
   function qtychange(id_str){
-    id= id_str.charAt(id_str.length-1)
+    id= id_str.split("item")[1]
     var qty = $(`#qty${id}`).val();
     var avl = document.getElementById(`stock_data${id}`).innerHTML;
     if(parseInt(qty)>parseInt(avl)){
@@ -2452,7 +2442,7 @@ function calculateGrandTotal() {
       <tr id='row${rowCount}'>
         <td >
           <div>
-            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="changeitem(this.id)">
+            <select class='form-control border-0 bg-transparent text-white  border-0 item_select itm' name='item[]' id='item${rowCount}' onchange="itemfunction(this.id)">
               <option value=" " selected disabled hidden>Select Item</option>
               {% for i in itm %}
                 <option  class="text-black" value="{{i.Name}}">{{ i.Name }}</option>
@@ -2480,7 +2470,7 @@ function calculateGrandTotal() {
         </td>
         
         <td style="width: 22%;" class='text-right'>
-          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="changeDateInput()">
+          <select name='tax[]'  id='tax${rowCount}' class='form-control border-0 bg-transparent text-white text-right border-0 tax' onchange="toggleDateInput()">
             <optgroup class="text-center text-black" label="GST">
                             <option class="text-black" value="0">0% GST(0%)</option>
                             <option class="text-black" value="3">3.0% GST(3%)</option>
@@ -2784,7 +2774,8 @@ function toggleDateInput() {
 <script>
 
 function itemfunction(id_str){
-    id = id_str.charAt(id_str.length-1)
+    id = id_str.split("item")[1]
+
 
           select = $(`#item${id}`).val();
           customer = $('#customer_sel').val();
